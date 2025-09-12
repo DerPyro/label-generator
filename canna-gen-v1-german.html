@@ -172,22 +172,11 @@
       });
     }
 
-    function downloadSVG() {
-      const svg = document.getElementById('etikettSVG');
-      const serializer = new XMLSerializer();
-      const source = serializer.serializeToString(svg);
-      const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "etikett.svg";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
     function downloadImage(format) {
+      const name = document.getElementById('name').value; // Den Namen aus dem Eingabefeld holen
+      const date = new Date().toISOString().split('T')[0]; // Aktuelles Datum im Format YYYY-MM-DD
+      const formattedName = `${name}_label_${date}`; // Formatierter Dateiname
+
       const svg = document.getElementById('etikettSVG');
       const serializer = new XMLSerializer();
       const source = serializer.serializeToString(svg);
@@ -206,7 +195,7 @@
         canvas.toBlob(function (blob) {
           const a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
-          a.download = `etikett.${format}`;
+          a.download = `${formattedName}.${format}`; // Verwendung des formatierten Dateinamens
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
