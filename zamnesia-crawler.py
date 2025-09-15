@@ -2,14 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 import re
-import time
+#import time
 
 BASE_URL = "https://www.zamnesia.com"
 START_URLS = [
-    "https://www.zamnesia.com/de/35-cannabissamen/295-feminisiert-hanfsamen",
-    "https://www.zamnesia.com/de/35-cannabissamen/294-autoflowering-hanfsamen",
-    "https://www.zamnesia.com/de/35-cannabissamen/296-regulare-hanfsamen",
-    "https://www.zamnesia.com/de/35-cannabissamen/297-cbd-hanfsamen"
+    #"https://www.zamnesia.com/de/35-cannabissamen/295-feminisiert-hanfsamen",
+    "https://www.zamnesia.com/de/35-cannabissamen/294-autoflowering-hanfsamen"
+    #"https://www.zamnesia.com/de/35-cannabissamen/296-regulare-hanfsamen",
+    #"https://www.zamnesia.com/de/35-cannabissamen/297-cbd-hanfsamen"
 ]
 
 def extract_percentage(text, keyword):
@@ -89,51 +89,103 @@ def scrape_strain(url):
                 range_match = re.search(r"(\d+[\.,]?\d*)\s*[-–]\s*(\d+[\.,]?\d*)", val)
                 if range_match:
                     thc = float(range_match.group(2).replace(',', '.'))
-                    print(f"⚠️  THC-Wert für '{name}': Spanne '{val}' erkannt, höchster Wert {thc} übernommen.")
+                    print(f"💬  THC-Wert für '{name}': Spanne '{val}' erkannt, höchster Wert {thc} übernommen.")
                 else:
                     match = re.search(r"(\d+[\.,]?\d*)", val)
                     if match:
                         thc = float(match.group(1).replace(',', '.'))
                     elif re.search(r"hoch", val, re.IGNORECASE):
                         thc = 20
-                        print(f"⚠️  THC-Wert für '{name}': 'hoch' erkannt und zu 20 konvertiert.")
+                        print(f"💬  THC-Wert für '{name}': 'hoch' erkannt und zu 20 konvertiert.")
                     elif re.search(r"mittel|medium", val, re.IGNORECASE):
                         thc = 10
-                        print(f"⚠️  THC-Wert für '{name}': 'mittel' erkannt und zu 10 konvertiert.")
+                        print(f"💬  THC-Wert für '{name}': 'mittel' erkannt und zu 10 konvertiert.")
                     elif re.search(r"niedrig|gering", val, re.IGNORECASE):
                         thc = 5
-                        print(f"⚠️  THC-Wert für '{name}': 'niedrig/gering' erkannt und zu 5 konvertiert.")
+                        print(f"💬  THC-Wert für '{name}': 'niedrig/gering' erkannt und zu 5 konvertiert.")
                     else:
-                        print(f"❌  Warnung: Unbekannter THC-Wert für '{name}': '{val}'")
+                        print(f"❌  Fehler: Unbekannter THC-Wert für '{name}': '{val}'")
             elif key == "cbd":
                 # Spanne wie '0-1%' erkennen
                 range_match = re.search(r"(\d+[\.,]?\d*)\s*[-–]\s*(\d+[\.,]?\d*)", val)
                 if range_match:
                     cbd = float(range_match.group(2).replace(',', '.'))
-                    print(f"⚠️  CBD-Wert für '{name}': Spanne '{val}' erkannt, höchster Wert {cbd} übernommen.")
+                    print(f"💬  CBD-Wert für '{name}': Spanne '{val}' erkannt, höchster Wert {cbd} übernommen.")
                 else:
                     match = re.search(r"(\d+[\.,]?\d*)", val)
                     if match:
                         cbd = float(match.group(1).replace(',', '.'))
                     elif re.search(r"hoch", val, re.IGNORECASE):
                         cbd = 20
-                        print(f"⚠️  CBD-Wert für '{name}': 'hoch' erkannt und zu 10 konvertiert.")
+                        print(f"💬  CBD-Wert für '{name}': 'hoch' erkannt und zu 10 konvertiert.")
                     elif re.search(r"mittel|medium", val, re.IGNORECASE):
                         cbd = 10
-                        print(f"⚠️  CBD-Wert für '{name}': 'mittel' erkannt und zu 5 konvertiert.")
+                        print(f"💬  CBD-Wert für '{name}': 'mittel' erkannt und zu 5 konvertiert.")
                     elif re.search(r"niedrig|gering", val, re.IGNORECASE):
                         cbd = 5
-                        print(f"⚠️  CBD-Wert für '{name}': 'niedrig/gering' erkannt und zu 1 konvertiert.")
+                        print(f"💬  CBD-Wert für '{name}': 'niedrig/gering' erkannt und zu 1 konvertiert.")
                     else:
-                        print(f"❌  Warnung: Unbekannter CBD-Wert für '{name}': '{val}'")
+                        print(f"❌  Fehler: Unbekannter CBD-Wert für '{name}': '{val}'")
             elif key == "genetik":
-                # Beispiel: '30% Indica / 70% Sativa'
-                indica_match = re.search(r"(\d+)%\s*Indica", val)
+                # Beispiel: '30% Indica / 70% Sativa' oder 'Sativa 35% Indica 60% Ruderalis 5%'
+                # Extrahiere alle Prozentangaben
                 sativa_match = re.search(r"(\d+)%\s*Sativa", val)
-                if indica_match:
-                    indica = int(indica_match.group(1))
-                if sativa_match:
-                    sativa = int(sativa_match.group(1))
+                indica_match = re.search(r"(\d+)%\s*Indica", val)
+                # Ignoriere Ruderalis, falls vorhanden
+                if sativa_match or indica_match:
+                    if sativa_match:
+                        sativa = int(sativa_match.group(1))
+                    if indica_match:
+                        indica = int(indica_match.group(1))
+                # Nur "Sativa" oder "Indica" als Text
+                elif re.search(r"^sativa$", val.strip(), re.IGNORECASE):
+                    sativa = 100
+                    indica = 0
+                elif re.search(r"^indica$", val.strip(), re.IGNORECASE):
+                    indica = 100
+                    sativa = 0
+                # Kombinationen wie "Indica/Sativa"
+                elif re.search(r"indica\s*/\s*sativa", val.strip(), re.IGNORECASE):
+                    indica = 50
+                    sativa = 50
+                elif re.search(r"sativa\s*/\s*indica", val.strip(), re.IGNORECASE):
+                    sativa = 50
+                    indica = 50
+                else:
+                    # Weitere Genetik-Begriffe erkennen
+                    if re.search(r"indica[- ]?dominant|indicadominiert|indicadominierte autoflower|mainly indica", val, re.IGNORECASE):
+                        indica = 80
+                        sativa = 20
+                        print(f"💬  Genetik für '{name}': '{val}' als Indica-dominant erkannt und zu 80/20 konvertiert.")
+                    elif re.search(r"sativa[- ]?dominant|sativadominierte autoflower", val, re.IGNORECASE):
+                        sativa = 80
+                        indica = 20
+                        print(f"💬  Genetik für '{name}': '{val}' als Sativa-dominant erkannt und zu 20/80 konvertiert.")
+                    elif re.search(r"100%\s*indica", val, re.IGNORECASE):
+                        indica = 100
+                        sativa = 0
+                        print(f"💬  Genetik für '{name}': '{val}' als 100% Indica erkannt und zu 100/0 konvertiert.")
+                    elif re.search(r"100%\s*sativa", val, re.IGNORECASE):
+                        sativa = 100
+                        indica = 0
+                        print(f"💬  Genetik für '{name}': '{val}' als 100% Sativa erkannt und zu 0/100 konvertiert.")
+                    elif re.search(r"auto\s*hybrid", val, re.IGNORECASE):
+                        indica = 50
+                        sativa = 50
+                        print(f"💬  Genetik für '{name}': '{val}' als Auto Hybrid erkannt und zu 50/50 konvertiert.")
+                    elif re.search(r"autoflowering", val, re.IGNORECASE):
+                        indica = 50
+                        sativa = 50
+                        print(f"💬  Genetik für '{name}': '{val}' als Autoflowering erkannt und zu 50/50 konvertiert.")
+                    elif re.search(r"50%\s*indica\s*/\s*50%\s*sativa|50%\s*sativa\s*/\s*50%\s*indica", val, re.IGNORECASE):
+                        indica = 50
+                        sativa = 50
+                        print(f"💬  Genetik für '{name}': '{val}' als 50/50 erkannt und zu 50/50 konvertiert.")
+                    elif re.search(r"mix pack|mix packs", val, re.IGNORECASE):
+                        print(f"⏭️  {name} (Mix Pack - übersprungen)")
+                        raise Exception("Mix Pack - übersprungen")
+                    else:
+                        print(f"❌  Fehler: Genetik für '{name}' konnte nicht erkannt werden: '{val}'")
 
     # Fallback falls Tabelle nicht gefunden
     if thc == 0 or cbd == 0 or (sativa == 0 and indica == 0):
@@ -192,17 +244,21 @@ with open("strains.csv", "w", newline="", encoding="utf-8") as f:
     writer = csv.writer(f)
     writer.writerow(["Name", "ShortName", "Brand", "Typ", "THC", "CBD", "Sativa", "Indica", "URL"])
     for index, link in enumerate(list(all_links), start=1):
+        if index < 440:
+            continue
         try:
             row = scrape_strain(link)
-            # Überspringe Einträge mit 'sorten' oder 'pack' als eigenständiges Wort im Namen (case-insensitive)
+            # Überspringe Einträge mit 'sorten', 'pack', 'Überraschungssamen' oder 'Mix Pack' im Namen (case-insensitive)
             name_lower = row[0].lower()
-            if re.search(r"\bsorten\b", name_lower) or re.search(r"\bpack\b", name_lower):
+            if re.search(r"\bsorten\b", name_lower) or re.search(r"\bpack\b", name_lower) or "überraschungssamen" in name_lower or "mix pack" in name_lower or "mix packs" in name_lower:
                 print(f"⏭️{index}: {row[0]} (übersprungen)")
                 continue
             writer.writerow(row)
             print(f"✔️  {index}: {row[0]}")
             time.sleep(0.5)
         except Exception as e:
-            print("❌  Fehler bei", link, e)
+            if "übersprungen" in str(e):
+                continue
+            print("⚠️  Fehler bei", link, e)
 
 print("✅ strains.csv erstellt!")
