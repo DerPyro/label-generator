@@ -2,14 +2,14 @@ import requests
 from bs4 import BeautifulSoup
 import csv
 import re
-#import time
+import time
 
 BASE_URL = "https://www.zamnesia.com"
 START_URLS = [
-    #"https://www.zamnesia.com/de/35-cannabissamen/295-feminisiert-hanfsamen",
-    "https://www.zamnesia.com/de/35-cannabissamen/294-autoflowering-hanfsamen"
-    #"https://www.zamnesia.com/de/35-cannabissamen/296-regulare-hanfsamen",
-    #"https://www.zamnesia.com/de/35-cannabissamen/297-cbd-hanfsamen"
+    "https://www.zamnesia.com/de/35-cannabissamen/295-feminisiert-hanfsamen",
+    "https://www.zamnesia.com/de/35-cannabissamen/294-autoflowering-hanfsamen",
+    "https://www.zamnesia.com/de/35-cannabissamen/296-regulare-hanfsamen",
+    "https://www.zamnesia.com/de/35-cannabissamen/297-cbd-hanfsamen"
 ]
 
 def extract_percentage(text, keyword):
@@ -244,8 +244,6 @@ with open("strains.csv", "w", newline="", encoding="utf-8") as f:
     writer = csv.writer(f)
     writer.writerow(["Name", "ShortName", "Brand", "Typ", "THC", "CBD", "Sativa", "Indica", "URL"])
     for index, link in enumerate(list(all_links), start=1):
-        if index < 440:
-            continue
         try:
             row = scrape_strain(link)
             # Überspringe Einträge mit 'sorten', 'pack', 'Überraschungssamen' oder 'Mix Pack' im Namen (case-insensitive)
