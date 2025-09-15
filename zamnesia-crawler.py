@@ -7,7 +7,9 @@ import time
 BASE_URL = "https://www.zamnesia.com"
 START_URLS = [
     "https://www.zamnesia.com/de/35-cannabissamen/295-feminisiert-hanfsamen",
-    "https://www.zamnesia.com/de/35-cannabissamen/294-autoflowering-hanfsamen"
+    "https://www.zamnesia.com/de/35-cannabissamen/294-autoflowering-hanfsamen",
+    "https://www.zamnesia.com/de/35-cannabissamen/296-regulare-hanfsamen",
+    "https://www.zamnesia.com/de/35-cannabissamen/297-cbd-hanfsamen"
 ]
 
 def extract_percentage(text, keyword):
@@ -31,7 +33,16 @@ def get_product_links(page_url):
         href = a.get("href")
         if href and "/de/" in href:
             links.append(BASE_URL + href if href.startswith("/") else href)
-    return links
+    # Anzahl Produkte auf Seite
+    product_count = len(links)
+    # Gesamtanzahl Produkte (steht meist oben auf der Seite)
+    total_count = None
+    total_count_elem = soup.find(string=re.compile(r"\d+\s+Produkte"))
+    if total_count_elem:
+        total_count_match = re.search(r"(\d+)\s+Produkte", total_count_elem)
+        if total_count_match:
+            total_count = int(total_count_match.group(1))
+    return links, product_count, total_count
 
 def scrape_strain(url):
     """Extrahiert Name, THC, CBD, Sativa, Indica von einer Produktseite"""
@@ -52,9 +63,13 @@ def scrape_strain(url):
     # Typ bestimmen
     typ = ""
     name_lower = name.lower()
-    if "feminis" in name_lower:
+    is_fem = "feminis" in name_lower
+    is_auto = "auto" in name_lower
+    if is_fem and is_auto:
+        typ = "AF"
+    elif is_fem:
         typ = "F"
-    elif "auto" in name_lower:
+    elif is_auto:
         typ = "A"
 
     thc, cbd, sativa, indica = 0, 0, 0, 0
@@ -142,33 +157,41 @@ def scrape_strain(url):
 
 # Schritt 1: Alle Produktlinks sammeln
 
-all_links = []
+
+all_links = set()
 for start_url in START_URLS:
     page = 1
-    count = 0
     print(f"🔎  Starte Crawl für: {start_url}")
-    while True:
-        url = f"{start_url}?p={page}"
-        links = get_product_links(url)
-        if not links:
-            break
-        if count == len(links):
-            print(f"✅  Alle {len(links)} Links gefunden")
-            break
+    # Erste Seite: Links, Produkte pro Seite, Gesamtanzahl
+    first_url = f"{start_url}?p=1&orderby=position&orderway=asc"
+    first_links, products_per_page, total_products = get_product_links(first_url)
+    if not first_links:
+        print(f"⏹️  Keine Links auf Seite 1, Kategorie übersprungen.")
+        continue
+    print(f"ℹ️  Gesamtanzahl Produkte laut Seite: {total_products}")
+    print(f"ℹ️  Produkte pro Seite: {products_per_page}")
+    # Seitenanzahl berechnen
+    if total_products and products_per_page:
+        max_page = int((total_products - 1) / products_per_page) + 1
+    else:
+        max_page = 1
+    print(f"ℹ️  Geplante Seiten: {max_page}")
+    # Alle Seiten abarbeiten
+    for page in range(1, max_page + 1):
+        url = f"{start_url}?p={page}&orderby=position&orderway=asc"
+        links, _, _ = get_product_links(url)
         print(f"✅  Seite {page}: {len(links)} Links")
-        count = len(links)
-        page += 1
-        time.sleep(1)  # Shop nicht überlasten
+        all_links.update(links)
+        time.sleep(1)
     print(f"➡️  Kategorie abgeschlossen: {start_url}")
-    all_links.extend(links)
 
-print(f"➡️  Gesamt: {len(all_links)} Sorten gefunden (feminisierte & automatic)")
+print(f"➡️  Gesamt: {len(all_links)} eindeutige Sorten gefunden (alle Kategorien)")
 
 # Schritt 2: Alle Produkte scrapen
 with open("strains.csv", "w", newline="", encoding="utf-8") as f:
     writer = csv.writer(f)
     writer.writerow(["Name", "ShortName", "Brand", "Typ", "THC", "CBD", "Sativa", "Indica", "URL"])
-    for index, link in enumerate(all_links, start=1):
+    for index, link in enumerate(list(all_links), start=1):
         try:
             row = scrape_strain(link)
             # Überspringe Einträge mit 'sorten' oder 'pack' als eigenständiges Wort im Namen (case-insensitive)
