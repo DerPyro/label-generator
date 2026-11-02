@@ -234,6 +234,14 @@
       </div>
 
       <div class="field">
+        <label for="labelShape">Etikettenform</label>
+        <select id="labelShape" onchange="setLabelShape(this.value)" style="width:100%;padding:10px;background:#111622;color:#e6eef8;border:1px solid #94a3b8;border-radius:10px">
+          <option value="rectangle">Rechteckig (Standard)</option>
+          <option value="circle">Rund</option>
+        </select>
+      </div>
+
+      <div class="field">
         <label for="indicaSativaRatioRange">Indica/Sativa Verhältnis</label>
         <div class="compact-row">
           <input type="range" id="indicaSativaRatioRange" min="0" max="100" value="80"
@@ -435,12 +443,106 @@
       });
     }
 
+
+    // Die runde Variante ist ein eigenständiges SVG mit transparentem Außenbereich.
+    // Das rechteckige Original bleibt für bestehende Nutzer unverändert.
+    function setLabelShape(shape) {
+      const original = document.getElementById('etikettSVG');
+      const wrapper = document.querySelector('.etikett');
+      let round = document.getElementById('roundEtikettSVG');
+      if (shape === 'circle' && !round) {
+        const ns = 'http://www.w3.org/2000/svg';
+        round = document.createElementNS(ns, 'svg');
+        round.id = 'roundEtikettSVG';
+        round.setAttribute('xmlns', ns);
+        round.setAttribute('viewBox', '0 0 378 378');
+        round.setAttribute('aria-label', 'Rundes Etikett');
+        round.style.cssText = 'display:block;width:100%;height:100%';
+        const images = Array.from(original.querySelectorAll('image')).slice(0, 2);
+        const defs = document.createElementNS(ns, 'defs');
+        defs.innerHTML = '<linearGradient id="roundGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#120523"/><stop offset="48%" stop-color="#32127A"/><stop offset="48%" stop-color="#FFBA00"/><stop offset="100%" stop-color="#FADA5E"/></linearGradient>';
+        round.appendChild(defs);
+        const bg = document.createElementNS(ns, 'circle');
+        bg.setAttribute('cx', '189'); bg.setAttribute('cy', '189'); bg.setAttribute('r', '187');
+        bg.setAttribute('fill', 'url(#roundGradient)');
+        bg.setAttribute('stroke', '#FFBA00'); bg.setAttribute('stroke-width', '2');
+        round.appendChild(bg);
+        const addText = (id, y, size, weight) => {
+          const el = document.createElementNS(ns, 'text');
+          el.id = id; el.setAttribute('x', '189'); el.setAttribute('y', String(y));
+          el.setAttribute('text-anchor', 'middle'); el.setAttribute('font-family', 'Arial, sans-serif');
+          el.setAttribute('font-size', String(size)); el.setAttribute('font-weight', weight || 'normal');
+          el.setAttribute('fill', '#FFBA00'); el.setAttribute('stroke', '#32127A');
+          el.setAttribute('stroke-width', '.7'); el.setAttribute('paint-order', 'stroke fill');
+          round.appendChild(el); return el;
+        };
+        addText('round-name', 66, 30, 'bold');
+        addText('round-marke', 94, 19);
+        addText('round-genetik', 117, 15);
+        addText('round-jahr', 139, 17, 'bold');
+        images.forEach((source, index) => {
+          const clone = source.cloneNode(true);
+          clone.removeAttribute('id');
+          clone.setAttribute('x', index === 0 ? '77' : '208');
+          clone.setAttribute('y', '157');
+          clone.setAttribute('width', '93'); clone.setAttribute('height', '93');
+          round.appendChild(clone);
+        });
+        const bar = (title, valueId, barId, y, color) => {
+          addText('round-' + title, y - 7, 18, 'bold').textContent = title.toUpperCase();
+          const back = document.createElementNS(ns, 'rect');
+          Object.entries({x:89,y,width:200,height:18,rx:8,fill:'#414141',stroke:'#32127A','stroke-width':1.5}).forEach(([k,v])=>back.setAttribute(k,v));
+          round.appendChild(back);
+          const fill = document.createElementNS(ns, 'rect');
+          Object.entries({id:barId,x:89,y,width:0,height:18,rx:8,fill:color}).forEach(([k,v])=>fill.setAttribute(k,v));
+          round.appendChild(fill);
+          const txt = addText(valueId, y + 14, 15, 'bold');
+          txt.setAttribute('fill', '#ffffff'); txt.setAttribute('stroke', '#111111');
+          txt.setAttribute('stroke-width', '2');
+        };
+        bar('THC', 'round-thc-text', 'round-thc-bar', 282, '#FF4500');
+        bar('CBD', 'round-cbd-text', 'round-cbd-bar', 334, '#32CD32');
+        wrapper.appendChild(round);
+      }
+      const circular = shape === 'circle';
+      original.style.display = circular ? 'none' : 'block';
+      if (round) round.style.display = circular ? 'block' : 'none';
+      wrapper.style.width = circular ? '378px' : '';
+      wrapper.style.height = circular ? '378px' : '';
+      wrapper.style.borderRadius = circular ? '50%' : '';
+      wrapper.style.border = circular ? 'none' : '';
+      wrapper.style.background = circular ? 'transparent' : '';
+      wrapper.style.overflow = 'hidden';
+      updateRoundLabel();
+    }
+    function updateRoundLabel() {
+      const svg = document.getElementById('roundEtikettSVG');
+      if (!svg) return;
+      const get = id => document.getElementById(id).textContent;
+      ['name','marke','genetik','jahr','thc-text','cbd-text'].forEach(id => {
+        document.getElementById('round-' + id).textContent = get('etk-' + id) || '';
+      });
+      // THC/CBD haben im Rechteck eigene IDs ohne "etk-".
+      ['thc','cbd'].forEach(id => {
+        document.getElementById('round-' + id + '-text').textContent = get(id + '-text');
+        document.getElementById('round-' + id + '-bar').setAttribute('width',
+          document.getElementById(id + '-bar').getAttribute('width'));
+      });
+    }
+
     function downloadImage(format) {
       const name = document.getElementById('name').value; // Den Namen aus dem Eingabefeld holen
       const date = new Date().toISOString().split('T')[0]; // Aktuelles Datum im Format YYYY-MM-DD
       const formattedName = `${name}_label_${date}`; // Formatierter Dateiname
 
-      const svg = document.getElementById('etikettSVG');
+      const svg = document.getElementById('labelShape').value === 'circle' ? document.getElementById('roundEtikettSVG') : document.getElementById('etikettSVG');
+      if (format === 'svg') {
+        const blob = new Blob([new XMLSerializer().serializeToString(svg)], {type:'image/svg+xml;charset=utf-8'});
+        const link = document.createElement('a'); const blobUrl = URL.createObjectURL(blob);
+        link.href = blobUrl; link.download = formattedName + '.svg'; link.click();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+        return;
+      }
       const serializer = new XMLSerializer();
       const source = serializer.serializeToString(svg);
 
@@ -451,8 +553,9 @@
       img.onload = function () {
         const canvas = document.createElement('canvas');
         canvas.width = 378 * 2; // Verdopplung der Breite für bessere Auflösung
-        canvas.height = 531 * 2; // Verdopplung der Höhe für bessere Auflösung
+        canvas.height = (document.getElementById('labelShape').value === 'circle' ? 378 : 531) * 2; // Verdopplung der Höhe für bessere Auflösung
         const ctx = canvas.getContext('2d');
+        if (format === 'jpg') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Bild auf die Canvas-Größe zeichnen
 
         canvas.toBlob(function (blob) {
@@ -469,6 +572,11 @@
       img.src = url;
     }
 
+    const previousUpdateEtikett = updateEtikett;
+    updateEtikett = function(...args) {
+      previousUpdateEtikett(...args);
+      updateRoundLabel();
+    };
     updateEtikett();
 
     document.addEventListener("DOMContentLoaded", function () {
