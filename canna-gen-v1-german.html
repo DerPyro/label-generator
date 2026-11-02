@@ -519,7 +519,7 @@
       const svg = document.getElementById('roundEtikettSVG');
       if (!svg) return;
       const get = id => document.getElementById(id).textContent;
-      ['name','marke','genetik','jahr','thc-text','cbd-text'].forEach(id => {
+      ['name','marke','genetik','jahr'].forEach(id => {
         document.getElementById('round-' + id).textContent = get('etk-' + id) || '';
       });
       // THC/CBD haben im Rechteck eigene IDs ohne "etk-".
