@@ -476,16 +476,16 @@
           el.setAttribute('stroke-width', '.7'); el.setAttribute('paint-order', 'stroke fill');
           round.appendChild(el); return el;
         };
-        addText('round-name', 66, 30, 'bold');
-        addText('round-marke', 94, 19);
-        addText('round-genetik', 117, 15);
-        addText('round-jahr', 139, 17, 'bold');
+        addText('round-name', 59, 27, 'bold');
+        addText('round-marke', 84, 18);
+        addText('round-genetik', 106, 14);
+        addText('round-jahr', 128, 16, 'bold');
         images.forEach((source, index) => {
           const clone = source.cloneNode(true);
           clone.removeAttribute('id');
-          clone.setAttribute('x', index === 0 ? '77' : '208');
-          clone.setAttribute('y', '157');
-          clone.setAttribute('width', '93'); clone.setAttribute('height', '93');
+          clone.setAttribute('x', index === 0 ? '90' : '204');
+          clone.setAttribute('y', '151');
+          clone.setAttribute('width', '84'); clone.setAttribute('height', '84');
           round.appendChild(clone);
         });
         const bar = (title, valueId, barId, y, color) => {
@@ -500,8 +500,8 @@
           txt.setAttribute('fill', '#ffffff'); txt.setAttribute('stroke', '#111111');
           txt.setAttribute('stroke-width', '2');
         };
-        bar('THC', 'round-thc-text', 'round-thc-bar', 282, '#FF4500');
-        bar('CBD', 'round-cbd-text', 'round-cbd-bar', 334, '#32CD32');
+        bar('THC', 'round-thc-text', 'round-thc-bar', 273, '#FF4500');
+        bar('CBD', 'round-cbd-text', 'round-cbd-bar', 321, '#32CD32');
         wrapper.appendChild(round);
       }
       const circular = shape === 'circle';
@@ -521,6 +521,16 @@
       const get = id => document.getElementById(id).textContent;
       ['name','marke','genetik','jahr'].forEach(id => {
         document.getElementById('round-' + id).textContent = get('etk-' + id) || '';
+      });
+      // Lange Namen innerhalb des sicheren Kreisbereichs halten.
+      [['name', 300], ['marke', 310], ['genetik', 310]].forEach(([id, width]) => {
+        document.getElementById('round-' + id).removeAttribute('textLength');
+        document.getElementById('round-' + id).removeAttribute('lengthAdjust');
+        const el = document.getElementById('round-' + id);
+        if (el.getComputedTextLength() > width) {
+          el.setAttribute('textLength', width);
+          el.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+        }
       });
       // THC/CBD haben im Rechteck eigene IDs ohne "etk-".
       ['thc','cbd'].forEach(id => {
