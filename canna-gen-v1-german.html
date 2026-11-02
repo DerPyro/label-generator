@@ -476,15 +476,15 @@
           el.setAttribute('stroke-width', '.7'); el.setAttribute('paint-order', 'stroke fill');
           round.appendChild(el); return el;
         };
-        addText('round-name', 57, 27, 'bold');
-        addText('round-marke', 81, 18);
-        addText('round-genetik', 103, 14);
-        addText('round-jahr', 125, 16, 'bold');
+        addText('round-name', 54, 27, 'bold');
+        addText('round-marke', 78, 18);
+        addText('round-genetik', 100, 14);
+        addText('round-jahr', 122, 16, 'bold');
         images.forEach((source, index) => {
           const clone = source.cloneNode(true);
           clone.removeAttribute('id');
-          clone.setAttribute('x', index === 0 ? '94' : '200');
-          clone.setAttribute('y', '145');
+          clone.setAttribute('x', index === 0 ? '91' : '209');
+          clone.setAttribute('y', '157');
           clone.setAttribute('width', '78'); clone.setAttribute('height', '78');
           round.appendChild(clone);
         });
