@@ -537,10 +537,43 @@
       });
       // Den dynamischen Indica/Sativa-Farbverlauf auch im runden SVG aktualisieren.
       // Die Stopps aus dem rechteckigen Original sind bereits vom Slider aktualisiert.
-      const originalGradient = document.getElementById('indicaSativa');
       const roundGradient = svg.querySelector('#roundGradient');
-      if (originalGradient && roundGradient) {
-        roundGradient.replaceChildren(...Array.from(originalGradient.children, stop => stop.cloneNode(true)));
+      if (roundGradient) {
+        // A diagonal gradient covers a circle nonlinearly: 10% along the diagonal
+        // is much less than 10% of its area. Map the slider to a true area fraction.
+        // Cache the sorted diagonal projections of a uniform circular sample grid.
+        if (!updateRoundLabel.circleAreaOffsets) {
+          const projections = [];
+          const resolution = 240;
+          for (let y = 0; y < resolution; y++) {
+            const ny = (y + 0.5) / resolution * 2 - 1;
+            for (let x = 0; x < resolution; x++) {
+              const nx = (x + 0.5) / resolution * 2 - 1;
+              if (nx * nx + ny * ny <= 1) {
+                projections.push((nx + ny + 2) / 4);
+              }
+            }
+          }
+          projections.sort((a, b) => a - b);
+          updateRoundLabel.circleAreaOffsets = projections;
+        }
+        const ratio = Math.max(0, Math.min(100,
+          Number(document.getElementById('indicaSativaRatioRange').value) || 0));
+        const projections = updateRoundLabel.circleAreaOffsets;
+        const threshold = ratio === 0 ? 0 : ratio === 100 ? 1 :
+          projections[Math.min(projections.length - 1, Math.floor(projections.length * ratio / 100))];
+        const stops = [
+          ['0%', '#000000'],
+          [(threshold * 100) + '%', '#32127A'],
+          [(threshold * 100) + '%', '#FFBA00'],
+          ['100%', '#FADA5E']
+        ];
+        roundGradient.replaceChildren(...stops.map(([offset, color]) => {
+          const stop = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+          stop.setAttribute('offset', offset);
+          stop.setAttribute('stop-color', color);
+          return stop;
+        }));
       }
       // THC/CBD haben im Rechteck eigene IDs ohne "etk-".
       ['thc','cbd'].forEach(id => {
