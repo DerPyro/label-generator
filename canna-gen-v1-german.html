@@ -483,8 +483,11 @@
         images.forEach((source, index) => {
           const clone = source.cloneNode(true);
           clone.removeAttribute('id');
-          clone.setAttribute('x', index === 0 ? '95' : '205');
-          clone.setAttribute('y', '169');
+          // Das Rechteck-SVG verschiebt die Bilder um -50/-50. Für das runde Layout
+          // verwenden wir absolute Koordinaten ohne diese alte Transformation.
+          clone.removeAttribute('transform');
+          clone.setAttribute('x', index === 0 ? '91' : '209');
+          clone.setAttribute('y', '151');
           clone.setAttribute('width', '78'); clone.setAttribute('height', '78');
           round.appendChild(clone);
         });
