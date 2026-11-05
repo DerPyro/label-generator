@@ -1,6 +1,7 @@
 # How to use
 
-Go to this page -> https://derpyro.github.io/label-generator/canna-gen-v1-german.html
+v1 -> https://derpyro.github.io/label-generator/v1/index.html
+v2 -> https://derpyro.github.io/label-generator/v2/index.html
 
 ## Updating Search
 
