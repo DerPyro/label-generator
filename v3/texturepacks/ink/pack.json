@@ -1,0 +1,284 @@
+{
+  "id": "ink",
+  "name": "Ink Study",
+  "description": "Monochromes Beispielpack mit eigener Farbpalette. Technische Platzhalterillustrationen.",
+  "author": "Label Generator contributors",
+  "version": "1.0.0",
+  "compatibilityVersion": 1,
+  "status": "placeholder",
+  "preview": "preview.png",
+  "fonts": [
+    {
+      "family": "LabelSerif",
+      "path": "fonts/label-serif.ttf",
+      "weight": "400 700"
+    }
+  ],
+  "layerOrder": [
+    "base",
+    "genetics",
+    "thc",
+    "cbd",
+    "text"
+  ],
+  "layouts": [
+    {
+      "width": 1200,
+      "height": 1800,
+      "shape": "rectangle",
+      "layers": {
+        "base": "rectangular/base.png",
+        "genetics": [
+          "rectangular/genetics/1.png",
+          "rectangular/genetics/2.png",
+          "rectangular/genetics/3.png",
+          "rectangular/genetics/4.png",
+          "rectangular/genetics/5.png",
+          "rectangular/genetics/6.png",
+          "rectangular/genetics/7.png"
+        ],
+        "thc": [
+          "rectangular/thc/1.png",
+          "rectangular/thc/2.png",
+          "rectangular/thc/3.png",
+          "rectangular/thc/4.png",
+          "rectangular/thc/5.png",
+          "rectangular/thc/6.png",
+          "rectangular/thc/7.png"
+        ],
+        "cbd": [
+          "rectangular/cbd/1.png",
+          "rectangular/cbd/2.png",
+          "rectangular/cbd/3.png",
+          "rectangular/cbd/4.png",
+          "rectangular/cbd/5.png",
+          "rectangular/cbd/6.png",
+          "rectangular/cbd/7.png"
+        ]
+      },
+      "typography": {
+        "family": "LabelSerif",
+        "ink": "#20272a",
+        "panel": "rgba(249, 246, 231, 0.96)",
+        "panels": [
+          {
+            "x": 140,
+            "y": 625,
+            "width": 920,
+            "height": 420,
+            "radius": 48
+          },
+          {
+            "x": 120,
+            "y": 1385,
+            "width": 960,
+            "height": 190,
+            "radius": 32
+          }
+        ],
+        "name": {
+          "centerX": 600,
+          "centerY": 760,
+          "maxWidth": 840,
+          "maxLines": 3,
+          "maxSize": 76,
+          "minSize": 30,
+          "lineHeight": 1.14
+        },
+        "producer": {
+          "x": 600,
+          "y": 925,
+          "maxWidth": 800,
+          "maxSize": 34,
+          "minSize": 16
+        },
+        "year": {
+          "x": 600,
+          "y": 990,
+          "size": 46
+        },
+        "footer": {
+          "x": 600,
+          "y": 1460,
+          "gap": 58,
+          "size": 38,
+          "maxWidth": 880
+        }
+      },
+      "id": "rectangular",
+      "name": "Klassisches Hochformat"
+    },
+    {
+      "width": 1200,
+      "height": 1200,
+      "shape": "circle",
+      "layers": {
+        "base": "circular/base.png",
+        "genetics": [
+          "circular/genetics/1.png",
+          "circular/genetics/2.png",
+          "circular/genetics/3.png",
+          "circular/genetics/4.png",
+          "circular/genetics/5.png",
+          "circular/genetics/6.png",
+          "circular/genetics/7.png"
+        ],
+        "thc": [
+          "circular/thc/1.png",
+          "circular/thc/2.png",
+          "circular/thc/3.png",
+          "circular/thc/4.png",
+          "circular/thc/5.png",
+          "circular/thc/6.png",
+          "circular/thc/7.png"
+        ],
+        "cbd": [
+          "circular/cbd/1.png",
+          "circular/cbd/2.png",
+          "circular/cbd/3.png",
+          "circular/cbd/4.png",
+          "circular/cbd/5.png",
+          "circular/cbd/6.png",
+          "circular/cbd/7.png"
+        ]
+      },
+      "typography": {
+        "family": "LabelSerif",
+        "ink": "#20272a",
+        "panel": "rgba(249, 246, 231, 0.96)",
+        "panels": [
+          {
+            "x": 180,
+            "y": 405,
+            "width": 840,
+            "height": 330,
+            "radius": 80
+          },
+          {
+            "x": 215,
+            "y": 860,
+            "width": 770,
+            "height": 142,
+            "radius": 45
+          }
+        ],
+        "name": {
+          "centerX": 600,
+          "centerY": 510,
+          "maxWidth": 740,
+          "maxLines": 2,
+          "maxSize": 66,
+          "minSize": 28,
+          "lineHeight": 1.13
+        },
+        "producer": {
+          "x": 600,
+          "y": 625,
+          "maxWidth": 700,
+          "maxSize": 31,
+          "minSize": 16
+        },
+        "year": {
+          "x": 600,
+          "y": 688,
+          "size": 40
+        },
+        "footer": {
+          "x": 600,
+          "y": 907,
+          "gap": 49,
+          "size": 32,
+          "maxWidth": 700
+        }
+      },
+      "id": "circular",
+      "name": "Runder Deckel"
+    },
+    {
+      "id": "wide-landscape",
+      "name": "Breites Querformat",
+      "width": 1800,
+      "height": 1200,
+      "shape": "rectangle",
+      "layers": {
+        "cbd": [
+          "layouts/wide-landscape/cbd/1.png",
+          "layouts/wide-landscape/cbd/2.png",
+          "layouts/wide-landscape/cbd/3.png",
+          "layouts/wide-landscape/cbd/4.png",
+          "layouts/wide-landscape/cbd/5.png",
+          "layouts/wide-landscape/cbd/6.png",
+          "layouts/wide-landscape/cbd/7.png"
+        ],
+        "genetics": [
+          "layouts/wide-landscape/genetics/1.png",
+          "layouts/wide-landscape/genetics/2.png",
+          "layouts/wide-landscape/genetics/3.png",
+          "layouts/wide-landscape/genetics/4.png",
+          "layouts/wide-landscape/genetics/5.png",
+          "layouts/wide-landscape/genetics/6.png",
+          "layouts/wide-landscape/genetics/7.png"
+        ],
+        "base": "layouts/wide-landscape/base.png",
+        "thc": [
+          "layouts/wide-landscape/thc/1.png",
+          "layouts/wide-landscape/thc/2.png",
+          "layouts/wide-landscape/thc/3.png",
+          "layouts/wide-landscape/thc/4.png",
+          "layouts/wide-landscape/thc/5.png",
+          "layouts/wide-landscape/thc/6.png",
+          "layouts/wide-landscape/thc/7.png"
+        ]
+      },
+      "typography": {
+        "family": "LabelSerif",
+        "ink": "#20272a",
+        "panel": "rgba(249, 246, 231, 0.96)",
+        "panels": [
+          {
+            "x": 480,
+            "y": 340,
+            "radius": 42,
+            "height": 420,
+            "width": 840
+          },
+          {
+            "x": 540,
+            "y": 835,
+            "radius": 30,
+            "height": 170,
+            "width": 720
+          }
+        ],
+        "name": {
+          "centerX": 900,
+          "centerY": 475,
+          "maxSize": 70,
+          "maxWidth": 750,
+          "lineHeight": 1.13,
+          "maxLines": 2,
+          "minSize": 28
+        },
+        "producer": {
+          "maxSize": 31,
+          "x": 900,
+          "minSize": 16,
+          "y": 635,
+          "maxWidth": 700
+        },
+        "year": {
+          "x": 900,
+          "size": 40,
+          "y": 690
+        },
+        "footer": {
+          "size": 32,
+          "x": 900,
+          "gap": 50,
+          "y": 890,
+          "maxWidth": 650
+        }
+      }
+    }
+  ]
+}

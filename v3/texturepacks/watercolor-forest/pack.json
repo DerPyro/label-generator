@@ -1,0 +1,287 @@
+{
+  "id": "watercolor-forest",
+  "name": "Watercolor Forest",
+  "description": "Illustriertes Wald-Texturepack in Aquarelloptik: sieben Tageszeiten, zunehmendes Wetter und wachsende botanische Ornamente. KI-generierte Illustrationen.",
+  "author": "Label Generator contributors · OpenAI image generation",
+  "version": "1.0.0",
+  "compatibilityVersion": 1,
+  "status": "illustrated",
+  "preview": "preview.png",
+  "fonts": [
+    {
+      "family": "LabelSerif",
+      "path": "fonts/label-serif.ttf",
+      "weight": "400 700"
+    }
+  ],
+  "layerOrder": [
+    "base",
+    "genetics",
+    "thc",
+    "cbd",
+    "text"
+  ],
+  "layouts": [
+    {
+      "id": "classic-portrait",
+      "name": "Klassisches Hochformat",
+      "width": 1024,
+      "height": 1536,
+      "shape": "rectangle",
+      "layers": {
+        "base": "layouts/classic-portrait/base.png",
+        "genetics": [
+          "layouts/classic-portrait/genetics/1.png",
+          "layouts/classic-portrait/genetics/2.png",
+          "layouts/classic-portrait/genetics/3.png",
+          "layouts/classic-portrait/genetics/4.png",
+          "layouts/classic-portrait/genetics/5.png",
+          "layouts/classic-portrait/genetics/6.png",
+          "layouts/classic-portrait/genetics/7.png"
+        ],
+        "thc": [
+          "layouts/classic-portrait/thc/1.png",
+          "layouts/classic-portrait/thc/2.png",
+          "layouts/classic-portrait/thc/3.png",
+          "layouts/classic-portrait/thc/4.png",
+          "layouts/classic-portrait/thc/5.png",
+          "layouts/classic-portrait/thc/6.png",
+          "layouts/classic-portrait/thc/7.png"
+        ],
+        "cbd": [
+          "layouts/classic-portrait/cbd/1.png",
+          "layouts/classic-portrait/cbd/2.png",
+          "layouts/classic-portrait/cbd/3.png",
+          "layouts/classic-portrait/cbd/4.png",
+          "layouts/classic-portrait/cbd/5.png",
+          "layouts/classic-portrait/cbd/6.png",
+          "layouts/classic-portrait/cbd/7.png"
+        ]
+      },
+      "typography": {
+        "family": "LabelSerif",
+        "ink": "#203b34",
+        "panel": "rgba(252, 247, 232, 0.88)",
+        "panels": [
+          {
+            "x": 184.32,
+            "y": 491.52,
+            "width": 655.36,
+            "height": 552.96,
+            "radius": 35.84
+          },
+          {
+            "x": 163.84,
+            "y": 1159.68,
+            "width": 696.32,
+            "height": 222.72,
+            "radius": 25.6
+          }
+        ],
+        "name": {
+          "centerX": 512,
+          "centerY": 660.48,
+          "maxWidth": 604.16,
+          "maxLines": 3,
+          "maxSize": 72.19,
+          "minSize": 28.88,
+          "lineHeight": 1.12
+        },
+        "producer": {
+          "x": 512,
+          "y": 875.52,
+          "maxWidth": 593.92,
+          "maxSize": 30,
+          "minSize": 14
+        },
+        "year": {
+          "x": 512,
+          "y": 967.68,
+          "size": 34.82
+        },
+        "footer": {
+          "x": 512,
+          "y": 1228.8,
+          "gap": 92.16,
+          "size": 34,
+          "maxWidth": 634.88
+        }
+      },
+      "preview": "classic-portrait-preview.png"
+    },
+    {
+      "id": "wide-landscape",
+      "name": "Breites Querformat",
+      "width": 1536,
+      "height": 1024,
+      "shape": "rectangle",
+      "layers": {
+        "base": "layouts/wide-landscape/base.png",
+        "genetics": [
+          "layouts/wide-landscape/genetics/1.png",
+          "layouts/wide-landscape/genetics/2.png",
+          "layouts/wide-landscape/genetics/3.png",
+          "layouts/wide-landscape/genetics/4.png",
+          "layouts/wide-landscape/genetics/5.png",
+          "layouts/wide-landscape/genetics/6.png",
+          "layouts/wide-landscape/genetics/7.png"
+        ],
+        "thc": [
+          "layouts/wide-landscape/thc/1.png",
+          "layouts/wide-landscape/thc/2.png",
+          "layouts/wide-landscape/thc/3.png",
+          "layouts/wide-landscape/thc/4.png",
+          "layouts/wide-landscape/thc/5.png",
+          "layouts/wide-landscape/thc/6.png",
+          "layouts/wide-landscape/thc/7.png"
+        ],
+        "cbd": [
+          "layouts/wide-landscape/cbd/1.png",
+          "layouts/wide-landscape/cbd/2.png",
+          "layouts/wide-landscape/cbd/3.png",
+          "layouts/wide-landscape/cbd/4.png",
+          "layouts/wide-landscape/cbd/5.png",
+          "layouts/wide-landscape/cbd/6.png",
+          "layouts/wide-landscape/cbd/7.png"
+        ]
+      },
+      "typography": {
+        "family": "LabelSerif",
+        "ink": "#203b34",
+        "panel": "rgba(252, 247, 232, 0.88)",
+        "panels": [
+          {
+            "x": 276.48,
+            "y": 327.68,
+            "width": 983.04,
+            "height": 368.64,
+            "radius": 35.84
+          },
+          {
+            "x": 245.76,
+            "y": 773.12,
+            "width": 1044.48,
+            "height": 148.48,
+            "radius": 25.6
+          }
+        ],
+        "name": {
+          "centerX": 768,
+          "centerY": 430,
+          "maxWidth": 906.24,
+          "maxLines": 3,
+          "maxSize": 78,
+          "minSize": 32,
+          "lineHeight": 1.12
+        },
+        "producer": {
+          "x": 768,
+          "y": 583.68,
+          "maxWidth": 890.88,
+          "maxSize": 36,
+          "minSize": 14
+        },
+        "year": {
+          "x": 768,
+          "y": 645.12,
+          "size": 42
+        },
+        "footer": {
+          "x": 768,
+          "y": 819.2,
+          "gap": 61.44,
+          "size": 44,
+          "maxWidth": 952.32
+        }
+      },
+      "preview": "wide-landscape-preview.png"
+    },
+    {
+      "id": "round-lid",
+      "name": "Runder Deckel",
+      "width": 1254,
+      "height": 1254,
+      "shape": "circle",
+      "layers": {
+        "base": "layouts/round-lid/base.png",
+        "genetics": [
+          "layouts/round-lid/genetics/1.png",
+          "layouts/round-lid/genetics/2.png",
+          "layouts/round-lid/genetics/3.png",
+          "layouts/round-lid/genetics/4.png",
+          "layouts/round-lid/genetics/5.png",
+          "layouts/round-lid/genetics/6.png",
+          "layouts/round-lid/genetics/7.png"
+        ],
+        "thc": [
+          "layouts/round-lid/thc/1.png",
+          "layouts/round-lid/thc/2.png",
+          "layouts/round-lid/thc/3.png",
+          "layouts/round-lid/thc/4.png",
+          "layouts/round-lid/thc/5.png",
+          "layouts/round-lid/thc/6.png",
+          "layouts/round-lid/thc/7.png"
+        ],
+        "cbd": [
+          "layouts/round-lid/cbd/1.png",
+          "layouts/round-lid/cbd/2.png",
+          "layouts/round-lid/cbd/3.png",
+          "layouts/round-lid/cbd/4.png",
+          "layouts/round-lid/cbd/5.png",
+          "layouts/round-lid/cbd/6.png",
+          "layouts/round-lid/cbd/7.png"
+        ]
+      },
+      "typography": {
+        "family": "LabelSerif",
+        "ink": "#203b34",
+        "panel": "rgba(252, 247, 232, 0.88)",
+        "panels": [
+          {
+            "x": 225.72,
+            "y": 401.28,
+            "width": 802.56,
+            "height": 451.44,
+            "radius": 43.89
+          },
+          {
+            "x": 250.8,
+            "y": 946.77,
+            "width": 752.4,
+            "height": 181.83,
+            "radius": 31.35
+          }
+        ],
+        "name": {
+          "centerX": 627,
+          "centerY": 539.22,
+          "maxWidth": 739.86,
+          "maxLines": 3,
+          "maxSize": 68.97,
+          "minSize": 27.59,
+          "lineHeight": 1.12
+        },
+        "producer": {
+          "x": 627,
+          "y": 714.78,
+          "maxWidth": 727.32,
+          "maxSize": 38,
+          "minSize": 17.14
+        },
+        "year": {
+          "x": 627,
+          "y": 790.02,
+          "size": 42.64
+        },
+        "footer": {
+          "x": 627,
+          "y": 1003.2,
+          "gap": 75.24,
+          "size": 40,
+          "maxWidth": 714.78
+        }
+      },
+      "preview": "round-lid-preview.png"
+    }
+  ]
+}

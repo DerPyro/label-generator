@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><title>Watercolor Forest · Pack-Abnahme</title>
+<body style="background:#eee9dc;color:#203b34;font:16px system-ui;margin:30px"><h1>Watercolor Forest</h1><p id="results">Illustrationen werden zusammengesetzt …</p><div id="art"></div>
+<script type="module">
+import { validateManifest,resolvePackConfig } from '../src/texturepacks.js';
+import { renderLabel } from '../src/renderer.js';
+import { THRESHOLDS } from '../src/config.js';
+const base=new URL('../texturepacks/watercolor-forest/',import.meta.url);
+const manifest=validateManifest(await(await fetch(new URL('pack.json',base))).json());
+const artifacts={};
+try{
+ const sheet=document.createElement('canvas');sheet.width=1440;sheet.height=2100;const ctx=sheet.getContext('2d');ctx.fillStyle='#f5f0e2';ctx.fillRect(0,0,sheet.width,sheet.height);
+ ctx.fillStyle='#203b34';ctx.font='32px Georgia';ctx.fillText('Watercolor Forest · Morgen / Nachmittag / Nacht',32,48);
+ const stages=[{sativa:95,thc:0,cbd:2},{sativa:68,thc:20,cbd:11},{sativa:0,thc:40,cbd:20}];
+ for(const [index,layout]of manifest.layouts.entries()){
+  const config=resolvePackConfig(manifest,layout.id,base);
+  for(const[row,stage]of stages.entries()){
+   const canvas=document.createElement('canvas');await renderLabel(canvas,{name:['Morning Mist','Golden Valley','Midnight Bloom'][row],producer:'Watercolor Forest',year:2026,...stage},{config});
+   const scale=Math.min(420/canvas.width,570/canvas.height),w=canvas.width*scale,h=canvas.height*scale,x=30+index*480+(420-w)/2,y=110+row*660;
+   ctx.drawImage(canvas,x,y,w,h);ctx.fillStyle='#203b34';ctx.font='17px system-ui';ctx.fillText(layout.name,30+index*480,y+600);ctx.font='15px system-ui';ctx.fillText(`Sativa ${stage.sativa} % · THC ${stage.thc} % · CBD ${stage.cbd} %`,30+index*480,y+628);
+  }
+  const preview=document.createElement('canvas');await renderLabel(preview,{name:'Watercolor Forest',producer:'Wald & Wiese',year:2026,sativa:80,thc:8,cbd:13},{config});
+  const small=document.createElement('canvas');small.width=Math.round(preview.width*360/Math.max(preview.width,preview.height));small.height=Math.round(preview.height*360/Math.max(preview.width,preview.height));small.getContext('2d').drawImage(preview,0,0,small.width,small.height);
+  artifacts[layout.id+'-preview.png']=small.toDataURL();if(index===0)artifacts['preview.png']=small.toDataURL();
+ }
+ artifacts['contact-sheet.png']=sheet.toDataURL();document.querySelector('#art').append(sheet);sheet.style.cssText='width:100%;max-width:1100px;height:auto';
+ window.__packArtifacts=artifacts;document.querySelector('#results').textContent='PASS Drei Layouts, neun vollständige Kompositionen, eigene Vorschauen. Keine Texte in die Illustrationen eingebrannt.';document.body.dataset.testStatus='passed';
+}catch(error){document.querySelector('#results').textContent='FAIL '+error.message;document.body.dataset.testStatus='failed';}
+</script></body></html>

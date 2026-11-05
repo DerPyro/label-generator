@@ -2,6 +2,7 @@
 
 v1 -> https://derpyro.github.io/label-generator/v1/index.html
 v2 -> https://derpyro.github.io/label-generator/v2/index.html
+v3 -> https://derpyro.github.io/label-generator/v3/
 
 ## Updating Search
 

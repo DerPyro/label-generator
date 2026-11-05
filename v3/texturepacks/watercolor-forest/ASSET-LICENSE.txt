@@ -1,0 +1,17 @@
+Watercolor Forest 1.0.0
+
+Illustrations were created for the Label Generator project using OpenAI's
+built-in image-generation tool. They are AI-generated artwork, not scans of
+hand-painted originals. The pack's provenance and generation prompts are
+documented in README.md and PROMPTS.md.
+
+These illustrations are distributed for use, modification, and redistribution
+with the Label Generator. To the extent the project contributors can grant
+copyright permissions in the generated illustrations, they dedicate those
+rights under CC0 1.0 Universal. No claim is made that generated imagery is
+copyrightable in every jurisdiction or exclusive to this project.
+
+The included Lora font is separate from the illustrations and retains its
+SIL Open Font License. Preserve fonts/OFL.txt when redistributing the font.
+
+Do not describe these illustrations as hand-painted originals.

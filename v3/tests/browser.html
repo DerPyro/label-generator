@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><title>v3 Browserprüfungen</title>
+<body style="font:15px system-ui;margin:2rem;background:#f3eee3;color:#21382d">
+<h1>v3 Browserprüfungen</h1><pre id="results">Prüfung läuft …</pre><canvas id="preview" style="max-width:320px;width:100%;height:auto"></canvas>
+<script type="module">
+import { CONFIG,THRESHOLDS } from '../src/config.js';
+import { getRenderPlan,getLayerLevel } from '../src/model.js';
+import { TexturePackManager,validateManifest,getLayouts } from '../src/texturepacks.js';
+import { renderLabel,canvasToPng,preloadAssets } from '../src/renderer.js';
+import { PrintCartService } from '../src/cart.js';
+import { IndexedDBPackStore } from '../src/pack-store.js';
+import { inspectPackArchive,buildPackArchive } from '../src/pack-archive.js';
+import { layoutSheets,generatePdf,configKey,getPhysicalSize,MM_TO_PT } from '../src/print.js';
+import { SheetEditor } from '../src/sheet-editor.js';
+import { PDFDocument } from '../vendor/pdf-lib.esm.min.js';
+const sample={name:'Super Silver Haze',producer:'Royal Queen Seeds',year:2026,sativa:75,thc:20,cbd:3};
+const canvas=document.querySelector('canvas'),checks=[],manager=new TexturePackManager(),configs=new Map();
+const assert=(ok,message)=>{if(!ok)throw Error(message);};
+const close=(a,b)=>assert(Math.abs(a-b)<1e-7,`${a} ≠ ${b}`);
+async function check(name,fn){try{await fn();checks.push('PASS '+name);}catch(error){checks.push('FAIL '+name+': '+error.message);}document.querySelector('#results').textContent=checks.join('\n');}
+async function until(fn){for(let i=0;i<400;i++){if(fn())return;await new Promise(resolve=>setTimeout(resolve,20));}throw Error('Zeitüberschreitung');}
+await check('Drei validierte Packs mit Hochformat, Querformat und Rund laden',async()=>{
+ const packs=(await manager.listPacks()).filter(pack=>pack.source==='bundled');assert(packs.length===3&&packs.some(pack=>pack.id==='watercolor-forest'),'Packs fehlen');
+ for(const pack of packs){const layouts=getLayouts(await manager.loadPack(pack.id));assert(layouts.length>=3,'Drei Beispiel-Layouts fehlen');for(const layout of layouts){const config=await manager.getConfig(pack.id,layout.id);await preloadAssets(config);configs.set(`${pack.id}@${config.packVersion}:${layout.id}`,config);}}
+});
+const rect=()=>configs.get('woodland@1.0.0:rectangular'),circle=()=>configs.get('woodland@1.0.0:circular');
+await check('Watercolor Forest: drei native PNG-Layouts und gemeinsamer maßstäblicher PDF-Bogen',async()=>{
+ const manifest=await manager.loadPack('watercolor-forest'),entries=[];
+ for(const [index,layout]of manifest.layouts.entries()){
+  const config=configs.get('watercolor-forest@1.0.0:'+layout.id);await renderLabel(canvas,{...sample,name:'Watercolor Forest',sativa:0,thc:40,cbd:20},{config});
+  assert(canvas.width===layout.width&&canvas.height===layout.height,'Illustration nicht nativ gerendert');
+  if(layout.shape==='circle')assert(canvas.getContext('2d').getImageData(0,0,1,1).data[3]===0,'Runder Außenbereich nicht transparent');
+  const blob=await canvasToPng(canvas);assert(blob.type==='image/png'&&blob.size>100000,'Illustriertes PNG fehlt');
+  entries.push({id:'art-'+index,data:{...sample,name:'Watercolor '+index},packId:manifest.id,packVersion:manifest.version,layoutId:layout.id,quantity:1,widthMm:60});
+ }
+ const layout=layoutSheets(entries,configs,{mixSizes:true,cropMarks:false,calibration:true});
+ const bytes=await generatePdf(layout,async(entry,config)=>{const target=document.createElement('canvas');await renderLabel(target,entry.data,{config});return target;});
+ const doc=await PDFDocument.load(bytes);assert(doc.getPageCount()===2,'Gemeinsamer Illustrationsbogen mit Kalibrierung fehlt');close(doc.getPage(0).getWidth(),210*MM_TO_PT);close(doc.getPage(0).getHeight(),297*MM_TO_PT);
+ for(const placement of layout.pages[0].placements)close(placement.originalHeightMm/placement.originalWidthMm,placement.config.height/placement.config.width);
+});
+await check('Alle sieben Klassen und sämtliche Dezimalgrenzen sind lückenlos',()=>{
+ for(const id of ['genetics','thc','cbd'])for(const [index,bound]of THRESHOLDS[id].entries()){assert(getLayerLevel(bound,id)===index+1,'Grenze falsch');if(index<6)assert(getLayerLevel(bound+0.01,id)===index+2,'Dezimalübergang falsch');}
+});
+await check('Identische Daten und Pack-Version erzeugen identische PNG-Daten',async()=>{
+ await renderLabel(canvas,sample,{config:rect()});const before=canvas.toDataURL();await renderLabel(canvas,{...sample},{config:rect()});assert(before===canvas.toDataURL(),'Rendern ist nicht deterministisch');
+});
+await check('PNG-Export erhält native Auflösung und echten Alphakanal',async()=>{
+ const blob=await canvasToPng(canvas),bytes=new Uint8Array(await blob.arrayBuffer()),view=new DataView(bytes.buffer);assert(blob.type==='image/png','Falsches Format');assert(view.getUint32(16)===1200&&view.getUint32(20)===1800,'Falsche Auflösung');assert(bytes[25]===6,'RGBA fehlt');
+});
+await check('Eigene runde Komposition bleibt außerhalb des Kreises transparent',async()=>{
+ await renderLabel(canvas,sample,{config:circle()});assert(canvas.width===1200&&canvas.height===1200,'Kreis ist nicht quadratisch');const ctx=canvas.getContext('2d');for(const[x,y]of [[0,0],[1199,0],[0,1199],[1199,1199],[80,80]])assert(ctx.getImageData(x,y,1,1).data[3]===0,'Kreisaußenbereich nicht transparent');assert(ctx.getImageData(600,600,1,1).data[3]>0,'Kreismitte fehlt');
+});
+await check('Packwechsel verändert Design bei identischen Sortendaten',async()=>{
+ await renderLabel(canvas,sample,{config:circle()});const original=canvas.toDataURL();const ink=configs.get('ink@1.0.0:circular');await renderLabel(canvas,sample,{config:ink});assert(original!==canvas.toDataURL(),'Design blieb gleich');assert(JSON.stringify(getRenderPlan(sample,ink).input)===JSON.stringify(getRenderPlan(sample,circle()).input),'Daten beim Wechsel verändert');
+});
+await check('Sieben Wetter- und Ornamentstufen sind visuell unterscheidbar',async()=>{
+ for(const config of [rect(),circle(),configs.get('woodland@1.0.0:wide-landscape')])for(const id of ['thc','cbd']){
+  const states=new Set();let lastCount=-1;
+  for(let index=0;index<7;index++){
+   const visibility={base:false,genetics:false,thc:id==='thc',cbd:id==='cbd',text:false};
+   await renderLabel(canvas,{...sample,[id]:THRESHOLDS[id][index]},{config,visibility});states.add(canvas.toDataURL());
+   const data=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;let count=0;for(let p=3;p<data.length;p+=4)if(data[p])count++;
+   assert(count>lastCount,`${config.layoutId} ${id}: Dichte steigt nicht bei Stufe ${index+1}`);lastCount=count;
+  }
+  assert(states.size===7,'Nicht sieben unterschiedliche Bilder');
+ }
+});
+await check('Optionale Himmel- und Textmasken werden in derselben Pipeline angewendet',async()=>{
+ const transparentMask=rect().thc[0].path;
+ for(const id of ['thc','text']){
+  const config={...rect(),masks:{[id]:transparentMask}};
+  const visibility={base:false,genetics:false,thc:id==='thc',cbd:false,text:id==='text'};
+  await renderLabel(canvas,{...sample,thc:40},{config,visibility});
+  const bytes=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;let count=0;for(let p=3;p<bytes.length;p+=4)if(bytes[p])count++;
+  assert(count===0,`${id}-Maske wurde ignoriert`);
+ }
+});
+await check('Lange Namen und optionaler Produzent bleiben in beiden Layouts lesbar',async()=>{
+ for(const config of [rect(),circle(),configs.get('woodland@1.0.0:wide-landscape')]){
+  const data={...sample,name:'Super Silver Haze mit einem besonders langen botanischen Sortennamen',producer:'Internationale Saatgutmanufaktur für traditionelle botanische Sammlungen'};
+  const result=await renderLabel(canvas,data,{config});assert(result.textLayout.lines.join(' ')===data.name,'Name abgeschnitten');assert(result.textLayout.producer.width<=config.typography.producer.maxWidth,'Produzent zu breit');
+  const without=await renderLabel(canvas,{...sample,producer:''},{config});assert(without.textLayout.producer===null,'Leerer Produzent wird gezeichnet');
+ }
+});
+await check('Fehlende Bilder und inkompatible Manifeste liefern kontrollierte Fehler',async()=>{
+ try{await renderLabel(canvas,sample,{config:{...rect(),base:{...rect().base,path:new URL('../texturepacks/woodland/missing.png',import.meta.url).href}}});throw Error('Fehler fehlt');}catch(error){assert(error.message.includes('PNG-Layer'),'Falscher Bildfehler');}
+ const manifest=await manager.loadPack('woodland');try{validateManifest({...manifest,compatibilityVersion:99});throw Error('Ungültiges Manifest akzeptiert');}catch(error){assert(error.message.includes('Texturepack'),'Manifestfehler nicht verständlich');}
+});
+await check('Warenkorb-Konfiguration überlebt echtes localStorage-Neuladen',()=>{
+ const key='label-generator-v3-browser-test';try{const service=new PrintCartService({storage:localStorage,key});service.clear();const entry=service.add({data:sample,packId:'woodland',packVersion:'1.0.0',layoutId:'rectangular',quantity:3,widthMm:70});const loaded=new PrintCartService({storage:localStorage,key});assert(loaded.list()[0].quantity===3,'Stückzahl nicht persistent');loaded.update(entry.id,{quantity:2});assert(loaded.list()[0].data.name===sample.name,'Sortendaten fehlen');}finally{localStorage.removeItem(key);}
+});
+await check('Echtes Browser-PDF enthält mehrere Sorten, A4-Seiten und Kalibrierung',async()=>{
+ const entries=[{id:'a',data:sample,packId:'woodland',packVersion:'1.0.0',layoutId:'rectangular',quantity:8,widthMm:70},{id:'b',data:{...sample,name:'Euphoria'},packId:'ink',packVersion:'1.0.0',layoutId:'rectangular',quantity:2,widthMm:70}];
+ const layout=layoutSheets(entries,configs,{marginMm:5,gapMm:2,cropMarks:false,calibration:true});
+ const bytes=await generatePdf(layout,async(entry,config)=>{const out=document.createElement('canvas');await renderLabel(out,entry.data,{config});return out;});
+ const pdf=await PDFDocument.load(bytes);assert(pdf.getPageCount()===layout.pages.length&&pdf.getPageCount()>2,'Mehrseitiges PDF fehlt');for(const page of pdf.getPages()){close(page.getWidth(),210*MM_TO_PT);close(page.getHeight(),297*MM_TO_PT);}
+ const physical=getPhysicalSize(rect(),70);close(physical.heightMm,105);
+});
+await check('Browser-PDF mit Beschnitt und gedrehten Etiketten exportiert',async()=>{
+ const entries=[{id:'bleed',data:sample,packId:'woodland',packVersion:'1.0.0',layoutId:'rectangular',quantity:2,widthMm:65}];
+ const layout=layoutSheets(entries,configs,{cropMarks:true,bleedMm:1,marginMm:5});
+ const bytes=await generatePdf(layout,async(entry,config)=>{const out=document.createElement('canvas');await renderLabel(out,entry.data,{config});return out;});assert(bytes.length>5000,'PDF mit Beschnitt fehlt');assert((await PDFDocument.load(bytes)).getPageCount()===layout.pages.length,'Seiten fehlen');
+});
+await check('Oberfläche: Form-/Packwechsel, Größen, Mengen, Bearbeitung und mobile Breite',async()=>{
+ const key='label-generator-v3-print-cart',original=localStorage.getItem(key);const frame=document.createElement('iframe');frame.style.cssText='width:390px;height:800px';
+ try{
+  localStorage.removeItem(key);const loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html';document.body.append(frame);await loaded;const doc=frame.contentDocument;
+  const ready=()=>until(()=>!doc.querySelector('#export').disabled);const input=(id,value)=>{doc.getElementById(id).value=value;doc.getElementById(id).dispatchEvent(new Event('input',{bubbles:true}));};
+  await ready();assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Mobile Seite läuft horizontal über');assert(doc.querySelector('#thc').max==='40'&&doc.querySelector('#cbd').max==='20','Wertebereiche falsch');
+  input('name','Test Sorte A');input('producer','Beispielzüchter');input('editor-quantity','3');await ready();doc.querySelector('#add-cart').click();await until(()=>doc.querySelectorAll('.cart-row').length===1);
+  assert(doc.querySelector('#layout').options.length===3&&doc.querySelectorAll('.layout-card').length===3,'Layoutauswahl nicht vom Pack erzeugt');
+  assert(doc.querySelector('#pack').value==='watercolor-forest@1.0.0','Illustriertes Startpack nicht gewählt');
+  input('layout','wide-landscape');await ready();assert(doc.querySelector('#preview').width===1536&&doc.querySelector('#preview').height===1024,'Querformat nicht aktiviert');
+  input('pack','ink@1.0.0');await ready();assert(doc.querySelector('#layout').value==='wide-landscape','Vergleichbares Layout beim Packwechsel verloren');
+  input('layout','circular');await ready();assert(doc.querySelector('#name').value==='Test Sorte A'&&doc.querySelector('#producer').value==='Beispielzüchter','Daten beim Wechsel verloren');assert(doc.querySelector('#preview').height===1200,'Kreis nicht aktiviert');assert(doc.querySelector('#size-label').textContent.includes('Durchmesser'),'Geometrie nicht vom Layout übernommen');
+  input('name','Test Sorte B');input('editor-quantity','2');await ready();doc.querySelector('#add-cart').click();await until(()=>doc.querySelectorAll('.cart-row').length===2);await until(()=>!doc.querySelector('#export-pdf').disabled);
+  assert(doc.querySelector('#cart-count').textContent==='5','Mengen falsch');assert(doc.querySelector('#sheet-summary').textContent.includes('5 Etiketten'),'Druckvorschau fehlt');
+  const first=doc.querySelector('.cart-row');first.querySelector('.cart-actions button').click();await until(()=>doc.querySelector('#name').value==='Test Sorte A');await ready();input('name','Bearbeitete Sorte');await ready();doc.querySelector('#add-cart').click();assert(doc.querySelector('.cart-description strong').textContent==='Bearbeitete Sorte','Bearbeitung nicht gespeichert');
+  input('print-width','150');await until(()=>!doc.querySelector('#print-warnings').hidden||!doc.querySelector('#print-error').hidden);assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Druckbereich läuft mobil über');
+  input('name','');assert(doc.querySelector('#export').disabled,'Ungültige Eingabe exportierbar');
+ }finally{frame.remove();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
+});
+await check('Gemischte Layouts: manuelle Position, Drehung, Ziehen und Rückgängig im mobilen Editor',async()=>{
+ const key='label-generator-v3-print-cart',original=localStorage.getItem(key),frame=document.createElement('iframe');frame.style.cssText='width:390px;height:900px';
+ try{
+  const entries=[{id:'manual-portrait',data:sample,packId:'woodland',packVersion:'1.0.0',layoutId:'rectangular',quantity:1,widthMm:60},{id:'manual-round',data:{...sample,name:'Rundes Etikett'},packId:'ink',packVersion:'1.0.0',layoutId:'circular',quantity:1,widthMm:40},{id:'manual-wide',data:{...sample,name:'Querformat'},packId:'woodland',packVersion:'1.0.0',layoutId:'wide-landscape',quantity:1,widthMm:60}];
+  localStorage.setItem(key,JSON.stringify({schemaVersion:2,entries}));const loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html';document.body.append(frame);await loaded;const doc=frame.contentDocument,win=frame.contentWindow;
+  await until(()=>!doc.querySelector('#export-pdf').disabled);assert(doc.querySelector('#sheet-page').options.length===1,'Gemischte Layouts nicht gemeinsam angeordnet');
+  const checkbox=doc.querySelector('#manual-mode');checkbox.checked=true;checkbox.dispatchEvent(new Event('input',{bubbles:true}));assert(!doc.querySelector('#manual-controls').hidden,'Manueller Editor fehlt');
+  const expected=layoutSheets(entries,configs,{marginMm:10,gapMm:3,cropMarks:true,mixSizes:true}),p=expected.pages[0].placements[0],sheet=doc.querySelector('#sheet-preview');
+  const point=(x,y)=>{const rect=sheet.getBoundingClientRect();return {clientX:rect.left+x/210*rect.width,clientY:rect.top+y/297*rect.height};};
+  const pointer=(type,x,y)=>sheet.dispatchEvent(new win.PointerEvent(type,{bubbles:true,pointerId:1,button:0,...point(x,y)}));
+  pointer('pointerdown',p.xMm+p.widthMm/2,p.yMm+p.heightMm/2);pointer('pointerup',p.xMm+p.widthMm/2,p.yMm+p.heightMm/2);
+  assert(doc.querySelector('#manual-selected').textContent.includes(sample.name),'Etikett nicht auswählbar');
+  doc.querySelector('#sheet-add-page').click();assert(doc.querySelector('#sheet-page').options.length===2,'Leere A4-Seite fehlt');
+  doc.querySelector('#placement-page').value='1';doc.querySelector('#placement-x').value='20';doc.querySelector('#placement-y').value='20';doc.querySelector('#apply-placement').click();
+  assert(doc.querySelector('#manual-error').hidden&&doc.querySelector('#manual-selected').textContent.includes('Seite 2'),'Seitenwechsel fehlgeschlagen');
+  const before=doc.querySelector('#manual-selected').textContent;doc.querySelector('#rotate-placement').click();assert(doc.querySelector('#manual-selected').textContent!==before,'Drehung ohne Wirkung');
+  doc.querySelector('#placement-x').value='0';doc.querySelector('#apply-placement').click();assert(!doc.querySelector('#manual-error').hidden&&doc.querySelector('#placement-x').value==='20','Ungültige Position nicht zurückgewiesen');
+  sheet.dispatchEvent(new win.KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));assert(doc.querySelector('#placement-x').value==='21','Tastaturpositionierung fehlt');
+  doc.querySelector('#sheet-undo').click();assert(doc.querySelector('#placement-x').value==='20','Rückgängig fehlt');doc.querySelector('#sheet-redo').click();assert(doc.querySelector('#placement-x').value==='21','Wiederholen fehlt');
+  const rotated=!p.rotated,w=rotated?p.originalHeightMm:p.originalWidthMm,h=rotated?p.originalWidthMm:p.originalHeightMm;
+  await new Promise(resolve=>setTimeout(resolve,100));pointer('pointerdown',21+w/2,20+h/2);pointer('pointermove',26+w/2,25+h/2);pointer('pointerup',26+w/2,25+h/2);
+  assert(doc.querySelector('#placement-x').value==='26'&&doc.querySelector('#placement-y').value==='25','Ziehen übernimmt Position nicht');
+  assert(doc.querySelector('#manual-error').hidden&&!doc.querySelector('#export-pdf').disabled,'Manuelles Layout nicht exportierbar');assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Manueller Editor läuft mobil über');
+ }finally{frame.remove();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
+});
+await check('Drei echte Sprite-Layouts bleiben im gemeinsamen PDF unverzerrt',async()=>{
+ const ids=['rectangular','wide-landscape','circular'],entries=ids.map((layoutId,i)=>({id:'layout-'+i,data:sample,packId:'woodland',packVersion:'1.0.0',layoutId,quantity:1,widthMm:50}));
+ const editor=new SheetEditor(layoutSheets(entries,configs,{mixSizes:true,cropMarks:false}));const moved=editor.move({placementId:'layout-0:0',xMm:10,yMm:100});
+ const bytes=await generatePdf(moved,async(entry,config)=>{const out=document.createElement('canvas');await renderLabel(out,entry.data,{config});return out;});assert((await PDFDocument.load(bytes)).getPageCount()===1,'PDF mit drei Layouts nicht gemeinsam exportiert');
+ close(getPhysicalSize(configs.get('woodland@1.0.0:wide-landscape'),60).heightMm,40);
+});
+let archiveFixture=null;
+await check('ZIP-Import verwendet echte Blob-Assets und bleibt nach erneutem Öffnen in IndexedDB erhalten',async()=>{
+ archiveFixture=await inspectPackArchive(await manager.exportPack('woodland','1.0.0'));
+ const dbName='label-v3-browser-'+crypto.randomUUID(),store=new IndexedDBPackStore({dbName});
+ let local=new TexturePackManager({importedStore:store}),restoredStore=null,restored=null;
+ try{
+  const manifest={...structuredClone(archiveFixture.manifest),id:'test-local-forest',name:'Lokaler Testwald',version:'2.0.0'};
+  const zip=buildPackArchive(manifest,archiveFixture.files);await local.importPack(zip);
+  const config=await local.getConfig(manifest.id,'circular','2.0.0');assert(config.base.path.startsWith('blob:'),'Dateien nicht aus dem lokalen Speicher');
+  await renderLabel(canvas,sample,{config});const before=canvas.toDataURL();
+  local.dispose();store.close();restoredStore=new IndexedDBPackStore({dbName});restored=new TexturePackManager({importedStore:restoredStore});
+  const restoredConfig=await restored.getConfig(manifest.id,'circular','2.0.0');await renderLabel(canvas,sample,{config:restoredConfig});assert(before===canvas.toDataURL(),'Gespeichertes Pack liefert nach Neustart andere Pixel');
+  const duplicate=await restored.importPack(zip);assert(duplicate.duplicate,'Identischer Reimport überschreibt Daten');
+  const changed={...manifest,name:'Anderer Inhalt'};try{await restored.importPack(buildPackArchive(changed,archiveFixture.files));throw Error('Version überschrieben');}catch(error){assert(error.message.includes('Version erhöhen'),'Versionskonflikt fehlt');}
+  const entries=[{id:'imported-label',data:sample,packId:manifest.id,packVersion:'2.0.0',layoutId:'circular',quantity:2,widthMm:60}];
+  const layouts=layoutSheets(entries,new Map([[configKey(entries[0]),restoredConfig]]),{cropMarks:false});
+  const pdf=await generatePdf(layouts,async(entry,cfg)=>{const out=document.createElement('canvas');await renderLabel(out,entry.data,{config:cfg});return out;});assert((await PDFDocument.load(pdf)).getPageCount()===1,'PDF mit importiertem Pack fehlt');
+  const backup=await inspectPackArchive(await restored.exportPack(manifest.id,'2.0.0'));assert(backup.manifest.id===manifest.id&&backup.files['fonts/OFL.txt'],'ZIP-Backup unvollständig');
+  await restored.removePack(manifest.id,'2.0.0');assert((await restored.listPacks()).every(x=>x.id!==manifest.id),'Lokales Pack nicht entfernt');
+ }finally{local.dispose();store.close();restored?.dispose();restoredStore?.close();await new Promise((resolve,reject)=>{const deletion=indexedDB.deleteDatabase(dbName);deletion.onsuccess=resolve;deletion.onerror=()=>reject(deletion.error);deletion.onblocked=()=>reject(Error('Testdatenbank blockiert'));});}
+});
+await check('Defekte Schrift wird vor dem Speichern abgefangen, installierte Packs bleiben erhalten',async()=>{
+ if(!archiveFixture)throw Error('ZIP-Testvorlage fehlt');
+ const dbName='label-v3-bad-font-'+crypto.randomUUID(),store=new IndexedDBPackStore({dbName}),local=new TexturePackManager({importedStore:store});
+ try{
+  const manifest={...structuredClone(archiveFixture.manifest),id:'invalid-font-pack',version:'1.0.0'};
+  const files={...archiveFixture.files,[manifest.fonts[0].path]:archiveFixture.files[manifest.fonts[0].path].slice(0,2048)};
+  try{await local.importPack(buildPackArchive(manifest,files));throw Error('Beschädigtes Pack installiert');}catch(error){assert(/schrift/i.test(error.message),'Schriftdekodierung nicht geprüft: '+error.message);}
+  assert((await store.list()).length===0,'Fehlerhaftes Pack wurde gespeichert');assert((await local.listPacks()).length===3,'Mitgelieferte Packs beschädigt');
+ }finally{local.dispose();store.close();await new Promise(resolve=>{const deletion=indexedDB.deleteDatabase(dbName);deletion.onsuccess=resolve;deletion.onerror=resolve;});}
+});
+await check('Ein-Layout-ZIP: dynamische Auswahl, vergleichbarer Packwechsel, Neustart und Warenkorbschutz',async()=>{
+ if(!archiveFixture)throw Error('ZIP-Testvorlage fehlt');
+ const id='ui-test-'+crypto.randomUUID().slice(0,8),version='1.0.0',manifest={...structuredClone(archiveFixture.manifest),id,name:'ZIP-Oberflächentest',version};
+ manifest.layouts=[{...manifest.layouts.find(layout=>layout.id==='wide-landscape'),id:'my-custom-layout',name:'Eigenes Querlayout'}];
+ manifest.layouts[0].preview=manifest.layouts[0].layers.genetics[4];
+ const bytes=buildPackArchive(manifest,archiveFixture.files),key='label-generator-v3-print-cart',original=localStorage.getItem(key),frame=document.createElement('iframe');frame.style.cssText='width:390px;height:800px';
+ const store=new IndexedDBPackStore();
+ try{
+  localStorage.removeItem(key);let loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html';document.body.append(frame);await loaded;let doc=frame.contentDocument;
+  await until(()=>!doc.querySelector('#export').disabled);
+  const transfer=new DataTransfer();transfer.items.add(new File([bytes],'test-pack.zip',{type:'application/zip'}));doc.querySelector('#pack-file').files=transfer.files;doc.querySelector('#pack-file').dispatchEvent(new Event('change',{bubbles:true}));
+  await until(()=>!doc.querySelector('#pack-file').disabled);
+  assert(doc.querySelector('#pack-error').hidden,'ZIP-UI-Import fehlgeschlagen: '+doc.querySelector('#pack-error').textContent);
+  assert(doc.querySelector('#pack').value===id+'@'+version,'Importiertes Pack nicht gewählt');assert(doc.querySelector('.pack-card[data-pack-key="'+id+'@'+version+'"]'),'Pack-Karte fehlt');
+  assert(doc.querySelector('#layout').options.length===1&&doc.querySelector('#layout').value==='my-custom-layout'&&doc.querySelector('#layout').disabled,'Einzelnes benutzerdefiniertes Layout nicht automatisch gewählt');
+  await until(()=>doc.querySelector('.layout-thumb img')?.complete);assert(doc.querySelector('.layout-thumb img').naturalWidth===1800,'Layout-eigenes Vorschaubild wird nicht verwendet');
+  await until(()=>!doc.querySelector('#add-cart').disabled);doc.querySelector('#add-cart').click();await until(()=>doc.querySelectorAll('.cart-row').length===1);
+  let card=doc.querySelector('.pack-card[data-pack-key="'+id+'@'+version+'"]');assert(card.querySelector('button:last-child').disabled,'Verwendetes Pack kann entfernt werden');
+  assert(JSON.parse(localStorage.getItem(key)).entries[0].layoutId==='my-custom-layout','Warenkorb speichert keine dynamische Referenz');
+  const chosenName=doc.querySelector('#name').value;doc.querySelector('#pack').value='ink@1.0.0';doc.querySelector('#pack').dispatchEvent(new Event('input',{bubbles:true}));await until(()=>!doc.querySelector('#export').disabled);
+  assert(doc.querySelector('#layout').value==='wide-landscape'&&doc.querySelector('#name').value===chosenName,'Vergleichbares Seitenverhältnis beim Wechsel nicht gewählt');
+  loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html?reload='+Date.now();await loaded;doc=frame.contentDocument;await until(()=>!doc.querySelector('#export').disabled);
+  assert([...doc.querySelector('#pack').options].some(x=>x.value===id+'@'+version),'Pack nach Neustart verschwunden');assert(doc.querySelectorAll('.cart-row').length===1,'Warenkorb nach Neustart verschwunden');
+  assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Pack-Verwaltung läuft mobil über');doc.querySelector('#clear-cart').click();await until(()=>!doc.querySelector('.pack-card[data-pack-key="'+id+'@'+version+'"] button:last-child').disabled);
+  doc.querySelector('.pack-card[data-pack-key="'+id+'@'+version+'"] button:last-child').click();await until(()=>!doc.querySelector('.pack-card[data-pack-key="'+id+'@'+version+'"]'));
+  assert(![...doc.querySelector('#pack').options].some(x=>x.value===id+'@'+version),'Entferntes Pack bleibt auswählbar');
+ }finally{frame.remove();await store.remove(id,version);store.close();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
+});
+await renderLabel(canvas,sample,{config:circle()});
+document.body.dataset.testStatus=checks.some(x=>x.startsWith('FAIL'))?'failed':'passed';
+</script></body></html>

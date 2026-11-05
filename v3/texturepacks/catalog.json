@@ -1,0 +1,32 @@
+{
+  "compatibilityVersion": 1,
+  "packs": [
+    {
+      "id": "woodland",
+      "name": "Woodland Study",
+      "description": "Technisches Wald-Beispielpack mit sieben Tageszeiten, Wetter- und Blütenstufen. Platzhalterillustrationen.",
+      "version": "1.0.0",
+      "status": "placeholder",
+      "manifest": "woodland/pack.json",
+      "preview": "woodland/preview.png"
+    },
+    {
+      "id": "ink",
+      "name": "Ink Study",
+      "description": "Monochromes Beispielpack mit eigener Farbpalette. Technische Platzhalterillustrationen.",
+      "version": "1.0.0",
+      "status": "placeholder",
+      "manifest": "ink/pack.json",
+      "preview": "ink/preview.png"
+    },
+    {
+      "id": "watercolor-forest",
+      "name": "Watercolor Forest",
+      "description": "Illustriertes Wald-Texturepack in Aquarelloptik: sieben Tageszeiten, zunehmendes Wetter und wachsende botanische Ornamente. KI-generierte Illustrationen.",
+      "version": "1.0.0",
+      "status": "illustrated",
+      "manifest": "watercolor-forest/pack.json",
+      "preview": "watercolor-forest/preview.png"
+    }
+  ]
+}
