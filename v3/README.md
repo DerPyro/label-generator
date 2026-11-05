@@ -24,6 +24,10 @@ Für eine lokale Prüfung dieses Unterpfads kann der Entwicklungsserver mit `BAS
 
 ## Funktionen
 
+Die optionale Sortensuche übernimmt wie in v1 Kurzname, Seed-Produzent, THC, CBD und Genetik aus der CSV. Alle 2.464 Einträge sind nach Name und Produzent durchsuchbar; Treffer lassen sich anklicken oder mit Pfeiltasten und Enter wählen. Eigene Angaben bleiben möglich, Erntejahr und Design bleiben bei der Auswahl erhalten. Unbekannte Genetik bleibt zur manuellen Prüfung stehen; Werte über den v3-Grenzen werden mit Hinweis begrenzt.
+
+`data/strains.csv` ist die statisch ausgelieferte Kopie der Repository-Datei `strains.csv`. Nach Änderungen an dieser Quelldatei im Ordner `v3` einmal `npm run data:sync` ausführen und die aktualisierte Kopie mit veröffentlichen. Der Browser benötigt weiterhin keinen Build oder Serverdienst. Die eigene Browserprüfung steht unter `tests/browser-strains.html`.
+
 - Ein Canvas-Renderer mit benannten, dynamischen Layouts. **Watercolor Forest** bietet Hochformat (1024 × 1536 px), Querformat (1536 × 1024 px) und Rund (1254 × 1254 px) mit jeweils eigener illustrierter Komposition. Die beiden technischen Packs besitzen dieselben Layoutarten in 1200 × 1800, 1800 × 1200 beziehungsweise 1200 × 1200 px.
 - Jedes Pack enthält 66 Layer-PNGs: pro Layout eine Basis und je sieben Genetik-, THC- und CBD-Stufen. Über alle drei Packs sind es 198 Layer-PNGs; Vorschauen kommen hinzu. Die Illustrationen von Watercolor Forest sind KI-generierte Grafiken, keine menschlich gemalten Originalaquarelle.
 - Feste, inklusive Stufen: Genetik 14/29/44/59/74/89/100 %, THC 5/11/17/23/29/35/40 %, CBD 2/5/8/11/14/17/20 %. THC reicht bis 40 %, CBD bis 20 %; Werte zwischen Schwellen werden der nächsthöheren passenden Stufe zugeordnet, ohne Überblendung.

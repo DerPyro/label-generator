@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><title>Sortensuche · Browserprüfungen</title>
+<body style="font:15px system-ui;margin:2rem;background:#f3eee3;color:#21382d"><h1>Sortensuche in v3</h1><pre id="results">Prüfung läuft …</pre>
+<script type="module">
+import { mountStrainPicker } from '../src/strain-picker.js';
+const checks=[],assert=(ok,message)=>{if(!ok)throw Error(message);};
+async function until(fn){for(let i=0;i<500;i++){if(fn())return;await new Promise(resolve=>setTimeout(resolve,20));}throw Error('Zeitüberschreitung');}
+async function check(name,fn){try{await fn();checks.push('PASS '+name);}catch(error){checks.push('FAIL '+name+': '+error.message);}document.querySelector('#results').textContent=checks.join('\n');}
+const key='label-generator-v3-print-cart',saved=localStorage.getItem(key),frame=document.createElement('iframe');frame.style.cssText='width:390px;height:900px';let doc,win;
+try{
+ localStorage.removeItem(key);const loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html';document.body.append(frame);await loaded;doc=frame.contentDocument;win=frame.contentWindow;
+ const input=(id,value)=>{const element=doc.getElementById(id);element.value=value;element.dispatchEvent(new win.Event('input',{bubbles:true}));};
+ const ready=()=>until(()=>!doc.querySelector('#export').disabled);
+ const choose=async query=>{input('strain-search',query);await until(()=>doc.querySelectorAll('#strain-results [role=option]').length>0);doc.querySelector('#strain-results [role=option]').click();await ready();};
+ await check('Alle 2.464 CSV-Sorten laden am Pages-Unterpfad; Suche verändert keine Eingaben',async()=>{
+  await ready();await until(()=>!doc.querySelector('#strain-search').disabled);assert(doc.querySelector('#strain-status').textContent.includes('2.464'),'Katalog unvollständig');
+  const previous=doc.querySelector('#name').value;input('year','2023');await ready();input('strain-search','Euphoria Royal Queen');
+  assert(doc.querySelector('#strain-search').getAttribute('aria-expanded')==='true','Dropdown öffnet nicht');assert(doc.querySelector('#name').value===previous,'Tippen überschreibt Etikett');assert(doc.querySelector('#strain-results').textContent.includes('Royal Queen Seeds'),'Seed-Produzent nicht durchsuchbar');
+ });
+ await check('Tastaturwahl übernimmt Kurzname, Produzent, THC, CBD und Genetik und erhält Jahr und Layout',async()=>{
+  const pack=doc.querySelector('#pack').value,layout=doc.querySelector('#layout').value,search=doc.querySelector('#strain-search');
+  search.dispatchEvent(new win.KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true}));assert(search.getAttribute('aria-activedescendant'),'Aktiver Treffer fehlt');search.dispatchEvent(new win.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));await ready();
+  for(const[id,value]of Object.entries({name:'Euphoria',producer:'Royal Queen Seeds',thc:'9',cbd:'10',sativa:'20',year:'2023'}))assert(doc.getElementById(id).value===value,id+' falsch übernommen');
+  assert(doc.querySelector('#indica-output').value==='80','Indica nicht ergänzt');assert(doc.querySelector('#pack').value===pack&&doc.querySelector('#layout').value===layout,'Design verändert');assert(doc.querySelector('#preview').getAttribute('aria-label').includes('Euphoria'),'Vorschau nicht aktualisiert');
+  doc.querySelector('#add-cart').click();const entry=JSON.parse(localStorage.getItem(key)).entries[0];assert(entry.data.name==='Euphoria'&&entry.data.thc===9&&entry.data.producer==='Royal Queen Seeds','Übernommene Werte fehlen im Warenkorb');
+ });
+ await check('Unbekannte Genetik und zu hohe CSV-Werte werden sichtbar behandelt',async()=>{
+  await choose('Super Critical Bud CBD Garden of Green');assert(doc.querySelector('#cbd').value==='20','CBD-Grenze nicht eingehalten');assert(!doc.querySelector('#strain-warning').hidden&&doc.querySelector('#strain-warning').textContent.includes('23'),'Begrenzung bleibt unsichtbar');
+  const sativa=doc.querySelector('#sativa').value;await choose('ExoEvania GeneSeeds');assert(doc.querySelector('#sativa').value===sativa,'Unbekannte 0/0-Genetik überschreibt vorhandene Werte');assert(doc.querySelector('#strain-warning').textContent.includes('manuell'),'Hinweis auf fehlende Genetik fehlt');
+  input('name','Eigene Sorte');await ready();assert(doc.querySelector('#name').value==='Eigene Sorte'&&doc.querySelector('#strain-warning').hidden,'Manuelle Bearbeitung blockiert');
+ });
+ await check('Keine Treffer, Escape, leere Auswahl und mobile Breite funktionieren',()=>{
+  input('strain-search','nicht-vorhandene-sorte-xyz');assert(doc.querySelectorAll('#strain-results [role=option]').length===0,'Unpassende Treffer');assert(doc.querySelector('#strain-status').textContent.includes('0 Treffer'),'Leermeldung fehlt');
+  doc.querySelector('#strain-search').dispatchEvent(new win.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));assert(doc.querySelector('#strain-results').hidden,'Escape schließt nicht');
+  input('strain-search','');assert(doc.querySelectorAll('#strain-results [role=option]').length===50,'Auswahl ohne Suchtext fehlt');assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Suche läuft mobil über');
+ });
+}catch(error){checks.push('FAIL Initialisierung: '+error.message);}finally{frame.remove();if(saved===null)localStorage.removeItem(key);else localStorage.setItem(key,saved);}
+await check('Eine fehlende CSV blockiert die manuelle Etikettenerstellung nicht',async()=>{
+ const wrapper=document.createElement('div'),originalFetch=globalThis.fetch;
+ wrapper.innerHTML='<input id="strain-search" disabled><button id="strain-toggle" disabled></button><ul id="strain-results" hidden></ul><p id="strain-status"></p>';document.body.append(wrapper);
+ try{globalThis.fetch=async()=>({ok:false,status:404});const picker=mountStrainPicker(wrapper,()=>{throw Error('Unerwartete Auswahl');});await picker.ready;assert(wrapper.querySelector('#strain-status').textContent.includes('manuell'),'Kein verständlicher Ausweichhinweis');assert(wrapper.querySelector('#strain-search').disabled,'Fehlgeschlagene Suche aktiv');}
+ finally{globalThis.fetch=originalFetch;wrapper.remove();}
+});
+document.querySelector('#results').textContent=checks.join('\n');document.body.dataset.testStatus=checks.some(line=>line.startsWith('FAIL'))?'failed':'passed';
+</script></body></html>

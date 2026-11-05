@@ -2,6 +2,7 @@ import { getRenderPlan } from './model.js';
 import { renderLabel, canvasToPng } from './renderer.js';
 import { TexturePackManager, getLayouts, chooseComparableLayout } from './texturepacks.js';
 import { PrintCartService } from './cart.js';
+import { mountStrainPicker } from './strain-picker.js';
 import { SheetEditor, findPlacement, movePlacement } from './sheet-editor.js';
 import { configKey, getPhysicalSize, layoutSheets, generatePdf, cropMarkSegments, preparePrintImage } from './print.js';
 
@@ -146,6 +147,7 @@ async function entryConfig(entry){return manager.getConfig(entry.packId,entry.la
 async function editEntry(entry){
  try{
   await entryConfig(entry);
+  strainPicker.clear();report('#strain-warning','');
   for(const [key,input]of Object.entries(fields))input.value=entry.data[key]??'';
   $('#pack').value=`${entry.packId}@${entry.packVersion}`;requestedLayoutId=entry.layoutId;$('#width-mm').value=entry.widthMm;$('#editor-quantity').value=entry.quantity;
   editingId=entry.id;editingVersion=entry.packVersion;$('#add-cart').textContent='Änderungen im Warenkorb speichern';$('#edit-cancel').hidden=false;
@@ -220,7 +222,12 @@ async function drawSheet(layout,index,request=sheetRequest){
  canvas.setAttribute('aria-label',`Druckvorschau Seite ${index+1}, ${page.widthMm} × ${page.heightMm} mm, ${page.placements.length} Etiketten`);
 }
 $('#label-form').addEventListener('submit',event=>event.preventDefault());
-$('#label-form').addEventListener('input',event=>{if(event.target.id==='pack'||event.target.id==='layout')editingVersion=null;updatePreview();});
+$('#label-form').addEventListener('input',event=>{
+ if(event.target.closest('.strain-picker'))return;
+ if(event.target.id==='pack'||event.target.id==='layout')editingVersion=null;
+ if(Object.values(fields).includes(event.target)){strainPicker.clear();report('#strain-warning','');}
+ updatePreview();
+});
 $('#export').addEventListener('click',async()=>{if(!current||busy)return;const state=current;$('#export').disabled=true;try{download(await canvasToPng(preview),`${safeName(state.data.name)}_${state.data.year}.png`);}catch(error){report('#form-error',error.message);}finally{if(current)setEditorEnabled(true);}});
 $('#add-cart').addEventListener('click',()=>{if(!current||busy)return;try{const entry={data:current.data,packId:current.packId,packVersion:current.packVersion,layoutId:current.layoutId,quantity:current.quantity,widthMm:current.widthMm};if(editingId)cart.update(editingId,entry);else cart.add(entry);notice(editingId?'Änderungen gespeichert.':'Etikett zum Druckwarenkorb hinzugefügt.');endEditing();report('#cart-error','');updateCart();}catch(error){report('#cart-error',error.message);}});
 $('#edit-cancel').addEventListener('click',()=>{endEditing();updatePreview();});
@@ -352,6 +359,10 @@ $('#sheet-redo').addEventListener('click',()=>{cancelDrag();if(sheetEditor)adopt
 $('#sheet-add-page').addEventListener('click',()=>{cancelDrag();if(!sheetEditor)return;try{const next=sheetEditor.addPage(),index=next.pages.findLastIndex(page=>!page.calibration);adoptManual(next,index);$('#placement-page').value=String(index);}catch(error){report('#manual-error',error.message);}});
 $('#sheet-reset').addEventListener('click',()=>{cancelDrag();if(sheetEditor&&automaticLayout){selectedPlacementId=null;adoptManual(sheetEditor.reset(automaticLayout),0);}});
 
+const strainPicker=mountStrainPicker($('.strain-picker'),({data,warnings})=>{
+ for(const [key,value]of Object.entries(data))if(fields[key])fields[key].value=value;
+ report('#strain-warning',warnings.join(' '));updatePreview();
+});
 async function initialize(){
  try{await refreshPacks('watercolor-forest@1.0.0');if(cart.error)notice(cart.error);await updatePreview();updateCart();}
  catch(error){report('#form-error',error.message);$('#loading').hidden=true;notice('Texturepacks konnten nicht geladen werden. Bitte statischen Webserver und Pack-Dateien prüfen.');}
