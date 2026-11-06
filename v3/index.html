@@ -47,7 +47,7 @@
         <div class="preview-heading"><h2 id="preview-title">Dein Etikett</h2><span class="live-indicator"><i></i>Live-Vorschau</span></div>
         <div class="canvas-stage"><canvas id="preview" width="1200" height="1800" aria-label="Vorschau des Etiketts für Super Silver Haze">Die Etikettenvorschau benötigt einen Browser mit Canvas-Unterstützung.</canvas><div id="loading" class="loading">Etikett wird zusammengesetzt …</div></div>
         <div class="preview-footer"><span class="asset-notice">Beispielassets · Platzhalter</span><span id="render-status" role="status" aria-live="polite">Lade Vorlagen …</span></div>
-        <details class="layer-inspector"><summary><span>Die Ebenen dieses Etiketts</span><span class="details-icon" aria-hidden="true">+</span></summary><p class="inspector-intro">Jede Eigenschaft wählt eine von sieben Vorlagen. Der PNG-Download übernimmt ausgeblendete Ebenen; Druckwarenkorb und PDF verwenden das vollständige Design.</p><div id="layer-list" class="layer-list"></div><p id="asset-version" class="asset-version"></p></details>
+        <section class="layer-inspector" aria-labelledby="layers-title"><h2 id="layers-title">Die Ebenen dieses Etiketts</h2><p class="inspector-intro">Bildebenen von vorne nach hinten. Mit den Pfeilen verschiebst du eine Ebene nach hinten (↓) oder vorne (↑). Die Reihenfolge gilt auch für PNG und Druckwarenkorb. Ausgeblendete Ebenen werden nur in Vorschau und PNG ausgeblendet.</p><div id="layer-list" class="layer-list"></div><button id="reset-sprite-order" class="text-button" type="button" disabled>Reihenfolge zurücksetzen</button><p id="asset-version" class="asset-version"></p></section>
       </section>
     </main>
     <section class="feature-section" aria-labelledby="cart-title"><div class="section-heading"><div><p class="eyebrow">MEHRERE SORTEN, EIN DRUCKAUFTRAG</p><h2 id="cart-title">Dein Druckwarenkorb</h2></div><button id="clear-cart" class="text-button" type="button">Warenkorb leeren</button></div><p class="section-copy">Etiketten werden mit ihren Werten, Pack-Versionen, Größen und Stückzahlen auf diesem Gerät gespeichert.</p><p id="cart-error" class="error" role="alert" hidden></p><div id="cart-list" class="cart-list"></div></section>
@@ -58,3 +58,4 @@
   </div>
 </body>
 </html>
+

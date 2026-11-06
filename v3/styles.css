@@ -752,3 +752,11 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible { 
   border:0;
 }
 
+
+
+.layer-inspector h2 { margin:0; padding:17px 0; font-size:11px; font-weight:600; }
+.layer-description { flex:1; min-width:0; cursor:pointer; }
+.layer-actions { display:flex; gap:6px; flex:0 0 auto; }
+.layer-move { width:34px; height:36px; padding:0; border:1px solid var(--line); border-radius:4px; background:var(--input-bg); color:var(--accent); font:18px system-ui; cursor:pointer; }
+.layer-move:hover:enabled { background:var(--hover-bg); }
+.layer-move:disabled { opacity:.35; cursor:default; }

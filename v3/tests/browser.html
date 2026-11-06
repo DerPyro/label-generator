@@ -120,6 +120,26 @@ await check('Oberfläche: Form-/Packwechsel, Größen, Mengen, Bearbeitung und m
   input('name','');assert(doc.querySelector('#export').disabled,'Ungültige Eingabe exportierbar');
  }finally{frame.remove();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
 });
+await check('Offene Ebenenliste: Reihenfolge, Rücksetzen, Warenkorb und Wiederherstellen',async()=>{
+ const key='label-generator-v3-print-cart',original=localStorage.getItem(key),frame=document.createElement('iframe');frame.style.cssText='width:390px;height:900px';
+ try{
+  localStorage.removeItem(key);let loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html';document.body.append(frame);await loaded;let doc=frame.contentDocument;
+  const ready=()=>until(()=>!doc.querySelector('#export').disabled);
+  const ids=()=>[...doc.querySelectorAll('.layer-row')].map(row=>row.dataset.layerId);
+  await ready();assert(doc.querySelector('.layer-inspector').tagName==='SECTION','Ebenen einklappbar');
+  const initial=ids(),before=doc.querySelector('#preview').toDataURL();
+  const move=doc.querySelector('[data-layer-id="genetics"] [data-action="front"]');move.click();await ready();
+  const changed=ids(),after=doc.querySelector('#preview').toDataURL();assert(initial.join()!==changed.join(),'Reihenfolge unverändert');assert(after!==before,'Spriteänderung nicht gerendert');
+  assert(doc.activeElement.closest('.layer-row')?.dataset.layerId==='genetics','Tastaturfokus verloren');
+  assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Ebenenliste läuft mobil über');
+  doc.querySelector('#add-cart').click();const saved=JSON.parse(localStorage.getItem(key)).entries[0];assert(saved.spriteOrder.join()===changed.slice(0,4).reverse().join(),'Reihenfolge nicht gespeichert');
+  doc.querySelector('#reset-sprite-order').click();await ready();assert(doc.querySelector('#preview').toDataURL()===before,'Zurücksetzen verändert Original');
+  loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html?order='+Date.now();await loaded;doc=frame.contentDocument;await ready();
+  doc.querySelector('.cart-actions button').click();await until(()=>!doc.querySelector('#edit-cancel').hidden);await ready();assert(ids().join()===changed.join(),'Gespeicherte Reihenfolge beim Bearbeiten verloren');assert(doc.querySelector('#preview').toDataURL()===after,'Bearbeitung rendert andere Pixel');
+  await until(()=>!doc.querySelector('#export-pdf').disabled);
+  const checkbox=doc.querySelector('[data-layer-id="thc"] input');checkbox.click();await ready();assert(!doc.querySelector('[data-layer-id="thc"] input').checked,'Ausblenden fehlt');
+ }finally{frame.remove();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
+});
 await check('Gemischte Layouts: manuelle Position, Drehung, Ziehen und Rückgängig im mobilen Editor',async()=>{
  const key='label-generator-v3-print-cart',original=localStorage.getItem(key),frame=document.createElement('iframe');frame.style.cssText='width:390px;height:900px';
  try{

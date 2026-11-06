@@ -1,3 +1,4 @@
+import { getSpriteOrder, withSpriteOrder } from './sprite-order.js';
 import { getRenderPlan } from './model.js';
 import { renderLabel, canvasToPng } from './renderer.js';
 import { TexturePackManager, getLayouts, chooseComparableLayout } from './texturepacks.js';
@@ -11,6 +12,10 @@ const fields = Object.fromEntries(['name','producer','year','thc','cbd','sativa'
 const manager = new TexturePackManager();
 const cart = new PrintCartService();
 const visibility = {base:true,genetics:true,thc:true,cbd:true,text:true};
+const spriteOrders = new Map();
+let pendingSpriteOrder;
+let layerFocus;
+const editorOrderKey = config => JSON.stringify([config.packId||config.id, config.packVersion, config.layoutId||config.format]);
 const preview = $('#preview');
 const renderCache = new Map();
 let packs = [];
@@ -62,15 +67,39 @@ function updateOutputs(){
  const sativa=Number(fields.sativa.value);$('#sativa-output').value=sativa;$('#indica-output').value=100-sativa;
  fields.sativa.setAttribute('aria-valuetext',`${sativa} Prozent Sativa, ${100-sativa} Prozent Indica`);
 }
-function showLayers(plan){
- const list=$('#layer-list');list.replaceChildren(...plan.layers.map(layer=>{
-  const row=document.createElement('label');row.className='layer-row';
+function showLayers(plan, config){
+ const order=getSpriteOrder(config);
+ // Use the explicit order for equal zIndex values, too.
+ const ids=config.spriteOrder||order;
+ const layers=[...[...ids].reverse().map(id=>plan.layers.find(layer=>layer.id===id)),plan.layers.find(layer=>layer.id==='text')];
+ const list=$('#layer-list');list.replaceChildren(...layers.map(layer=>{
+  const row=document.createElement('div');row.className='layer-row';row.dataset.layerId=layer.id;
   const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.checked=visibility[layer.id]!==false;
-  checkbox.setAttribute('aria-label',`${layer.label} anzeigen`);checkbox.addEventListener('change',()=>{visibility[layer.id]=checkbox.checked;updatePreview();});
-  const description=document.createElement('div'),label=document.createElement('span'),path=document.createElement('code');
-  label.textContent=layer.label;path.textContent=layer.id==='text'?'Dynamischer Text':`${layer.level?'Stufe '+layer.level+' / 7 · ':''}${layer.assetPath||new URL(layer.path).pathname.split('/').slice(-3).join('/')}`;
-  description.append(label,path);row.append(checkbox,description);return row;
+  checkbox.setAttribute('aria-label',layer.label+' anzeigen');checkbox.addEventListener('change',()=>{visibility[layer.id]=checkbox.checked;layerFocus={id:layer.id,action:'visibility'};updatePreview();});
+  const description=document.createElement('label'),label=document.createElement('span'),path=document.createElement('code');description.className='layer-description';
+  checkbox.id='layer-visible-'+layer.id;checkbox.dataset.action='visibility';description.htmlFor=checkbox.id;
+  label.textContent=layer.label;path.textContent=layer.id==='text'?'Text & Dekoration':(layer.level?'Stufe '+layer.level+' / 7 · ':'')+(layer.assetPath||new URL(layer.path).pathname.split('/').slice(-3).join('/'));
+  description.append(label,path);row.append(checkbox,description);
+  if(layer.id!=='text'){
+   const actions=document.createElement('div');actions.className='layer-actions';
+   const index=ids.indexOf(layer.id);
+   for(const [direction,offset,symbol,title]of [['back',-1,'↓','Weiter nach hinten'],['front',1,'↑','Weiter nach vorne']]){
+    const button=document.createElement('button');button.type='button';button.className='layer-move';button.textContent=symbol;button.title=title;button.dataset.action=direction;
+    button.setAttribute('aria-label',layer.label+': '+title.toLowerCase());button.disabled=index+offset<0||index+offset>=ids.length;
+    button.addEventListener('click',()=>{
+     if(busy)return;
+     const next=[...ids];[next[index],next[index+offset]]=[next[index+offset],next[index]];
+     spriteOrders.set(editorOrderKey(config),next);layerFocus={id:layer.id,action:direction};updatePreview();
+    });actions.append(button);
+   }row.append(actions);
+  }return row;
  }));
+ if(layerFocus){
+  const row=[...list.children].find(row=>row.dataset.layerId===layerFocus.id);
+  const control=row?.querySelector('[data-action="'+layerFocus.action+'"]');
+  (control?.disabled?row.querySelector('input'):control)?.focus({preventScroll:true});layerFocus=null;
+ }
+ $('#reset-sprite-order').disabled=!spriteOrders.has(editorOrderKey(config));
 }
 function updateLayoutSelection(layoutId){
  for(const button of $('#layout-gallery').querySelectorAll('button'))button.setAttribute('aria-pressed',String(button.dataset.layoutId===layoutId));
@@ -116,13 +145,18 @@ async function updatePreview(){
   }
   if(!layouts.some(layout=>layout.id===layoutId))throw Error('Das gewählte Layout ist in diesem Texturepack nicht vorhanden.');
   updateLayoutSelection(layoutId);
-  const config=await manager.getConfig(packId,layoutId,selection.version||editingVersion||undefined);
+  const baseConfig=await manager.getConfig(packId,layoutId,selection.version||editingVersion||undefined);
+  if(request!==requestId)return;
+  const orderKey=editorOrderKey(baseConfig);
+  if(pendingSpriteOrder){if(pendingSpriteOrder.key===orderKey){if(pendingSpriteOrder.order===undefined)spriteOrders.delete(orderKey);else spriteOrders.set(orderKey,pendingSpriteOrder.order);}pendingSpriteOrder=null;}
+  const spriteOrder=spriteOrders.get(orderKey);
+  const config=withSpriteOrder(baseConfig,spriteOrder);
   const size=editorSize(config);const plan=getRenderPlan(data,config);
   if(request!==requestId)return;
   const result=await renderLabel(preview,data,{config,visibility:{...visibility}});
   if(request!==requestId||!result.committed)return;
-  activeConfig=config;current={data:plan.input,config,packId,packVersion:config.packVersion,layoutId,widthMm:size.widthMm,quantity:Number($('#editor-quantity').value)};
-  showLayers(plan);$('#asset-version').textContent=`${config.packName||packId} · ${config.packVersion} · ${config.layoutName}`;
+  activeConfig=config;current={data:plan.input,config,packId,packVersion:config.packVersion,layoutId,widthMm:size.widthMm,quantity:Number($('#editor-quantity').value),spriteOrder};
+  showLayers(plan,config);$('#asset-version').textContent=`${config.packName||packId} · ${config.packVersion} · ${config.layoutName}`;
   $('.asset-notice').textContent=config.assetStatus==='illustrated'?'Illustrationen · Texturepack':'Beispielassets · Platzhalter';
   preview.setAttribute('aria-label',`Etikett für ${plan.input.name}${plan.input.producer?' von '+plan.input.producer:''}, Ernte ${plan.input.year}, ${plan.input.thc} Prozent THC, ${plan.input.cbd} Prozent CBD, ${plan.input.sativa} Prozent Sativa.`);
   $('#render-status').textContent=`${plan.width} × ${plan.height} px · bereit`;
@@ -134,9 +168,9 @@ function download(blob,filename){const url=URL.createObjectURL(blob);const ancho
 function endEditing(){editingId=null;editingVersion=null;$('#add-cart').textContent='Zum Druckwarenkorb hinzufügen';$('#edit-cancel').hidden=true;}
 function safeName(name){return name.replace(/[<>:"/\\|?*\u0000-\u001f]/g,'-')||'Etikett';}
 async function renderEntry(entry,config){
- const key=JSON.stringify([entry.data,entry.packId,entry.packVersion,entry.layoutId]);
+ const key=JSON.stringify([entry.data,entry.packId,entry.packVersion,entry.layoutId,entry.spriteOrder]);
  if(!renderCache.has(key)){
-  const task=(async()=>{const canvas=document.createElement('canvas');await renderLabel(canvas,entry.data,{config});return canvas;})();
+  const task=(async()=>{const canvas=document.createElement('canvas');await renderLabel(canvas,entry.data,{config:withSpriteOrder(config,entry.spriteOrder)});return canvas;})();
   renderCache.set(key,task);task.catch(()=>renderCache.delete(key));
   // A small in-memory working set; saved cart entries remain plain configuration.
   if(renderCache.size>80)renderCache.delete(renderCache.keys().next().value);
@@ -151,6 +185,7 @@ async function editEntry(entry){
   for(const [key,input]of Object.entries(fields))input.value=entry.data[key]??'';
   $('#pack').value=`${entry.packId}@${entry.packVersion}`;requestedLayoutId=entry.layoutId;$('#width-mm').value=entry.widthMm;$('#editor-quantity').value=entry.quantity;
   editingId=entry.id;editingVersion=entry.packVersion;$('#add-cart').textContent='Änderungen im Warenkorb speichern';$('#edit-cancel').hidden=false;
+  pendingSpriteOrder={key:JSON.stringify([entry.packId,entry.packVersion,entry.layoutId]),order:entry.spriteOrder};
   await updatePreview();$('#editor-title').scrollIntoView({behavior:'smooth'});
  }catch(error){report('#cart-error',error.message);}
 }
@@ -221,6 +256,7 @@ async function drawSheet(layout,index,request=sheetRequest){
  if(request!==sheetRequest||drawRequest!==sheetDrawRequest||currentLayout!==layout||drag)return;canvas.width=buffer.width;canvas.height=buffer.height;canvas.getContext('2d').drawImage(buffer,0,0);
  canvas.setAttribute('aria-label',`Druckvorschau Seite ${index+1}, ${page.widthMm} × ${page.heightMm} mm, ${page.placements.length} Etiketten`);
 }
+$('#reset-sprite-order').addEventListener('click',()=>{if(busy||!activeConfig)return;spriteOrders.delete(editorOrderKey(activeConfig));updatePreview();});
 $('#label-form').addEventListener('submit',event=>event.preventDefault());
 $('#label-form').addEventListener('input',event=>{
  if(event.target.closest('.strain-picker'))return;
@@ -229,7 +265,7 @@ $('#label-form').addEventListener('input',event=>{
  updatePreview();
 });
 $('#export').addEventListener('click',async()=>{if(!current||busy)return;const state=current;$('#export').disabled=true;try{download(await canvasToPng(preview),`${safeName(state.data.name)}_${state.data.year}.png`);}catch(error){report('#form-error',error.message);}finally{if(current)setEditorEnabled(true);}});
-$('#add-cart').addEventListener('click',()=>{if(!current||busy)return;try{const entry={data:current.data,packId:current.packId,packVersion:current.packVersion,layoutId:current.layoutId,quantity:current.quantity,widthMm:current.widthMm};if(editingId)cart.update(editingId,entry);else cart.add(entry);notice(editingId?'Änderungen gespeichert.':'Etikett zum Druckwarenkorb hinzugefügt.');endEditing();report('#cart-error','');updateCart();}catch(error){report('#cart-error',error.message);}});
+$('#add-cart').addEventListener('click',()=>{if(!current||busy)return;try{const entry={data:current.data,packId:current.packId,packVersion:current.packVersion,layoutId:current.layoutId,quantity:current.quantity,widthMm:current.widthMm,spriteOrder:current.spriteOrder};if(editingId)cart.update(editingId,entry);else cart.add(entry);notice(editingId?'Änderungen gespeichert.':'Etikett zum Druckwarenkorb hinzugefügt.');endEditing();report('#cart-error','');updateCart();}catch(error){report('#cart-error',error.message);}});
 $('#edit-cancel').addEventListener('click',()=>{endEditing();updatePreview();});
 $('#clear-cart').addEventListener('click',()=>{try{cart.clear();endEditing();updateCart();}catch(error){report('#cart-error',error.message);}});
 $('#print-form').addEventListener('submit',event=>event.preventDefault());$('#print-form').addEventListener('input',event=>{if(event.target.id==='manual-mode'){cancelDrag();syncManualControls();if(currentLayout)drawSheet(currentLayout,Number($('#sheet-page').value));}else scheduleSheets();});
