@@ -128,6 +128,9 @@ function drawText(ctx, input, config) {
   return { lines, fontSize: size, producer };
 }
 
+/** Invalidate pending preview work without affecting shared image downloads. */
+export function cancelRender(canvas){renderJobs.set(canvas,(renderJobs.get(canvas)??0)+1);}
+
 export async function renderLabel(canvas, input, { config = CONFIG, visibility = {} } = {}) {
  const job=(renderJobs.get(canvas)??0)+1;renderJobs.set(canvas,job);
  const plan=getRenderPlan(input,config);
@@ -136,6 +139,7 @@ export async function renderLabel(canvas, input, { config = CONFIG, visibility =
   Promise.all(plan.layers.map(layer=>config.masks?.[layer.id]?loadImage(config.masks[layer.id],config):null)),
   loadFont(config)
  ]);
+ if(renderJobs.get(canvas)!==job)return {plan,textLayout:null,committed:false};
  const drawConfig={...config,typography:{...config.typography,family:fontFamily}};
  const buffer=document.createElement('canvas');buffer.width=config.width;buffer.height=config.height;
  const ctx=buffer.getContext('2d');if(!ctx)throw new Error('Canvas-Rendering ist in diesem Browser nicht verfügbar.');
@@ -166,3 +170,4 @@ export function canvasToPng(canvas) {
     }
   });
 }
+

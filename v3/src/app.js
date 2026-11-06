@@ -1,7 +1,7 @@
 import { t, locale, layerLabel, mountLanguageControl } from './i18n.js';
 import { getSpriteOrder, withSpriteOrder } from './sprite-order.js';
 import { getRenderPlan } from './model.js';
-import { renderLabel, canvasToPng } from './renderer.js';
+import { renderLabel, canvasToPng, cancelRender } from './renderer.js';
 import { TexturePackManager, getLayouts, chooseComparableLayout } from './texturepacks.js';
 import { PrintCartService } from './cart.js';
 import { mountStrainPicker } from './strain-picker.js';
@@ -25,6 +25,7 @@ let requestId = 0;
 let editingId = null;
 let editingVersion = null;
 let busy = false;
+let previewTimer = null;
 let pdfBusy = false;
 let sheetRequest = 0;
 let sheetDrawRequest = 0;
@@ -131,7 +132,13 @@ function drawLayoutGallery(manifest){
   return button;
  }));
 }
+function schedulePreview(){
+ clearTimeout(previewTimer);requestId++;cancelRender(preview);
+ current=null;busy=true;setEditorEnabled(false);updateOutputs();$('#loading').hidden=true;
+ previewTimer=setTimeout(()=>{previewTimer=null;updatePreview();},120);
+}
 async function updatePreview(){
+ clearTimeout(previewTimer);previewTimer=null;cancelRender(preview);
  const request=++requestId;current=null;busy=true;setEditorEnabled(false);updateOutputs();report('#form-error','');$('#loading').hidden=false;
  $('#render-status').textContent=t('Vorschau wird aktualisiert …');
  try{
@@ -268,8 +275,9 @@ $('#label-form').addEventListener('input',event=>{
  if(event.target.closest('.strain-picker'))return;
  if(event.target.id==='pack'||event.target.id==='layout')editingVersion=null;
  if(Object.values(fields).includes(event.target)){strainPicker.clear();report('#strain-warning','');}
- updatePreview();
+ if(event.target.matches('input[type=range]'))schedulePreview();else updatePreview();
 });
+$('#label-form').addEventListener('change',event=>{if(event.target.matches('input[type=range]')&&previewTimer!==null)updatePreview();});
 $('#export').addEventListener('click',async()=>{if(!current||busy)return;const state=current;$('#export').disabled=true;try{download(await canvasToPng(preview),`${safeName(state.data.name)}_${state.data.year}.png`);}catch(error){report('#form-error',error.message);}finally{if(current)setEditorEnabled(true);}});
 $('#add-cart').addEventListener('click',()=>{if(!current||busy)return;try{const entry={data:current.data,packId:current.packId,packVersion:current.packVersion,layoutId:current.layoutId,quantity:current.quantity,widthMm:current.widthMm,spriteOrder:current.spriteOrder};if(editingId)cart.update(editingId,entry);else cart.add(entry);notice(editingId?'Änderungen gespeichert.':'Etikett zum Druckwarenkorb hinzugefügt.');endEditing();report('#cart-error','');updateCart();}catch(error){report('#cart-error',error.message);}});
 $('#edit-cancel').addEventListener('click',()=>{endEditing();updatePreview();});
