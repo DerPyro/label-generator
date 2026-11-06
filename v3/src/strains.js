@@ -75,7 +75,7 @@ export function getStrainValues(row) {
     if (!raw) continue;
     const value = Number(raw.replace(',', '.'));
     if (!Number.isFinite(value) || value < 0) { warnings.push(`${target.toUpperCase()}-Wert „${raw}“ konnte nicht übernommen werden.`); continue; }
-    data[target] = Math.min(value, maximum);
+    data[target] = Math.round(Math.min(value, maximum));
     if (value > maximum) warnings.push(`${target.toUpperCase()} wurde von ${value} % auf ${maximum} % begrenzt.`);
   }
   const parsePercent = value => {

@@ -56,7 +56,7 @@ function editorSize(config){
 }
 function updateOutputs(){
  for(const key of ['thc','cbd']){
-  const value=Number(fields[key].value).toLocaleString('de-DE',{maximumFractionDigits:1});
+  const value=Number(fields[key].value).toLocaleString('de-DE',{maximumFractionDigits:0});
   $('#'+key+'-output').value=value;fields[key].setAttribute('aria-valuetext',`${value} Prozent ${key.toUpperCase()}`);
  }
  const sativa=Number(fields.sativa.value);$('#sativa-output').value=sativa;$('#indica-output').value=100-sativa;
