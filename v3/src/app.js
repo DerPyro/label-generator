@@ -230,7 +230,7 @@ function updateCart({schedule=true}={}){
 }
 function readPrintSettings(){
  for(const input of $('#print-form').querySelectorAll('input[type=number]'))if(!input.checkValidity())throw Error('Bitte gültige Druckmaße eingeben.');
- return {widthMm:$('#print-width').value===''?undefined:Number($('#print-width').value),orientation:$('#orientation').value,marginMm:Number($('#margin-mm').value),gapMm:Number($('#gap-mm').value),bleedMm:Number($('#bleed-mm').value),cropMarks:$('#crop-marks').checked,calibration:$('#calibration').checked,mixSizes:$('#mix-sizes').checked};
+ return {adjacent:$('#adjacent-labels').checked,widthMm:$('#print-width').value===''?undefined:Number($('#print-width').value),orientation:$('#orientation').value,marginMm:Number($('#margin-mm').value),gapMm:Number($('#gap-mm').value),bleedMm:Number($('#bleed-mm').value),cropMarks:$('#crop-marks').checked,calibration:$('#calibration').checked,mixSizes:$('#mix-sizes').checked};
 }
 function scheduleSheets(){
  cancelDrag();
@@ -282,6 +282,17 @@ $('#export').addEventListener('click',async()=>{if(!current||busy)return;const s
 $('#add-cart').addEventListener('click',()=>{if(!current||busy)return;try{const entry={data:current.data,packId:current.packId,packVersion:current.packVersion,layoutId:current.layoutId,quantity:current.quantity,widthMm:current.widthMm,spriteOrder:current.spriteOrder};if(editingId)cart.update(editingId,entry);else cart.add(entry);notice(editingId?'Änderungen gespeichert.':'Etikett zum Druckwarenkorb hinzugefügt.');endEditing();report('#cart-error','');updateCart();}catch(error){report('#cart-error',error.message);}});
 $('#edit-cancel').addEventListener('click',()=>{endEditing();updatePreview();});
 $('#clear-cart').addEventListener('click',()=>{try{cart.clear();endEditing();updateCart();}catch(error){report('#cart-error',error.message);}});
+let spacedPrintSettings;
+$('#adjacent-labels').addEventListener('input',()=>{
+ const gap=$('#gap-mm'),bleed=$('#bleed-mm'),marks=$('#crop-marks'),adjacent=$('#adjacent-labels').checked;
+ if(adjacent){
+  spacedPrintSettings={gap:gap.value,bleed:bleed.value,marks:marks.checked};
+  gap.value='0';bleed.value='0';marks.checked=false;
+ }else if(spacedPrintSettings){
+  gap.value=spacedPrintSettings.gap;bleed.value=spacedPrintSettings.bleed;marks.checked=spacedPrintSettings.marks;
+ }
+ gap.disabled=adjacent;bleed.disabled=adjacent;marks.disabled=adjacent;
+});
 $('#print-form').addEventListener('submit',event=>event.preventDefault());$('#print-form').addEventListener('input',event=>{if(event.target.id==='manual-mode'){cancelDrag();syncManualControls();if(currentLayout)drawSheet(currentLayout,Number($('#sheet-page').value));}else scheduleSheets();});
 $('#sheet-page').addEventListener('change',()=>{cancelDrag();if(currentLayout){syncManualControls();drawSheet(currentLayout,Number($('#sheet-page').value)).catch(error=>report('#print-error',error.message));}});
 $('#export-pdf').addEventListener('click',async()=>{

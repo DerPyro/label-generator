@@ -24,17 +24,19 @@ export function getPhysicalSize(config, widthMm) {
 export function normalizePrintSettings(settings = {}) {
   const orientation = settings.orientation ?? 'portrait';
   if (!['portrait', 'landscape'].includes(orientation)) throw new Error('Ungültige Seitenausrichtung.');
-  const cropMarks = settings.cropMarks ?? true;
+  const adjacent = settings.adjacent ?? false;
+  if (typeof adjacent !== 'boolean') throw new Error('Ungültige Druckoption.');
+  const cropMarks = adjacent ? false : (settings.cropMarks ?? true);
   const calibration = settings.calibration ?? false;
   const mixSizes = settings.mixSizes ?? false;
   if (typeof cropMarks !== 'boolean' || typeof calibration !== 'boolean' || typeof mixSizes !== 'boolean') throw new Error('Ungültige Druckoption.');
   return {
     orientation,
     marginMm: numeric(settings.marginMm ?? 5, 'Seitenrand', 0, 100),
-    gapMm: numeric(settings.gapMm ?? 2, 'Etikettenabstand', 0, 100),
-    bleedMm: numeric(settings.bleedMm ?? 0, 'Beschnittzugabe', 0, 10),
+    gapMm: adjacent ? 0 : numeric(settings.gapMm ?? 2, 'Etikettenabstand', 0, 100),
+    bleedMm: adjacent ? 0 : numeric(settings.bleedMm ?? 0, 'Beschnittzugabe', 0, 10),
     widthMm: settings.widthMm === undefined ? undefined : numeric(settings.widthMm, 'Etikettengröße', 1, 300),
-    cropMarks, calibration, mixSizes,
+    cropMarks, calibration, mixSizes, adjacent,
   };
 }
 

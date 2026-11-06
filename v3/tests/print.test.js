@@ -39,6 +39,34 @@ test('Physische Maße halten Seitenverhältnis und berechnen echte DPI', () => {
   for (const width of [0, -1, NaN, 301, '']) assert.throws(() => getPhysicalSize(rectangular, width));
   assert.throws(() => normalizePrintSettings({ marginMm: -1 }));
 });
+test('Direkte Anordnung teilt Schnittkanten in Raster und gemischtem Layout, auch im PDF', async () => {
+  const entries = [{ ...base, quantity: 12, widthMm: 40 }];
+  assert.throws(() => normalizePrintSettings({ adjacent: 'true' }));
+  for (const mixSizes of [false, true]) {
+    const layout = layoutSheets(entries, configs(entries), { adjacent: true, mixSizes, gapMm: 3, bleedMm: 2, cropMarks: true });
+    assert.equal(layout.settings.gapMm, 0);
+    assert.equal(layout.settings.bleedMm, 0);
+    assert.equal(layout.settings.cropMarks, false);
+    const placements = layout.pages[0].placements;
+    const [a, b] = placements;
+    close(a.xMm + a.widthMm, b.xMm);
+    close(a.yMm, b.yMm);
+    const below = placements.find(p => p !== a && Math.abs(p.xMm - a.xMm) < 1e-7 && Math.abs(p.yMm - a.yMm - a.heightMm) < 1e-7);
+    assert.ok(below, 'Auch die nächste Zeile liegt ohne Zwischenraum an.');
+    const pdf = await PDFDocument.load(await generatePdf(layout, png));
+    const matrices = imageMatrices(contents(pdf, pdf.getPage(0)));
+    const xBounds = m => {
+      const xs = [m[4], m[4] + m[0], m[4] + m[2], m[4] + m[0] + m[2]];
+      return [Math.min(...xs), Math.max(...xs)];
+    };
+    close(xBounds(matrices[0])[1], xBounds(matrices[1])[0]);
+    assert.equal(matrices.length, 12);
+    const overlapping = structuredClone(layout);
+    overlapping.pages[0].placements[1].xMm -= 0.1;
+    assert.throws(() => validateLayout(overlapping), /überlappen/);
+  }
+});
+
 test('Mehrere Sorten und Packs teilen Bögen, Mengen und Pagination stimmen', () => {
   const entries = [
     { ...base, quantity: 3, widthMm: 60 },

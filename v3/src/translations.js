@@ -31,6 +31,8 @@ export const english = {
   'Hochformat': 'Portrait', 'Querformat': 'Landscape', 'Seitenrand in mm': 'Page margin in mm', 'Abstand in mm': 'Gap in mm',
   'Beschnittzugabe in mm': 'Bleed in mm', 'Randfortsetzung außerhalb der unveränderten Schnittgröße.': 'Extends the edge beyond the unchanged trim size.',
   'Unterschiedliche Größen und Formen gemeinsam anordnen': 'Arrange different sizes and shapes together',
+  'Etiketten direkt aneinander': 'Place labels edge to edge',
+  'Gemeinsame Schnittkanten ohne Abstand, Beschnittzugabe und Schnittmarken. Bei rechteckigen Etiketten genügt ein Schnitt zwischen Nachbarn.': 'Shared trim edges without gaps, bleed or crop marks. Rectangular labels need only one cut between neighbours.',
   'Positionen manuell bearbeiten': 'Edit positions manually', 'Schnittmarken': 'Crop marks',
   'Zusätzliche Kalibrierungsseite mit 100 × 100 mm Quadrat': 'Additional calibration page with a 100 × 100 mm square',
   'Beim Drucken': 'When printing, select', '„Tatsächliche Größe“ / 100 %': '“Actual size” / 100%',
