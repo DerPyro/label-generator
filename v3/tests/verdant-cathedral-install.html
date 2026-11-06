@@ -11,16 +11,17 @@ async function until(fn){const end=Date.now()+60000;while(Date.now()<end){if(fn(
 // version, bytes and real IndexedDB importer; only omit it from the test catalog.
 const fetchIsolated=async(url,...args)=>{const response=await fetch(url,...args);if(new URL(url).pathname.endsWith('/texturepacks/catalog.json')){const catalog=await response.json();catalog.packs=catalog.packs.filter(x=>x.id!==id);return new Response(JSON.stringify(catalog),{status:200,headers:{'Content-Type':'application/json'}});}return response;};
 try{
+ const manifest=await(await fetch('../texturepacks/'+id+'/pack.json')).json(),version=manifest.version;
  const archive=new Uint8Array(await(await fetch('../output/verdant-cathedral-source/import.zip')).arrayBuffer());
  const manager=new TexturePackManager({fetchImpl:fetchIsolated,importedStore:new IndexedDBPackStore()});
  const result=await manager.importPack(archive);assert(result.id===id,'ID geändert');
  for(const layout of ['classic-portrait','round-lid']){const config=await manager.getConfig(id,layout);const c=document.createElement('canvas');await renderLabel(c,{name:'Imported Cathedral',producer:'Local ZIP',year:2026,sativa:100,thc:40,cbd:20},{config});assert(config.source==='imported','Kein Blob-Import');}
  report('Unverändertes ZIP mit echter IndexedDB installiert und beide Layouts über Blob-Assets gerendert');
  manager.dispose();
- const reopened=new TexturePackManager({fetchImpl:fetchIsolated,importedStore:new IndexedDBPackStore()});assert((await reopened.loadPack(id)).version==='1.0.0','Neustart');assert((await reopened.importPack(archive)).duplicate,'Reimport');await reopened.removePack(id,'1.0.0');reopened.dispose();
+ const reopened=new TexturePackManager({fetchImpl:fetchIsolated,importedStore:new IndexedDBPackStore()});assert((await reopened.loadPack(id)).version===version,'Neustart');assert((await reopened.importPack(archive)).duplicate,'Reimport');await reopened.removePack(id,version);reopened.dispose();
  report('Gespeichertes ZIP nach erneutem Öffnen geladen; identischer Reimport erkannt; Testimport entfernt');
  const frame=document.querySelector('#app'),loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html';await loaded;const doc=frame.contentDocument;
- await until(()=>!doc.querySelector('#pack').disabled);const select=doc.querySelector('#pack'),key=id+'@1.0.0';assert([...select.options].some(x=>x.value===key),'Dropdown');select.value=key;select.dispatchEvent(new Event('input',{bubbles:true}));
+ await until(()=>!doc.querySelector('#pack').disabled);const select=doc.querySelector('#pack'),key=id+'@'+version;assert([...select.options].some(x=>x.value===key),'Dropdown');select.value=key;select.dispatchEvent(new Event('input',{bubbles:true}));
  await until(()=>doc.querySelector('#asset-version').textContent.includes('Verdant Cathedral')&&!doc.querySelector('#export').disabled);
  for(const [layout,w,h]of [['classic-portrait',1024,1536],['round-lid',1254,1254]]){const selectLayout=doc.querySelector('#layout');selectLayout.value=layout;selectLayout.dispatchEvent(new Event('input',{bubbles:true}));await until(()=>!doc.querySelector('#export').disabled&&doc.querySelector('#preview').width===w&&doc.querySelector('#preview').height===h);assert(doc.querySelector('[data-layer-id="foreground"]'),'Foreground');}
  report('Pack im echten App-Dropdown ausgewählt; beide Layouts und statische Vordergrundebene verfügbar');

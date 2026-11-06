@@ -1,25 +1,25 @@
-Stained Glass – Verdant Cathedral 1.0.0
+Stained Glass – Verdant Cathedral 1.1.0
 
 ARTWORK PROVENANCE
-All master illustrations were generated specifically for this project using
-the integrated OpenAI Imagegen tool on 2026-11-06. No external reference art,
-stock images, brand marks or existing texturepack illustrations were used.
-The full prompts and deterministic derivation are documented in PROMPTS.md.
-All PNGs other than rendered previews are these masters or their derivatives.
-Previews/contact sheets additionally contain text rendered with the fonts below.
+Four original masters were created specifically for this revision with the
+integrated OpenAI Imagegen tool on 2026-11-06. The portrait and circular master
+edit this project's own earlier generated images. The astronomy atlas and
+floral-growth master were newly generated without external image references.
+No third-party artwork, stock imagery, logos or other texturepack art was used.
+PROMPTS.md records the full prompts and deterministic separation/composition.
+All PNGs are these originals, their derivatives or renderer-generated previews.
+Preview text is rendered with the licensed font below.
 
 ARTWORK PERMISSION
 To the extent rights exist in these AI-generated images and their deterministic
-derivatives, the project contributors permit their use, copying, modification,
+derivatives, the project contributors permit use, copying, modification,
 redistribution and commercial use, with or without attribution. No exclusivity
 or copyright protection of AI-generated material is asserted. Artwork is
-provided as is, without warranty. This permission does not relicense the fonts.
+provided as is, without warranty. This permission does not relicense fonts.
 
-FONTS (unmodified local copies)
-Lora: fonts/lora/label-serif.ttf
-Source: the repository's examples/composition/fonts/lora/label-serif.ttf.
-Abel: fonts/abel/Abel-Regular.ttf
-Source: the repository's examples/composition/fonts/abel/Abel-Regular.ttf.
-Both are licensed under the SIL Open Font License 1.1. The complete copyright
-notices and license terms accompany each file in its own fonts/<family>/OFL.txt.
-These font licenses govern font redistribution, including the reserved names.
+FONT
+Lora: fonts/lora/label-serif.ttf (unmodified).
+Source: this repository's examples/composition/fonts/lora/label-serif.ttf.
+Licensed under the SIL Open Font License 1.1. The complete copyright notices
+and license terms accompany the file in fonts/lora/OFL.txt. These terms govern
+redistribution of the font, including any reserved names.

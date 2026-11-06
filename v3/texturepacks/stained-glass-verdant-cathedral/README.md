@@ -1,46 +1,58 @@
-# Stained Glass – Verdant Cathedral
+# Stained Glass – Verdant Cathedral 1.1.0
 
-Illustriertes, eigenständig importierbares Texturepack für Label Generator v3,
-Version 1.0.0, compatibilityVersion 2. Zwei originale Imagegen-Kompositionen:
-Spitzbogenfenster (1024 × 1536) und eigenständige Rosette (1254 × 1254).
+Eigenständig importierbares, illustriertes Texturepack für Label Generator v3,
+compatibilityVersion 2. Hochformat 1024 × 1536 und eigenständige runde Rosette
+1254 × 1254. Die Revision macht Genetik und Gehalt unmittelbar erkennbar.
 
-## Ebenen und Werte
+## Visuelle Zuordnung
 
-- Base 0; Genetics 100; THC 200; CBD 300; fester Foreground 400;
-  illustriertes Opalmedaillon 450; sieben dynamische Textfelder 500.
-- 21 Genetics-Sprites: exklusive Grenzen 5, 10, …, 95, 100; letzte Stufe
-  ausschließlich bei 100 % Sativa. Indica ist der Gegenanteil. Violett/Blau
-  wandelt sich über Türkis/Grün zu Gold/Bernstein/Rubinrot.
-- Neun THC-Sprites: exklusive Grenzen 5, 10, 15, 20, 25, 30, 35, 40.
-  Transparente Reflexe lassen Glasfarben und Textmedaillon sichtbar.
-- Sieben CBD-Sprites: exklusive Grenzen 2, 5, 8, 11, 14, 17.
-  Botanische Glasteile werden kumulativ farbig ausgefüllt; ihre Bleikonturen
-  gehören zur unveränderlichen Fensterarchitektur. Vorhandene Teile bleiben
-  exakt an Ort und Stelle. Keine Überblendung zwischen Stufen.
+- **Genetik färbt das ganze Glas**, einschließlich der Textmitte, aller seitlichen
+  Scheiben und der oberen und unteren Motivkammern. 0 % Sativa ist violett,
+  25 % saphirblau, 50 % türkisgrün, 75 % goldfarben und 100 % warm rot.
+  Dunkle metallische Bleifassungen behalten ihre Position und Materialfarbe.
+- **THC füllt den oberen Bereich**: neun Zustände von leer bis acht erkennbaren
+  Himmelsmotiven. Nacheinander kommen Mondsichel, Sonne, Saturn, Himmelsstern,
+  Orbitalplanet, Sternbild, Komet und Mondphasen hinzu. Motive bewegen sich
+  beim Wechsel nicht. Die ausdrücklich gewünschte Astronomie ersetzt die
+  Lichtreflexe aus Version 1.0.
+- **CBD lässt unten eine Pflanze wachsen**: sieben kumulative Zustände von der
+  kleinen Wurzel mit ersten Blättern bis zum vollen Jugendstil-Ornament mit
+  Ranken, Efeu, Farnen und Blüten. Wachstum folgt den Verzweigungen der Pflanze.
+  Es gibt keine fest eingebauten floralen Hintergrundflächen.
+- **Werte sind größer und kräftiger**: separate Beschriftungen über THC, CBD,
+  Indica und Sativa; große Prozentangaben in lokal eingebundener Lora. Die
+  Prozentwerte tragen bei normaler Breite mindestens 40 native Pixel Größe.
 
-Pro Layout 39 Canvas-Layer (1 + 21 + 9 + 7 + 1), insgesamt 78. Die im Auftrag
-genannte Summe 76 war ein Rechenfehler. Zusätzlich zwei Canvas-Textmedaillons,
-zwei unveränderte Masterillustrationen, drei Vorschauen und drei Kontaktbögen.
-Alle PNGs sind 8-Bit-RGBA. Sämtliche Rundlayer haben transparente Außenbereiche.
-Keine dynamischen Werte sind in Layer-PNGs eingebrannt.
+## Skalen und Ebenen
 
-## Typografie und Druck
+Genetics: 21 Stufen, exklusive Grenzen 5, 10, …, 95, 100; die letzte Stufe
+gilt nur für 100 % Sativa. THC: neun Stufen, exklusive Grenzen 5, 10, 15, 20,
+25, 30, 35, 40. CBD: sieben Stufen mit Grenzen 2, 5, 8, 11, 14, 17.
+Pro Kategorie wird genau ein Sprite gewählt, ohne Überblendung.
 
-Lora für Name, Produzent und Jahr; Abel für die Prozentwerte. Lokale Fonts
-und vollständige SIL-OFL-Lizenzen sind enthalten. Sehr lange Texte verkleinert
-der Renderer und bricht sie kontrolliert um. Die maximal erlaubten 200/120
-Zeichen passen; bei solch extremen Eingaben leidet die Lesbarkeit kleiner
-Druckgrößen. Für übliche Namen ist eine Druckbreite ab 60 mm sinnvoll.
-Native Auflösung bei 60 mm: etwa 434 dpi Hochformat, 531 dpi Rosette.
-Ein physischer Druck-/Farbproof auf dem Zielmaterial steht noch aus.
+Base 0; Genetics 100; THC 200; CBD 300; ein statischer Foreground 400;
+alle Texte 500. Keine deckende Textplakette über der Genetikfarbe.
+Je Layout 39 Canvas-Layer, insgesamt 78, echte 8-Bit-RGBA-PNGs. Kreisaußenbereiche
+sind transparent. Hinzu kommen vier Originalmaster, drei Vorschauen und vier
+Kontakt-/Vergleichsbögen. Keine dynamischen Werte sind in Layer-PNGs eingebrannt.
 
-## Vorschauen und Reproduktion
+## Vorschauen, Lizenz und Druck
 
-`classic-portrait-preview.png`, `round-lid-preview.png`, `preview.png`.
-`genetics-contact-sheet.png`: alle 21 Farbzustände beider Layouts.
-`light-growth-contact-sheet.png`: alle Licht- und Pflanzenzustände.
-`combinations-contact-sheet.png`: 54 niedrige/mittlere/hohe Kombinationen.
-PROMPTS.md dokumentiert die Originalgenerierung und Ableitung.
+`revision-comparison.png` zeigt beide Layouts mit niedrigen, mittleren und
+hohen Werten. `genetics-contact-sheet.png` zeigt alle 21 Genetikfarben,
+`light-growth-contact-sheet.png` alle Astronomie-/Pflanzenstufen und
+`combinations-contact-sheet.png` 54 niedrige/mittlere/hohe Kombinationen.
+Die vollständigen Vorschauen heißen `classic-portrait-preview.png` und
+`round-lid-preview.png`; `preview.png` ist die Katalogvorschau.
+
+Alle Grafiken sind originale Imagegen-Arbeiten; Herkunft und Bildprompts stehen
+in PROMPTS.md und ASSET-LICENSE.txt. Lora liegt lokal mit vollständiger SIL OFL.
+Sehr lange Namen/Produzenten werden kontrolliert umgebrochen und verkleinert.
+Bei maximalen 200/120 Zeichen oder sehr kleinen Etiketten nimmt die Lesbarkeit
+ab. Empfohlene Prüfbreite 60 mm: etwa 434 dpi Hochformat, 531 dpi rund.
+Ein physischer Druck- und Farbproof auf dem Zielmaterial steht aus.
+
+## Erzeugen und prüfen
 
 Ab Repositorywurzel:
 
@@ -50,10 +62,13 @@ npm --prefix v3 start
 node v3/scripts/run-browser-check.js --url http://localhost:3003/tests/verdant-cathedral.html --artifacts-dir v3/texturepacks/stained-glass-verdant-cathedral
 npm --prefix v3 test
 npm --prefix v3 run check
+npm --prefix v3 run test:browser
 node v3/scripts/validate-pack.js v3/texturepacks/stained-glass-verdant-cathedral --zip stained-glass-verdant-cathedral.zip
 ```
 
-Zum Importieren auf einer Installation ohne diese mitgelieferte Pack-ID die
-ZIP-Datei in der Texturepack-Verwaltung auswählen. Eine bereits mitgelieferte
-identische ID/Version ist absichtlich gegen lokalen Reimport geschützt.
-Siehe TEST-REPORT.md für tatsächlich ausgeführte Prüfungen und Grenzen.
+Für den zusätzlichen Browser-Installationstest das erzeugte ZIP nach
+`v3/output/verdant-cathedral-source/import.zip` kopieren und
+`tests/verdant-cathedral-install.html` öffnen. Der Test simuliert eine
+Installation ohne bereits mitgelieferte Pack-ID/Version. In der normalen
+Anwendung ist dieses identische mitgelieferte ID-/Versionspaar geschützt.
+1.1.0 kann neben einer lokal importierten 1.0.0 koexistieren.

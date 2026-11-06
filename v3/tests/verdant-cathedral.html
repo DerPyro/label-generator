@@ -21,7 +21,7 @@ for(const [key,cols,rows]of [['genetics',7,6],['light-growth',9,4],['combination
 function tile(sheet,c,col,row,label){const ctx=sheet.getContext('2d'),s=Math.min(166/c.width,218/c.height);ctx.drawImage(c,col*180+(180-c.width*s)/2,row*252+4,c.width*s,c.height*s);ctx.fillStyle='#193b36';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText(label,col*180+90,row*252+241);}
 try{
  const manager=new TexturePackManager();assert((await manager.catalog()).packs.some(x=>x.id===manifest.id),'Katalogeintrag fehlt');
- const configs=new Map(),entries=[];
+ const configs=new Map(),entries=[],comparison=canvas(720,700),comparisonCtx=comparison.getContext('2d');comparisonCtx.fillStyle='#ede7d9';comparisonCtx.fillRect(0,0,720,700);
  for(const [li,layout]of manifest.layouts.entries()){
   const config=resolvePackConfig(manifest,layout.id,root);await preloadAssets(config);const c=canvas(config.width,config.height);
   for(const key of ['genetics','thc','cbd']){
@@ -45,11 +45,16 @@ try{
    {...sample,producer:'',thc:39.99,cbd:19.99,sativa:99.99},
   ]){const result=await renderLabel(c,data,{config});for(const field of config.typography.fields){const fit=result.textLayout[field.id];assert(fit&&fit.fontSize>=field.minFontSize,'Text zu klein');}}
   report(`${layout.id}: 27 Kombinationen, maximale Textlängen, Dezimalwerte, leerer Produzent`);
+  for(const [column,values]of [[0,[0,0,0]],[1,[50,20,10]],[2,[100,40,20]]]){
+   const[sativa,thc,cbd]=values;await renderLabel(c,{...sample,name:'Verdant',sativa,thc,cbd},{config});
+   const scale=Math.min(224/c.width,310/c.height);comparisonCtx.drawImage(c,column*240+(240-c.width*scale)/2,li*350+8,c.width*scale,c.height*scale);
+   comparisonCtx.fillStyle='#193b36';comparisonCtx.font='13px sans-serif';comparisonCtx.textAlign='center';comparisonCtx.fillText(`Sativa ${sativa}% · THC ${thc}% · CBD ${cbd}%`,column*240+120,li*350+338);
+  }
   const data={...sample,name:li?'Emerald Rosette':'Verdant Cathedral'};await renderLabel(c,data,{config});
   const url=c.toDataURL();await renderLabel(c,data,{config});assert(url===c.toDataURL(),'Nicht deterministisch');
   const blob=await canvasToPng(c),bitmap=await createImageBitmap(blob),decoded=canvas(c.width,c.height);decoded.getContext('2d').drawImage(bitmap,0,0);assert(decoded.toDataURL()===url,'PNG und Vorschau weichen ab');bitmap.close();
   if(li){for(const[x,y]of [[0,0],[1253,0],[0,1253],[1253,1253],[80,80]])assert(c.getContext('2d').getImageData(x,y,1,1).data[3]===0,'Kreisaußenbereich');}
-  const z=getRenderPlan(data,config).elements.map(x=>x.zIndex);assert(z.join(',')==='0,100,200,300,400,450,500,500,500,500,500,500,500','zIndex');
+  const z=getRenderPlan(data,config).elements.map(x=>x.zIndex);assert(z.join(',')===[0,100,200,300,400,...Array(11).fill(500)].join(','),'zIndex');
   save(`${layout.id}-preview.png`,c);if(!li)save('preview.png',c);
   const entry={id:'cathedral-'+li,data,packId:manifest.id,packVersion:manifest.version,layoutId:layout.id,quantity:1,widthMm:60};entries.push(entry);configs.set(configKey(entry),config);
  }
@@ -60,7 +65,7 @@ try{
  // Expose the actual PDF for the artifact runner, without changing the app.
  window.__verdantPdf=Array.from(pdf);
  report('Vorschau und dekodierter PNG-Export pixelgleich; gemeinsamer A4-PDF-Bogen mit beiden Layouts bei 60 mm erzeugt');
- for(const[key,c]of Object.entries(sheets))save(`${key}-contact-sheet.png`,c);
+ for(const[key,c]of Object.entries(sheets))save(`${key}-contact-sheet.png`,c);save('revision-comparison.png',comparison);
  document.body.dataset.testStatus='passed';
 }catch(error){document.querySelector('#results').textContent=checks.join('\n')+'\nFAIL '+error.stack;document.body.dataset.testStatus='failed';}
 </script></body></html>
