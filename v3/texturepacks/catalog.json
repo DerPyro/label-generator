@@ -2,6 +2,15 @@
   "compatibilityVersion": 2,
   "packs": [
     {
+      "id": "stained-glass-verdant-cathedral",
+      "name": "Stained Glass – Verdant Cathedral",
+      "description": "Illustriertes gotisches Bleiglas mit botanischem Jugendstil, 21 Glasfarben, neun Licht- und sieben Pflanzenstufen.",
+      "version": "1.0.0",
+      "status": "illustrated",
+      "manifest": "stained-glass-verdant-cathedral/pack.json",
+      "preview": "stained-glass-verdant-cathedral/preview.png"
+    },
+    {
       "id": "woodland",
       "name": "Woodland Study",
       "description": "Technisches Wald-Beispielpack mit sieben Tageszeiten, Wetter- und Blütenstufen. Platzhalterillustrationen.",

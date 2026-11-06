@@ -1,0 +1,638 @@
+{
+  "id": "stained-glass-verdant-cathedral",
+  "name": "Stained Glass – Verdant Cathedral",
+  "description": "Gotisches Bleiglas und botanischer Jugendstil: 21 Glasfarben, neun Lichtstufen und sieben kumulative Pflanzenornamente.",
+  "author": "Label Generator contributors · OpenAI Imagegen original artwork",
+  "version": "1.0.0",
+  "compatibilityVersion": 2,
+  "status": "illustrated",
+  "preview": "preview.png",
+  "fonts": [
+    {
+      "family": "Lora",
+      "path": "fonts/lora/label-serif.ttf",
+      "weight": "400 700"
+    },
+    {
+      "family": "Abel",
+      "path": "fonts/abel/Abel-Regular.ttf",
+      "weight": "400"
+    }
+  ],
+  "layouts": [
+    {
+      "id": "classic-portrait",
+      "name": "Gotisches Spitzbogenfenster",
+      "width": 1024,
+      "height": 1536,
+      "shape": "rectangle",
+      "bleedMm": 0,
+      "preview": "classic-portrait-preview.png",
+      "layers": {
+        "base": "layouts/classic-portrait/base.png",
+        "genetics": [
+          {
+            "below": 5,
+            "asset": "layouts/classic-portrait/genetics/1.png"
+          },
+          {
+            "below": 10,
+            "asset": "layouts/classic-portrait/genetics/2.png"
+          },
+          {
+            "below": 15,
+            "asset": "layouts/classic-portrait/genetics/3.png"
+          },
+          {
+            "below": 20,
+            "asset": "layouts/classic-portrait/genetics/4.png"
+          },
+          {
+            "below": 25,
+            "asset": "layouts/classic-portrait/genetics/5.png"
+          },
+          {
+            "below": 30,
+            "asset": "layouts/classic-portrait/genetics/6.png"
+          },
+          {
+            "below": 35,
+            "asset": "layouts/classic-portrait/genetics/7.png"
+          },
+          {
+            "below": 40,
+            "asset": "layouts/classic-portrait/genetics/8.png"
+          },
+          {
+            "below": 45,
+            "asset": "layouts/classic-portrait/genetics/9.png"
+          },
+          {
+            "below": 50,
+            "asset": "layouts/classic-portrait/genetics/10.png"
+          },
+          {
+            "below": 55,
+            "asset": "layouts/classic-portrait/genetics/11.png"
+          },
+          {
+            "below": 60,
+            "asset": "layouts/classic-portrait/genetics/12.png"
+          },
+          {
+            "below": 65,
+            "asset": "layouts/classic-portrait/genetics/13.png"
+          },
+          {
+            "below": 70,
+            "asset": "layouts/classic-portrait/genetics/14.png"
+          },
+          {
+            "below": 75,
+            "asset": "layouts/classic-portrait/genetics/15.png"
+          },
+          {
+            "below": 80,
+            "asset": "layouts/classic-portrait/genetics/16.png"
+          },
+          {
+            "below": 85,
+            "asset": "layouts/classic-portrait/genetics/17.png"
+          },
+          {
+            "below": 90,
+            "asset": "layouts/classic-portrait/genetics/18.png"
+          },
+          {
+            "below": 95,
+            "asset": "layouts/classic-portrait/genetics/19.png"
+          },
+          {
+            "below": 100,
+            "asset": "layouts/classic-portrait/genetics/20.png"
+          },
+          {
+            "asset": "layouts/classic-portrait/genetics/21.png"
+          }
+        ],
+        "thc": [
+          {
+            "below": 5,
+            "asset": "layouts/classic-portrait/thc/1.png"
+          },
+          {
+            "below": 10,
+            "asset": "layouts/classic-portrait/thc/2.png"
+          },
+          {
+            "below": 15,
+            "asset": "layouts/classic-portrait/thc/3.png"
+          },
+          {
+            "below": 20,
+            "asset": "layouts/classic-portrait/thc/4.png"
+          },
+          {
+            "below": 25,
+            "asset": "layouts/classic-portrait/thc/5.png"
+          },
+          {
+            "below": 30,
+            "asset": "layouts/classic-portrait/thc/6.png"
+          },
+          {
+            "below": 35,
+            "asset": "layouts/classic-portrait/thc/7.png"
+          },
+          {
+            "below": 40,
+            "asset": "layouts/classic-portrait/thc/8.png"
+          },
+          {
+            "asset": "layouts/classic-portrait/thc/9.png"
+          }
+        ],
+        "cbd": [
+          {
+            "below": 2,
+            "asset": "layouts/classic-portrait/cbd/1.png"
+          },
+          {
+            "below": 5,
+            "asset": "layouts/classic-portrait/cbd/2.png"
+          },
+          {
+            "below": 8,
+            "asset": "layouts/classic-portrait/cbd/3.png"
+          },
+          {
+            "below": 11,
+            "asset": "layouts/classic-portrait/cbd/4.png"
+          },
+          {
+            "below": 14,
+            "asset": "layouts/classic-portrait/cbd/5.png"
+          },
+          {
+            "below": 17,
+            "asset": "layouts/classic-portrait/cbd/6.png"
+          },
+          {
+            "asset": "layouts/classic-portrait/cbd/7.png"
+          }
+        ],
+        "foreground": "layouts/classic-portrait/foreground.png"
+      },
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300,
+        "foreground": 400
+      },
+      "typography": {
+        "fields": [
+          {
+            "id": "strain-name",
+            "source": "name",
+            "font": "Lora",
+            "x": 512,
+            "y": 680,
+            "fontSize": 72,
+            "minFontSize": 18,
+            "maxWidth": 530,
+            "maxLines": 8,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "maxHeight": 210,
+            "lineHeight": 1.05,
+            "fontWeight": 600
+          },
+          {
+            "id": "producer",
+            "source": "producer",
+            "font": "Lora",
+            "x": 512,
+            "y": 865,
+            "fontSize": 32,
+            "minFontSize": 14,
+            "maxWidth": 520,
+            "maxLines": 4,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "maxHeight": 85,
+            "lineHeight": 1.1
+          },
+          {
+            "id": "year",
+            "source": "year",
+            "font": "Lora",
+            "x": 512,
+            "y": 964,
+            "fontSize": 35,
+            "minFontSize": 28,
+            "maxWidth": 490,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "year-full",
+            "prefix": "Ernte "
+          },
+          {
+            "id": "thc-value",
+            "source": "thc",
+            "font": "Abel",
+            "x": 375,
+            "y": 1064,
+            "fontSize": 36,
+            "minFontSize": 28,
+            "maxWidth": 250,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "THC  "
+          },
+          {
+            "id": "cbd-value",
+            "source": "cbd",
+            "font": "Abel",
+            "x": 649,
+            "y": 1064,
+            "fontSize": 36,
+            "minFontSize": 28,
+            "maxWidth": 250,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "CBD  "
+          },
+          {
+            "id": "indica",
+            "source": "indica",
+            "font": "Abel",
+            "x": 375,
+            "y": 1140,
+            "fontSize": 32,
+            "minFontSize": 28,
+            "maxWidth": 250,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "Indica  "
+          },
+          {
+            "id": "sativa",
+            "source": "sativa",
+            "font": "Abel",
+            "x": 649,
+            "y": 1140,
+            "fontSize": 32,
+            "minFontSize": 28,
+            "maxWidth": 250,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "Sativa  "
+          }
+        ],
+        "decorations": [
+          {
+            "id": "opal-text-medallion",
+            "type": "sprite",
+            "asset": "layouts/classic-portrait/opal-medallion.png",
+            "x": 512,
+            "y": 768,
+            "width": 1024,
+            "height": 1536,
+            "zIndex": 450
+          }
+        ]
+      }
+    },
+    {
+      "id": "round-lid",
+      "name": "Botanische Fensterrosette",
+      "width": 1254,
+      "height": 1254,
+      "shape": "circle",
+      "bleedMm": 0,
+      "preview": "round-lid-preview.png",
+      "layers": {
+        "base": "layouts/round-lid/base.png",
+        "genetics": [
+          {
+            "below": 5,
+            "asset": "layouts/round-lid/genetics/1.png"
+          },
+          {
+            "below": 10,
+            "asset": "layouts/round-lid/genetics/2.png"
+          },
+          {
+            "below": 15,
+            "asset": "layouts/round-lid/genetics/3.png"
+          },
+          {
+            "below": 20,
+            "asset": "layouts/round-lid/genetics/4.png"
+          },
+          {
+            "below": 25,
+            "asset": "layouts/round-lid/genetics/5.png"
+          },
+          {
+            "below": 30,
+            "asset": "layouts/round-lid/genetics/6.png"
+          },
+          {
+            "below": 35,
+            "asset": "layouts/round-lid/genetics/7.png"
+          },
+          {
+            "below": 40,
+            "asset": "layouts/round-lid/genetics/8.png"
+          },
+          {
+            "below": 45,
+            "asset": "layouts/round-lid/genetics/9.png"
+          },
+          {
+            "below": 50,
+            "asset": "layouts/round-lid/genetics/10.png"
+          },
+          {
+            "below": 55,
+            "asset": "layouts/round-lid/genetics/11.png"
+          },
+          {
+            "below": 60,
+            "asset": "layouts/round-lid/genetics/12.png"
+          },
+          {
+            "below": 65,
+            "asset": "layouts/round-lid/genetics/13.png"
+          },
+          {
+            "below": 70,
+            "asset": "layouts/round-lid/genetics/14.png"
+          },
+          {
+            "below": 75,
+            "asset": "layouts/round-lid/genetics/15.png"
+          },
+          {
+            "below": 80,
+            "asset": "layouts/round-lid/genetics/16.png"
+          },
+          {
+            "below": 85,
+            "asset": "layouts/round-lid/genetics/17.png"
+          },
+          {
+            "below": 90,
+            "asset": "layouts/round-lid/genetics/18.png"
+          },
+          {
+            "below": 95,
+            "asset": "layouts/round-lid/genetics/19.png"
+          },
+          {
+            "below": 100,
+            "asset": "layouts/round-lid/genetics/20.png"
+          },
+          {
+            "asset": "layouts/round-lid/genetics/21.png"
+          }
+        ],
+        "thc": [
+          {
+            "below": 5,
+            "asset": "layouts/round-lid/thc/1.png"
+          },
+          {
+            "below": 10,
+            "asset": "layouts/round-lid/thc/2.png"
+          },
+          {
+            "below": 15,
+            "asset": "layouts/round-lid/thc/3.png"
+          },
+          {
+            "below": 20,
+            "asset": "layouts/round-lid/thc/4.png"
+          },
+          {
+            "below": 25,
+            "asset": "layouts/round-lid/thc/5.png"
+          },
+          {
+            "below": 30,
+            "asset": "layouts/round-lid/thc/6.png"
+          },
+          {
+            "below": 35,
+            "asset": "layouts/round-lid/thc/7.png"
+          },
+          {
+            "below": 40,
+            "asset": "layouts/round-lid/thc/8.png"
+          },
+          {
+            "asset": "layouts/round-lid/thc/9.png"
+          }
+        ],
+        "cbd": [
+          {
+            "below": 2,
+            "asset": "layouts/round-lid/cbd/1.png"
+          },
+          {
+            "below": 5,
+            "asset": "layouts/round-lid/cbd/2.png"
+          },
+          {
+            "below": 8,
+            "asset": "layouts/round-lid/cbd/3.png"
+          },
+          {
+            "below": 11,
+            "asset": "layouts/round-lid/cbd/4.png"
+          },
+          {
+            "below": 14,
+            "asset": "layouts/round-lid/cbd/5.png"
+          },
+          {
+            "below": 17,
+            "asset": "layouts/round-lid/cbd/6.png"
+          },
+          {
+            "asset": "layouts/round-lid/cbd/7.png"
+          }
+        ],
+        "foreground": "layouts/round-lid/foreground.png"
+      },
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300,
+        "foreground": 400
+      },
+      "typography": {
+        "fields": [
+          {
+            "id": "strain-name",
+            "source": "name",
+            "font": "Lora",
+            "x": 627,
+            "y": 510,
+            "fontSize": 66,
+            "minFontSize": 18,
+            "maxWidth": 480,
+            "maxLines": 8,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "maxHeight": 160,
+            "lineHeight": 1.05,
+            "fontWeight": 600
+          },
+          {
+            "id": "producer",
+            "source": "producer",
+            "font": "Lora",
+            "x": 627,
+            "y": 638,
+            "fontSize": 30,
+            "minFontSize": 14,
+            "maxWidth": 525,
+            "maxLines": 4,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "maxHeight": 62,
+            "lineHeight": 1.05
+          },
+          {
+            "id": "year",
+            "source": "year",
+            "font": "Lora",
+            "x": 627,
+            "y": 709,
+            "fontSize": 32,
+            "minFontSize": 28,
+            "maxWidth": 500,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "year-full",
+            "prefix": "Ernte "
+          },
+          {
+            "id": "thc-value",
+            "source": "thc",
+            "font": "Abel",
+            "x": 492,
+            "y": 780,
+            "fontSize": 32,
+            "minFontSize": 28,
+            "maxWidth": 246,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "THC  "
+          },
+          {
+            "id": "cbd-value",
+            "source": "cbd",
+            "font": "Abel",
+            "x": 762,
+            "y": 780,
+            "fontSize": 32,
+            "minFontSize": 28,
+            "maxWidth": 246,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "CBD  "
+          },
+          {
+            "id": "indica",
+            "source": "indica",
+            "font": "Abel",
+            "x": 509,
+            "y": 822,
+            "fontSize": 29,
+            "minFontSize": 28,
+            "maxWidth": 230,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "Indica  "
+          },
+          {
+            "id": "sativa",
+            "source": "sativa",
+            "font": "Abel",
+            "x": 745,
+            "y": 822,
+            "fontSize": 29,
+            "minFontSize": 28,
+            "maxWidth": 230,
+            "maxLines": 1,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#193b36",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "Sativa  "
+          }
+        ],
+        "decorations": [
+          {
+            "id": "opal-text-medallion",
+            "type": "sprite",
+            "asset": "layouts/round-lid/opal-medallion.png",
+            "x": 627,
+            "y": 627,
+            "width": 1254,
+            "height": 1254,
+            "zIndex": 450
+          }
+        ]
+      }
+    }
+  ]
+}

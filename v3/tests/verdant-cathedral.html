@@ -1,0 +1,67 @@
+<!doctype html><html lang="de"><meta charset="utf-8"><title>Verdant Cathedral · Qualitätskontrolle</title>
+<body style="background:#ede7d9;color:#193b36;font:16px system-ui"><h1>Verdant Cathedral</h1><pre id="results">Prüfung läuft …</pre><div id="art"></div>
+<script type="module">
+import {TexturePackManager,resolvePackConfig} from '../src/texturepacks.js';
+import {renderLabel,canvasToPng,preloadAssets} from '../src/renderer.js';
+import {getLayerLevel,getRenderPlan} from '../src/model.js';
+import {layoutSheets,generatePdf,configKey} from '../src/print.js';
+import {PDFDocument} from '../vendor/pdf-lib.esm.min.js';
+const root=new URL('../texturepacks/stained-glass-verdant-cathedral/',import.meta.url);
+const manifest=await(await fetch(new URL('pack.json',root))).json();
+const sample={name:'Verdant Cathedral',producer:'Botanical Glassworks',year:2026,sativa:50,thc:22,cbd:20};
+const assert=(value,message)=>{if(!value)throw Error(message);};
+const checks=[],artifacts={};window.__packArtifacts=artifacts;
+const report=text=>{checks.push('PASS '+text);document.querySelector('#results').textContent=checks.join('\n');};
+function canvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+function save(name,c){artifacts[name]=c.toDataURL();const img=new Image();img.src=artifacts[name];img.style='max-width:600px;vertical-align:top;margin:8px';document.querySelector('#art').append(img);}
+const sheets={};
+for(const [key,cols,rows]of [['genetics',7,6],['light-growth',9,4],['combinations',9,6]]){
+ const c=canvas(cols*180,rows*252),ctx=c.getContext('2d');ctx.fillStyle='#ede7d9';ctx.fillRect(0,0,c.width,c.height);sheets[key]=c;
+}
+function tile(sheet,c,col,row,label){const ctx=sheet.getContext('2d'),s=Math.min(166/c.width,218/c.height);ctx.drawImage(c,col*180+(180-c.width*s)/2,row*252+4,c.width*s,c.height*s);ctx.fillStyle='#193b36';ctx.font='12px sans-serif';ctx.textAlign='center';ctx.fillText(label,col*180+90,row*252+241);}
+try{
+ const manager=new TexturePackManager();assert((await manager.catalog()).packs.some(x=>x.id===manifest.id),'Katalogeintrag fehlt');
+ const configs=new Map(),entries=[];
+ for(const [li,layout]of manifest.layouts.entries()){
+  const config=resolvePackConfig(manifest,layout.id,root);await preloadAssets(config);const c=canvas(config.width,config.height);
+  for(const key of ['genetics','thc','cbd']){
+   const bounds=config.thresholds[key],max=key==='genetics'?100:key==='thc'?40:20;
+   assert(getLayerLevel(0,key,config.thresholds)===1,'Nullwert');assert(getLayerLevel(max,key,config.thresholds)===bounds.length,'Maximum');
+   bounds.forEach((rule,i)=>{if(rule.below!==undefined){assert(getLayerLevel(rule.below-.001,key,config.thresholds)===i+1,'unter Grenze');assert(getLayerLevel(rule.below,key,config.thresholds)===i+2,'auf Grenze');assert(getLayerLevel(Math.min(max,rule.below+.001),key,config.thresholds)===i+2,'über Grenze');}});
+   const states=new Set();
+   for(let i=0;i<bounds.length;i++){
+    const value=i===0?0:bounds[i-1].below,data={...sample,[key==='genetics'?'sativa':key]:value};
+    const result=await renderLabel(c,data,{config});assert(result.plan.levels[key]===i+1,'Falsche Stufe');states.add(c.toDataURL());
+    if(key==='genetics')tile(sheets.genetics,c,i%7,li*3+Math.floor(i/7),`${value}% Sativa`);
+    else tile(sheets['light-growth'],c,i,li*2+(key==='thc'?0:1),`${key.toUpperCase()} ${value}%`);
+   }
+   assert(states.size===bounds.length,'Identische Stufen');report(`${layout.id}: alle ${bounds.length} ${key}-Stufen und exklusive Grenzen`);
+  }
+  let n=0;
+  for(const sativa of [0,50,100])for(const thc of [0,20,40])for(const cbd of [0,10,20]){await renderLabel(c,{...sample,sativa,thc,cbd},{config});tile(sheets.combinations,c,n%9,li*3+Math.floor(n/9),`S ${sativa} · T ${thc} · C ${cbd}`);n++;}
+  for(const data of [
+   {...sample,name:'Northern Lights – Amethyst Botanical Reserve',producer:'Vereinigte Botanische Manufaktur zum Grünen Dom'},
+   {...sample,name:'W'.repeat(200),producer:'W'.repeat(120)},
+   {...sample,producer:'',thc:39.99,cbd:19.99,sativa:99.99},
+  ]){const result=await renderLabel(c,data,{config});for(const field of config.typography.fields){const fit=result.textLayout[field.id];assert(fit&&fit.fontSize>=field.minFontSize,'Text zu klein');}}
+  report(`${layout.id}: 27 Kombinationen, maximale Textlängen, Dezimalwerte, leerer Produzent`);
+  const data={...sample,name:li?'Emerald Rosette':'Verdant Cathedral'};await renderLabel(c,data,{config});
+  const url=c.toDataURL();await renderLabel(c,data,{config});assert(url===c.toDataURL(),'Nicht deterministisch');
+  const blob=await canvasToPng(c),bitmap=await createImageBitmap(blob),decoded=canvas(c.width,c.height);decoded.getContext('2d').drawImage(bitmap,0,0);assert(decoded.toDataURL()===url,'PNG und Vorschau weichen ab');bitmap.close();
+  if(li){for(const[x,y]of [[0,0],[1253,0],[0,1253],[1253,1253],[80,80]])assert(c.getContext('2d').getImageData(x,y,1,1).data[3]===0,'Kreisaußenbereich');}
+  const z=getRenderPlan(data,config).elements.map(x=>x.zIndex);assert(z.join(',')==='0,100,200,300,400,450,500,500,500,500,500,500,500','zIndex');
+  save(`${layout.id}-preview.png`,c);if(!li)save('preview.png',c);
+  const entry={id:'cathedral-'+li,data,packId:manifest.id,packVersion:manifest.version,layoutId:layout.id,quantity:1,widthMm:60};entries.push(entry);configs.set(configKey(entry),config);
+ }
+ const plan=layoutSheets(entries,configs,{mixSizes:true,cropMarks:false});
+ const pdf=await generatePdf(plan,async(entry,config)=>{const c=canvas(config.width,config.height);await renderLabel(c,entry.data,{config});return c;});
+ const documentPdf=await PDFDocument.load(pdf);assert(documentPdf.getPageCount()===1,'A4-PDF');
+ for(const placement of plan.pages[0].placements)assert(Math.abs(placement.originalHeightMm/placement.originalWidthMm-placement.config.height/placement.config.width)<1e-8,'PDF verzerrt');
+ // Expose the actual PDF for the artifact runner, without changing the app.
+ window.__verdantPdf=Array.from(pdf);
+ report('Vorschau und dekodierter PNG-Export pixelgleich; gemeinsamer A4-PDF-Bogen mit beiden Layouts bei 60 mm erzeugt');
+ for(const[key,c]of Object.entries(sheets))save(`${key}-contact-sheet.png`,c);
+ document.body.dataset.testStatus='passed';
+}catch(error){document.querySelector('#results').textContent=checks.join('\n')+'\nFAIL '+error.stack;document.body.dataset.testStatus='failed';}
+</script></body></html>
+
