@@ -50,15 +50,12 @@ test('Gleichzeitige Importe derselben Version werden seriell und unveränderlich
  const exported=await inspectPackArchive(await manager.exportPack('local-forest','1.2.3'));assert.equal(exported.manifest.name,'Lokaler Wald');
 });
 
-test('Bereits importierte Legacy-Packs bleiben nutzbar und identischer Reimport trotz altem Hash erlaubt',async t=>{
+test('Alte lokale Packs sind kontrolliert unbenutzbar, bleiben aber gespeichert',async t=>{
  const store=new MemoryPackStore(),manager=make({importedStore:store});t.after(()=>manager.dispose());
- const manifest=localManifest();
- const layouts=manifest.layouts || Object.entries(manifest.formats).map(([id,design])=>({...design,id}));
- const legacy={...manifest,formats:Object.fromEntries(layouts.filter(x=>['rectangular','circular'].includes(x.id)).map(({id,name,...design})=>[id,design]))};delete legacy.layouts;
- await store.put({manifest:legacy,files,contentHash:'0'.repeat(64),totalBytes:Object.values(files).reduce((n,bytes)=>n+bytes.length,0),importedAt:1});
- assert.deepEqual((await manager.loadPack('local-forest','1.2.3')).layouts.map(x=>x.id),['rectangular','circular']);
- assert.equal((await manager.getConfig('local-forest','circular','1.2.3')).shape,'circle');
- assert.equal((await manager.importPack(buildPackArchive(legacy,files))).duplicate,true);
- assert.equal((await store.get('local-forest','1.2.3')).importedAt,1);
- const changed={...legacy,name:'Changed'};await assert.rejects(manager.importPack(buildPackArchive(changed,files)),/Version erhöhen/);
+ const manifest=localManifest();manifest.compatibilityVersion=1;
+ await store.put({manifest,files,contentHash:'0'.repeat(64),totalBytes:100,importedAt:1});
+ await assert.rejects(manager.getConfig(manifest.id,'circular',manifest.version),/aktualisieren/);
+ await assert.rejects(manager.loadPack(manifest.id,manifest.version),/aktualisieren/);
+ assert.equal((await manager.listPacks()).filter(x=>x.source==='imported').length,0);
+ assert.match(manager.warning,/aktualisieren/);assert.ok(await store.get(manifest.id,manifest.version));
 });

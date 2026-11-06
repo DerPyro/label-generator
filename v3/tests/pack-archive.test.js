@@ -130,15 +130,10 @@ test('Stark komprimierte Bilddateien dürfen das gesamte Dekodierbudget nicht ü
   await assert.rejects(inspectPackArchive(zip(files)),/zu viele Bildpunkte/);
 });
 
-test('Legacy-ZIPs migrieren zu Layouts und neue ZIPs behalten beliebige Layout-IDs', async () => {
-  const manifest = structuredClone(original.manifest);
-  const legacy = {...manifest, formats:Object.fromEntries(manifest.layouts.filter(x=>['rectangular','circular'].includes(x.id)).map(({id,name,...design})=>[id,design]))};
-  delete legacy.layouts;
-  const importedLegacy = await inspectPackArchive(zip({...original.files,'pack.json':strToU8(JSON.stringify(legacy))}));
-  assert.equal(importedLegacy.manifest.formats, undefined);
-  assert.deepEqual(importedLegacy.manifest.layouts.map(x=>x.id), ['rectangular','circular']);
-  manifest.layouts = manifest.layouts.map((layout,index)=>({...layout,id:`custom-layout-${index+1}`,name:`Eigenes Layout ${index+1}`}));
-  const imported = await inspectPackArchive(buildPackArchive(manifest, original.files));
-  assert.deepEqual(imported.manifest.layouts.map(x=>x.id), manifest.layouts.map(x=>x.id));
-  assert.deepEqual(imported.manifest.layouts.map(x=>[x.width,x.height]),manifest.layouts.map(x=>[x.width,x.height]));
+test('Alte ZIPs werden abgewiesen, neue ZIPs behalten beliebige Layout-IDs', async () => {
+ const manifest=structuredClone(original.manifest),legacy={...manifest,compatibilityVersion:1};
+ await assert.rejects(inspectPackArchive(zip({...original.files,'pack.json':strToU8(JSON.stringify(legacy))})),/aktualisieren/);
+ manifest.layouts=manifest.layouts.map((layout,i)=>({...layout,id:'custom-layout-'+i,name:'Eigenes Layout'}));
+ const imported=await inspectPackArchive(buildPackArchive(manifest,original.files));
+ assert.deepEqual(imported.manifest.layouts,manifest.layouts);
 });

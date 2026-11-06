@@ -54,3 +54,7 @@ Native Prüfungen laufen mit `npm test`, Manifest-/PNG-/Syntaxprüfungen mit `np
 Ein tatsächlicher Probedruck auf dem vorgesehenen Drucker und Etikettenpapier steht weiterhin aus. Dabei Lesbarkeit, Farben und Kanten prüfen; die digitale Maßprüfung ersetzt diese physische Druckabnahme nicht.
 
 Für einen automatisierten Browser-Durchlauf: Server starten und `npm run test:browser` ausführen. Chrome wird im Hintergrund mit einem separaten temporären Profil gestartet; einen anderen Chrome-Pfad kannst du über `CHROME_PATH` angeben. Mit `-- --url http://localhost:3004/label-generator/v3/tests/browser.html` lässt sich der Projekt-Pages-Pfad prüfen.
+
+## Natural Boho
+
+Natural Boho ergänzt zwei illustrierte Layouts mit Pilzen, Wildblumen, sieben Tageszeiten und Groovy-Rauch. Das Pack verwendet die neue Typografie- und zIndex-Engine (compatibilityVersion 2). [Pack-Dokumentation](texturepacks/natural-boho/README.md).

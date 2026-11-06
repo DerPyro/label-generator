@@ -3,6 +3,7 @@
 <body style="font:15px system-ui;margin:2rem;background:#f3eee3;color:#21382d">
 <h1>v3 Browserprüfungen</h1><pre id="results">Prüfung läuft …</pre><canvas id="preview" style="max-width:320px;width:100%;height:auto"></canvas>
 <script type="module">
+import { checkTypography } from './browser-typography.js';
 import { CONFIG,THRESHOLDS } from '../src/config.js';
 import { getRenderPlan,getLayerLevel } from '../src/model.js';
 import { TexturePackManager,validateManifest,getLayouts } from '../src/texturepacks.js';
@@ -20,9 +21,9 @@ const assert=(ok,message)=>{if(!ok)throw Error(message);};
 const close=(a,b)=>assert(Math.abs(a-b)<1e-7,`${a} ≠ ${b}`);
 async function check(name,fn){try{await fn();checks.push('PASS '+name);}catch(error){checks.push('FAIL '+name+': '+error.message);}document.querySelector('#results').textContent=checks.join('\n');}
 async function until(fn){for(let i=0;i<400;i++){if(fn())return;await new Promise(resolve=>setTimeout(resolve,20));}throw Error('Zeitüberschreitung');}
-await check('Drei validierte Packs mit Hochformat, Querformat und Rund laden',async()=>{
- const packs=(await manager.listPacks()).filter(pack=>pack.source==='bundled');assert(packs.length===3&&packs.some(pack=>pack.id==='watercolor-forest'),'Packs fehlen');
- for(const pack of packs){const layouts=getLayouts(await manager.loadPack(pack.id));assert(layouts.length>=3,'Drei Beispiel-Layouts fehlen');for(const layout of layouts){const config=await manager.getConfig(pack.id,layout.id);await preloadAssets(config);configs.set(`${pack.id}@${config.packVersion}:${layout.id}`,config);}}
+await check('Alle Katalogpacks mit ihren eigenen Layouts laden',async()=>{
+ const packs=(await manager.listPacks()).filter(pack=>pack.source==='bundled');assert(packs.length===(await manager.catalog()).packs.length&&packs.some(pack=>pack.id==='watercolor-forest')&&packs.some(pack=>pack.id==='natural-boho'),'Packs fehlen');
+ for(const pack of packs){const layouts=getLayouts(await manager.loadPack(pack.id));assert(layouts.length>=2,'Hochformat und Rund fehlen');for(const layout of layouts){const config=await manager.getConfig(pack.id,layout.id);await preloadAssets(config);configs.set(`${pack.id}@${config.packVersion}:${layout.id}`,config);}}
 });
 const rect=()=>configs.get('woodland@1.0.0:rectangular'),circle=()=>configs.get('woodland@1.0.0:circular');
 await check('Watercolor Forest: drei native PNG-Layouts und gemeinsamer maßstäblicher PDF-Bogen',async()=>{
@@ -79,8 +80,8 @@ await check('Optionale Himmel- und Textmasken werden in derselben Pipeline angew
 await check('Lange Namen und optionaler Produzent bleiben in beiden Layouts lesbar',async()=>{
  for(const config of [rect(),circle(),configs.get('woodland@1.0.0:wide-landscape')]){
   const data={...sample,name:'Super Silver Haze mit einem besonders langen botanischen Sortennamen',producer:'Internationale Saatgutmanufaktur für traditionelle botanische Sammlungen'};
-  const result=await renderLabel(canvas,data,{config});assert(result.textLayout.lines.join(' ')===data.name,'Name abgeschnitten');assert(result.textLayout.producer.width<=config.typography.producer.maxWidth,'Produzent zu breit');
-  const without=await renderLabel(canvas,{...sample,producer:''},{config});assert(without.textLayout.producer===null,'Leerer Produzent wird gezeichnet');
+  const result=await renderLabel(canvas,data,{config});assert(result.textLayout['strain-name'].lines.join(' ')===data.name,'Name abgeschnitten');assert(result.textLayout.producer.width<=config.typography.fields.find(f=>f.id==='producer').maxWidth,'Produzent zu breit');
+  const without=await renderLabel(canvas,{...sample,producer:''},{config});assert(without.textLayout.producer.text==='','Leerer Produzent wird gezeichnet');
  }
 });
 await check('Fehlende Bilder und inkompatible Manifeste liefern kontrollierte Fehler',async()=>{
@@ -200,7 +201,7 @@ await check('Defekte Schrift wird vor dem Speichern abgefangen, installierte Pac
   const manifest={...structuredClone(archiveFixture.manifest),id:'invalid-font-pack',version:'1.0.0'};
   const files={...archiveFixture.files,[manifest.fonts[0].path]:archiveFixture.files[manifest.fonts[0].path].slice(0,2048)};
   try{await local.importPack(buildPackArchive(manifest,files));throw Error('Beschädigtes Pack installiert');}catch(error){assert(/schrift/i.test(error.message),'Schriftdekodierung nicht geprüft: '+error.message);}
-  assert((await store.list()).length===0,'Fehlerhaftes Pack wurde gespeichert');assert((await local.listPacks()).length===3,'Mitgelieferte Packs beschädigt');
+  assert((await store.list()).length===0,'Fehlerhaftes Pack wurde gespeichert');assert((await local.listPacks()).length===(await local.catalog()).packs.length,'Mitgelieferte Packs beschädigt');
  }finally{local.dispose();store.close();await new Promise(resolve=>{const deletion=indexedDB.deleteDatabase(dbName);deletion.onsuccess=resolve;deletion.onerror=resolve;});}
 });
 await check('Ein-Layout-ZIP: dynamische Auswahl, vergleichbarer Packwechsel, Neustart und Warenkorbschutz',async()=>{
@@ -231,8 +232,8 @@ await check('Ein-Layout-ZIP: dynamische Auswahl, vergleichbarer Packwechsel, Neu
   assert(![...doc.querySelector('#pack').options].some(x=>x.value===id+'@'+version),'Entferntes Pack bleibt auswählbar');
  }finally{frame.remove();await store.remove(id,version);store.close();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
 });
+await checkTypography(check);
 await renderLabel(canvas,sample,{config:circle()});
 if(savedLanguage===null)localStorage.removeItem('label-generator-v3-language');else localStorage.setItem('label-generator-v3-language',savedLanguage);
 document.body.dataset.testStatus=checks.some(x=>x.startsWith('FAIL'))?'failed':'passed';
 </script></body></html>
-

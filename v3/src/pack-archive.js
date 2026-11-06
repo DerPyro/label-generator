@@ -156,6 +156,7 @@ function validateFiles(manifest, files) {
   for (const design of manifest.layouts) {
     for (const path of [design.layers.base, ...design.layers.genetics, ...design.layers.thc, ...design.layers.cbd, ...Object.values(design.masks || {})]) pngInfo(requireFile(path), path, design);
   }
+  for(const design of manifest.layouts)for(const element of [...design.typography.decorations,...design.typography.fields.flatMap(field=>field.background?[field.background]:[])])if(element.asset)pngInfo(requireFile(element.asset),element.asset);
   for (const design of manifest.layouts) if (design.preview) pngInfo(requireFile(design.preview), design.preview);
   if (manifest.preview) pngInfo(requireFile(manifest.preview), manifest.preview);
   for (const font of manifest.fonts) fontInfo(requireFile(font.path), font.path);

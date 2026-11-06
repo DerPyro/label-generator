@@ -1,0 +1,446 @@
+{
+  "id": "natural-boho",
+  "name": "Natural Boho",
+  "version": "1.0.0",
+  "compatibilityVersion": 2,
+  "description": "Märchenhafte Naturillustration und groovige 70er-Jahre-Farben: Tageszyklus, Rauchspiralen und eine wachsende Pilzwelt.",
+  "author": "label-generator contributors",
+  "status": "illustrated",
+  "preview": "preview.png",
+  "fonts": [
+    {
+      "family": "Shrikhand",
+      "path": "fonts/shrikhand/Shrikhand-Regular.ttf",
+      "weight": "400"
+    },
+    {
+      "family": "Lora",
+      "path": "fonts/lora/label-serif.ttf",
+      "weight": "400 700"
+    }
+  ],
+  "layouts": [
+    {
+      "id": "classic-portrait",
+      "name": "Classic Portrait",
+      "width": 1024,
+      "height": 1536,
+      "shape": "rectangle",
+      "bleedMm": 0,
+      "preview": "classic-portrait-preview.png",
+      "layers": {
+        "base": "layouts/classic-portrait/base.png",
+        "genetics": [
+          "layouts/classic-portrait/genetics/1.png",
+          "layouts/classic-portrait/genetics/2.png",
+          "layouts/classic-portrait/genetics/3.png",
+          "layouts/classic-portrait/genetics/4.png",
+          "layouts/classic-portrait/genetics/5.png",
+          "layouts/classic-portrait/genetics/6.png",
+          "layouts/classic-portrait/genetics/7.png"
+        ],
+        "thc": [
+          "layouts/classic-portrait/thc/1.png",
+          "layouts/classic-portrait/thc/2.png",
+          "layouts/classic-portrait/thc/3.png",
+          "layouts/classic-portrait/thc/4.png",
+          "layouts/classic-portrait/thc/5.png",
+          "layouts/classic-portrait/thc/6.png",
+          "layouts/classic-portrait/thc/7.png"
+        ],
+        "cbd": [
+          "layouts/classic-portrait/cbd/1.png",
+          "layouts/classic-portrait/cbd/2.png",
+          "layouts/classic-portrait/cbd/3.png",
+          "layouts/classic-portrait/cbd/4.png",
+          "layouts/classic-portrait/cbd/5.png",
+          "layouts/classic-portrait/cbd/6.png",
+          "layouts/classic-portrait/cbd/7.png"
+        ]
+      },
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300
+      },
+      "typography": {
+        "fields": [
+          {
+            "id": "strain-name",
+            "source": "name",
+            "font": "Shrikhand",
+            "x": 512,
+            "y": 650,
+            "fontSize": 100,
+            "minFontSize": 32,
+            "maxWidth": 620,
+            "maxLines": 3,
+            "color": "#425D43",
+            "zIndex": 500,
+            "maxHeight": 230,
+            "lineHeight": 1.04,
+            "background": {
+              "id": "name-plaque",
+              "type": "sprite",
+              "asset": "decorations/portrait-plaque.png",
+              "x": 0,
+              "y": 0,
+              "width": 780,
+              "height": 310,
+              "zIndex": 450,
+              "relativeTo": "strain-name"
+            }
+          },
+          {
+            "id": "harvest-year",
+            "source": "year",
+            "font": "Lora",
+            "x": 512,
+            "y": 850,
+            "fontSize": 36,
+            "minFontSize": 24,
+            "maxWidth": 640,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "year-full",
+            "prefix": "Ernte "
+          },
+          {
+            "id": "producer-name",
+            "source": "producer",
+            "font": "Lora",
+            "x": 512,
+            "y": 915,
+            "fontSize": 30,
+            "minFontSize": 18,
+            "maxWidth": 600,
+            "maxLines": 2,
+            "color": "#425D43",
+            "zIndex": 500,
+            "maxHeight": 65,
+            "lineHeight": 1.1
+          },
+          {
+            "id": "thc-value",
+            "source": "thc",
+            "font": "Lora",
+            "x": 346,
+            "y": 1020,
+            "fontSize": 40,
+            "minFontSize": 24,
+            "maxWidth": 264,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "THC  ",
+            "background": {
+              "id": "thc-value-plaque",
+              "type": "sprite",
+              "asset": "decorations/value-plaque.png",
+              "x": 0,
+              "y": 0,
+              "width": 292,
+              "height": 100,
+              "zIndex": 440,
+              "relativeTo": "thc-value"
+            }
+          },
+          {
+            "id": "cbd-value",
+            "source": "cbd",
+            "font": "Lora",
+            "x": 678,
+            "y": 1020,
+            "fontSize": 40,
+            "minFontSize": 24,
+            "maxWidth": 264,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "CBD  ",
+            "background": {
+              "id": "cbd-value-plaque",
+              "type": "sprite",
+              "asset": "decorations/value-plaque.png",
+              "x": 0,
+              "y": 0,
+              "width": 292,
+              "height": 100,
+              "zIndex": 440,
+              "relativeTo": "cbd-value"
+            }
+          },
+          {
+            "id": "indica-value",
+            "source": "indica",
+            "font": "Lora",
+            "x": 346,
+            "y": 1135,
+            "fontSize": 32,
+            "minFontSize": 24,
+            "maxWidth": 280,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "Indica  "
+          },
+          {
+            "id": "sativa-value",
+            "source": "sativa",
+            "font": "Lora",
+            "x": 678,
+            "y": 1135,
+            "fontSize": 32,
+            "minFontSize": 24,
+            "maxWidth": 280,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "Sativa  "
+          }
+        ],
+        "decorations": [
+          {
+            "id": "information-paper",
+            "type": "sprite",
+            "asset": "decorations/value-plaque.png",
+            "x": 512,
+            "y": 1134,
+            "width": 690,
+            "height": 105,
+            "zIndex": 420
+          },
+          {
+            "id": "foreground-sprig",
+            "type": "sprite",
+            "asset": "decorations/foreground-sprig.png",
+            "x": -358,
+            "y": 95,
+            "width": 105,
+            "height": 155,
+            "zIndex": 600,
+            "relativeTo": "strain-name",
+            "rotation": -12
+          }
+        ]
+      }
+    },
+    {
+      "id": "round-lid",
+      "name": "Round Lid",
+      "width": 1254,
+      "height": 1254,
+      "shape": "circle",
+      "bleedMm": 0,
+      "preview": "round-lid-preview.png",
+      "layers": {
+        "base": "layouts/round-lid/base.png",
+        "genetics": [
+          "layouts/round-lid/genetics/1.png",
+          "layouts/round-lid/genetics/2.png",
+          "layouts/round-lid/genetics/3.png",
+          "layouts/round-lid/genetics/4.png",
+          "layouts/round-lid/genetics/5.png",
+          "layouts/round-lid/genetics/6.png",
+          "layouts/round-lid/genetics/7.png"
+        ],
+        "thc": [
+          "layouts/round-lid/thc/1.png",
+          "layouts/round-lid/thc/2.png",
+          "layouts/round-lid/thc/3.png",
+          "layouts/round-lid/thc/4.png",
+          "layouts/round-lid/thc/5.png",
+          "layouts/round-lid/thc/6.png",
+          "layouts/round-lid/thc/7.png"
+        ],
+        "cbd": [
+          "layouts/round-lid/cbd/1.png",
+          "layouts/round-lid/cbd/2.png",
+          "layouts/round-lid/cbd/3.png",
+          "layouts/round-lid/cbd/4.png",
+          "layouts/round-lid/cbd/5.png",
+          "layouts/round-lid/cbd/6.png",
+          "layouts/round-lid/cbd/7.png"
+        ]
+      },
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300
+      },
+      "typography": {
+        "fields": [
+          {
+            "id": "strain-name",
+            "source": "name",
+            "font": "Shrikhand",
+            "x": 627,
+            "y": 535,
+            "fontSize": 92,
+            "minFontSize": 32,
+            "maxWidth": 650,
+            "maxLines": 3,
+            "color": "#425D43",
+            "zIndex": 500,
+            "maxHeight": 230,
+            "lineHeight": 1.04,
+            "background": {
+              "id": "name-plaque",
+              "type": "sprite",
+              "asset": "decorations/round-medallion.png",
+              "x": 0,
+              "y": 125,
+              "width": 850,
+              "height": 760,
+              "zIndex": 425,
+              "relativeTo": "strain-name"
+            }
+          },
+          {
+            "id": "harvest-year",
+            "source": "year",
+            "font": "Lora",
+            "x": 627,
+            "y": 698,
+            "fontSize": 38,
+            "minFontSize": 24,
+            "maxWidth": 660,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "year-full",
+            "prefix": "Ernte "
+          },
+          {
+            "id": "producer-name",
+            "source": "producer",
+            "font": "Lora",
+            "x": 627,
+            "y": 757,
+            "fontSize": 32,
+            "minFontSize": 18,
+            "maxWidth": 570,
+            "maxLines": 2,
+            "color": "#425D43",
+            "zIndex": 500,
+            "maxHeight": 65,
+            "lineHeight": 1.1
+          },
+          {
+            "id": "thc-value",
+            "source": "thc",
+            "font": "Lora",
+            "x": 472,
+            "y": 835,
+            "fontSize": 44,
+            "minFontSize": 24,
+            "maxWidth": 264,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "THC  ",
+            "background": {
+              "id": "thc-value-plaque",
+              "type": "sprite",
+              "asset": "decorations/value-plaque.png",
+              "x": 0,
+              "y": 0,
+              "width": 292,
+              "height": 100,
+              "zIndex": 440,
+              "relativeTo": "thc-value"
+            }
+          },
+          {
+            "id": "cbd-value",
+            "source": "cbd",
+            "font": "Lora",
+            "x": 782,
+            "y": 835,
+            "fontSize": 44,
+            "minFontSize": 24,
+            "maxWidth": 264,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "CBD  ",
+            "background": {
+              "id": "cbd-value-plaque",
+              "type": "sprite",
+              "asset": "decorations/value-plaque.png",
+              "x": 0,
+              "y": 0,
+              "width": 292,
+              "height": 100,
+              "zIndex": 440,
+              "relativeTo": "cbd-value"
+            }
+          },
+          {
+            "id": "indica-value",
+            "source": "indica",
+            "font": "Lora",
+            "x": 472,
+            "y": 915,
+            "fontSize": 34,
+            "minFontSize": 24,
+            "maxWidth": 280,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "Indica  "
+          },
+          {
+            "id": "sativa-value",
+            "source": "sativa",
+            "font": "Lora",
+            "x": 782,
+            "y": 915,
+            "fontSize": 34,
+            "minFontSize": 24,
+            "maxWidth": 280,
+            "maxLines": 1,
+            "color": "#425D43",
+            "zIndex": 500,
+            "format": "percent",
+            "prefix": "Sativa  "
+          }
+        ],
+        "decorations": [
+          {
+            "id": "information-paper",
+            "type": "sprite",
+            "asset": "decorations/value-plaque.png",
+            "x": 627,
+            "y": 908,
+            "width": 660,
+            "height": 105,
+            "zIndex": 435
+          },
+          {
+            "id": "foreground-sprig",
+            "type": "sprite",
+            "asset": "decorations/foreground-sprig.png",
+            "x": -358,
+            "y": 30,
+            "width": 105,
+            "height": 155,
+            "zIndex": 600,
+            "relativeTo": "strain-name",
+            "rotation": -12
+          }
+        ]
+      }
+    }
+  ]
+}

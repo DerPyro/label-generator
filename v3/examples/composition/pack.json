@@ -1,0 +1,310 @@
+{
+  "id": "composition-demo",
+  "name": "Composition Demo",
+  "description": "Zwei Schriften, Textplakette, Vordergrund, Rotation und Kreisbogen.",
+  "author": "label-generator contributors",
+  "version": "1.0.0",
+  "compatibilityVersion": 2,
+  "fonts": [
+    {
+      "family": "Lora",
+      "path": "fonts/lora/label-serif.ttf",
+      "weight": "400 700"
+    },
+    {
+      "family": "Abel",
+      "path": "fonts/abel/Abel-Regular.ttf",
+      "weight": "400"
+    }
+  ],
+  "layouts": [
+    {
+      "id": "portrait",
+      "name": "Hochformat",
+      "width": 512,
+      "height": 768,
+      "shape": "rectangle",
+      "layers": {
+        "base": "layouts/portrait/base.png",
+        "genetics": [
+          "layouts/portrait/genetics/1.png",
+          "layouts/portrait/genetics/2.png",
+          "layouts/portrait/genetics/3.png",
+          "layouts/portrait/genetics/4.png",
+          "layouts/portrait/genetics/5.png",
+          "layouts/portrait/genetics/6.png",
+          "layouts/portrait/genetics/7.png"
+        ],
+        "thc": [
+          "layouts/portrait/thc/1.png",
+          "layouts/portrait/thc/2.png",
+          "layouts/portrait/thc/3.png",
+          "layouts/portrait/thc/4.png",
+          "layouts/portrait/thc/5.png",
+          "layouts/portrait/thc/6.png",
+          "layouts/portrait/thc/7.png"
+        ],
+        "cbd": [
+          "layouts/portrait/cbd/1.png",
+          "layouts/portrait/cbd/2.png",
+          "layouts/portrait/cbd/3.png",
+          "layouts/portrait/cbd/4.png",
+          "layouts/portrait/cbd/5.png",
+          "layouts/portrait/cbd/6.png",
+          "layouts/portrait/cbd/7.png"
+        ]
+      },
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300
+      },
+      "typography": {
+        "fields": [
+          {
+            "id": "strain-name",
+            "source": "name",
+            "font": "Lora",
+            "x": 256,
+            "y": 330.24,
+            "fontSize": 38,
+            "minFontSize": 16,
+            "maxWidth": 409.6,
+            "maxLines": 2,
+            "lineHeight": 1.15,
+            "color": "#253e32",
+            "zIndex": 500,
+            "rotation": -4,
+            "background": {
+              "id": "name-plaque",
+              "type": "sprite",
+              "asset": "decorations/plaque.png",
+              "relativeTo": "strain-name",
+              "x": 0,
+              "y": 0,
+              "width": 450,
+              "height": 110,
+              "zIndex": 450
+            }
+          },
+          {
+            "id": "producer",
+            "source": "producer",
+            "font": "Abel",
+            "x": 256,
+            "y": 445.43999999999994,
+            "fontSize": 26,
+            "minFontSize": 14,
+            "maxWidth": 400,
+            "color": "#253e32",
+            "zIndex": 500
+          },
+          {
+            "id": "harvest",
+            "source": "year",
+            "format": "year-full",
+            "prefix": "Ernte ",
+            "font": "Abel",
+            "x": 256,
+            "y": 522.24,
+            "fontSize": 24,
+            "color": "#253e32",
+            "zIndex": 500
+          },
+          {
+            "id": "thc-value",
+            "source": "thc",
+            "format": "percent",
+            "prefix": "THC: ",
+            "font": "Abel",
+            "x": 153.6,
+            "y": 629.76,
+            "fontSize": 24,
+            "color": "#ffffff",
+            "zIndex": 500
+          },
+          {
+            "id": "cbd-value",
+            "source": "cbd",
+            "format": "percent",
+            "prefix": "CBD: ",
+            "font": "Abel",
+            "x": 358.4,
+            "y": 629.76,
+            "fontSize": 24,
+            "color": "#ffffff",
+            "zIndex": 500
+          }
+        ],
+        "decorations": [
+          {
+            "id": "foreground",
+            "type": "sprite",
+            "asset": "decorations/ornament.png",
+            "relativeTo": "strain-name",
+            "x": 180,
+            "y": 0,
+            "width": 90,
+            "height": 120,
+            "zIndex": 600
+          }
+        ]
+      }
+    },
+    {
+      "id": "round-lid",
+      "name": "Runder Deckel",
+      "width": 512,
+      "height": 512,
+      "shape": "circle",
+      "layers": {
+        "base": "layouts/round-lid/base.png",
+        "genetics": [
+          "layouts/round-lid/genetics/1.png",
+          "layouts/round-lid/genetics/2.png",
+          "layouts/round-lid/genetics/3.png",
+          "layouts/round-lid/genetics/4.png",
+          "layouts/round-lid/genetics/5.png",
+          "layouts/round-lid/genetics/6.png",
+          "layouts/round-lid/genetics/7.png"
+        ],
+        "thc": [
+          "layouts/round-lid/thc/1.png",
+          "layouts/round-lid/thc/2.png",
+          "layouts/round-lid/thc/3.png",
+          "layouts/round-lid/thc/4.png",
+          "layouts/round-lid/thc/5.png",
+          "layouts/round-lid/thc/6.png",
+          "layouts/round-lid/thc/7.png"
+        ],
+        "cbd": [
+          "layouts/round-lid/cbd/1.png",
+          "layouts/round-lid/cbd/2.png",
+          "layouts/round-lid/cbd/3.png",
+          "layouts/round-lid/cbd/4.png",
+          "layouts/round-lid/cbd/5.png",
+          "layouts/round-lid/cbd/6.png",
+          "layouts/round-lid/cbd/7.png"
+        ]
+      },
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300
+      },
+      "typography": {
+        "fields": [
+          {
+            "id": "strain-name",
+            "source": "name",
+            "font": "Lora",
+            "x": 256,
+            "y": 220.16,
+            "fontSize": 38,
+            "minFontSize": 16,
+            "maxWidth": 409.6,
+            "maxLines": 2,
+            "lineHeight": 1.15,
+            "color": "#253e32",
+            "zIndex": 500,
+            "rotation": -4,
+            "background": {
+              "id": "name-plaque",
+              "type": "sprite",
+              "asset": "decorations/plaque.png",
+              "relativeTo": "strain-name",
+              "x": 0,
+              "y": 0,
+              "width": 450,
+              "height": 110,
+              "zIndex": 450
+            }
+          },
+          {
+            "id": "producer",
+            "source": "producer",
+            "font": "Abel",
+            "x": 256,
+            "y": 296.96,
+            "fontSize": 26,
+            "minFontSize": 14,
+            "maxWidth": 400,
+            "color": "#253e32",
+            "zIndex": 500
+          },
+          {
+            "id": "harvest",
+            "source": "year",
+            "format": "year-full",
+            "prefix": "Ernte ",
+            "font": "Abel",
+            "x": 256,
+            "y": 348.16,
+            "fontSize": 24,
+            "color": "#253e32",
+            "zIndex": 500
+          },
+          {
+            "id": "thc-value",
+            "source": "thc",
+            "format": "percent",
+            "prefix": "THC: ",
+            "font": "Abel",
+            "x": 153.6,
+            "y": 419.84,
+            "fontSize": 24,
+            "color": "#ffffff",
+            "zIndex": 500
+          },
+          {
+            "id": "cbd-value",
+            "source": "cbd",
+            "format": "percent",
+            "prefix": "CBD: ",
+            "font": "Abel",
+            "x": 358.4,
+            "y": 419.84,
+            "fontSize": 24,
+            "color": "#ffffff",
+            "zIndex": 500
+          },
+          {
+            "id": "round-title",
+            "source": "static",
+            "text": "BOTANICAL COLLECTION",
+            "font": "Lora",
+            "fontSize": 22,
+            "minFontSize": 12,
+            "color": "#735c31",
+            "path": {
+              "type": "arc",
+              "centerX": 256,
+              "centerY": 256,
+              "radius": 205,
+              "startAngle": -150,
+              "endAngle": -30,
+              "direction": "clockwise"
+            },
+            "letterSpacing": 1,
+            "zIndex": 500
+          }
+        ],
+        "decorations": [
+          {
+            "id": "foreground",
+            "type": "sprite",
+            "asset": "decorations/ornament.png",
+            "relativeTo": "strain-name",
+            "x": 180,
+            "y": 0,
+            "width": 90,
+            "height": 120,
+            "zIndex": 600
+          }
+        ]
+      }
+    }
+  ]
+}

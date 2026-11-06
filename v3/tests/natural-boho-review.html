@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><title>Natural Boho · Abnahme</title>
+<body style="margin:28px;background:#f4e6c8;color:#425d43;font:16px system-ui"><h1>Natural Boho</h1><pre id="results">Prüfung läuft …</pre><div id="art"></div>
+<script type="module">
+import { TexturePackManager, resolvePackConfig, validateManifest } from '../src/texturepacks.js';
+import { renderLabel, canvasToPng, preloadAssets } from '../src/renderer.js';
+import { THRESHOLDS } from '../src/config.js';
+import { inspectPackArchive, buildPackArchive } from '../src/pack-archive.js';
+import { IndexedDBPackStore } from '../src/pack-store.js';
+import { layoutSheets, generatePdf, configKey } from '../src/print.js';
+import { PDFDocument } from '../vendor/pdf-lib.esm.min.js';
+const root = new URL('../texturepacks/natural-boho/', import.meta.url);
+const manifest = validateManifest(await (await fetch(new URL('pack.json', root))).json());
+const sample = { name: 'Golden Meadow', producer: 'Wald & Wiese', year: 2026, sativa: 59, thc: 23, cbd: 11 };
+const canvas = document.createElement('canvas'), artifacts = {}, results = [], configs = new Map(), entries = [];
+const assert = (value, message) => { if (!value) throw Error(message); };
+const log = message => { results.push('PASS ' + message); document.querySelector('#results').textContent = results.join('\n'); };
+const sheet = document.createElement('canvas'); sheet.width = 1680; sheet.height = 2660;
+const stages = document.createElement('canvas'); stages.width = 1960; stages.height = 2760;
+const stageCtx = stages.getContext('2d'); stageCtx.fillStyle = '#f4e6c8'; stageCtx.fillRect(0, 0, stages.width, stages.height);
+const ctx = sheet.getContext('2d'); ctx.fillStyle = '#f4e6c8'; ctx.fillRect(0, 0, sheet.width, sheet.height);
+ctx.fillStyle = '#425d43'; ctx.font = '36px Georgia'; ctx.fillText('Natural Boho · Nacht bis Sonnentag', 32, 50);
+function thumbnail(source, width = 600) {
+  const out = document.createElement('canvas'), scale = width / Math.max(source.width, source.height);
+  out.width = Math.round(source.width * scale); out.height = Math.round(source.height * scale);
+  out.getContext('2d').drawImage(source, 0, 0, out.width, out.height); return out.toDataURL();
+}
+try {
+  for (const [li, layout] of manifest.layouts.entries()) {
+    const config = resolvePackConfig(manifest, layout.id, root); configs.set(`natural-boho@1.0.0:${layout.id}`, config);
+    await preloadAssets(config);
+    for (const [ci, category] of ['genetics', 'thc', 'cbd'].entries()) {
+      for (let stage = 0; stage < 7; stage++) {
+        const property = category === 'genetics' ? 'sativa' : category;
+        const data = { ...sample, [property]: THRESHOLDS[category][stage] };
+        const rendered = await renderLabel(canvas, data, { config });
+        assert(rendered.plan.elements.every((element, i, list) => !i || element.zIndex >= list[i - 1].zIndex), 'zIndex unsortiert');
+        assert(rendered.textLayout['strain-name'].fontSize >= 32, 'Namensschrift unter Mindestgröße');
+        const scale = Math.min(260 / canvas.width, 400 / canvas.height), w = canvas.width * scale, h = canvas.height * scale;
+        const sx = stage * 280 + (280 - w) / 2, sy = (li * 3 + ci) * 460;
+        stageCtx.drawImage(canvas, sx, sy + 35, w, h); stageCtx.fillStyle = '#425d43'; stageCtx.font = '16px Georgia';
+        stageCtx.fillText(`${layout.id} · ${category} ${stage + 1}`, stage * 280 + 8, sy + 22);
+      }
+    }
+    for (const [row, values] of [[0, { sativa: 0, thc: 5, cbd: 2 }], [1, { sativa: 44, thc: 17, cbd: 8 }], [2, { sativa: 100, thc: 40, cbd: 20 }]]) {
+      await renderLabel(canvas, { ...sample, ...values, name: ['Moon Garden', 'Rosy Dawn', 'Golden Meadow'][row] }, { config });
+      const scale = Math.min(700 / canvas.width, 740 / canvas.height), w = canvas.width * scale, h = canvas.height * scale;
+      const x = 40 + li * 830 + (740 - w) / 2, y = 100 + row * 850;
+      ctx.drawImage(canvas, x, y, w, h); ctx.fillStyle = '#425d43'; ctx.font = '22px Georgia';
+      ctx.fillText(`${layout.name} · Sativa ${values.sativa} · THC ${values.thc} · CBD ${values.cbd}`, 45 + li * 830, y + 790);
+    }
+    for (const name of ['Haze', 'Super Silver Strawberry Banana Northern Lights Limited Harvest', 'ÄÖÜ – Süße Blüte']) {
+      await renderLabel(canvas, { ...sample, name, producer: 'Botanische Manufaktur Schwarzwald & Freunde', sativa: 100, thc: 40, cbd: 20 }, { config });
+    }
+    await renderLabel(canvas, sample, { config });
+    artifacts[layout.id + '-preview.png'] = thumbnail(canvas);
+    if (!li) artifacts['preview.png'] = artifacts[layout.id + '-preview.png'];
+    const png = await canvasToPng(canvas); assert(png.type === 'image/png' && png.size > 100000, 'PNG-Export fehlt');
+    const image = await createImageBitmap(png); const decoded = document.createElement('canvas'); decoded.width = image.width; decoded.height = image.height;
+    decoded.getContext('2d').drawImage(image, 0, 0); image.close();
+    assert(decoded.toDataURL() === canvas.toDataURL(), 'PNG und Vorschau unterscheiden sich');
+    if (layout.shape === 'circle') assert(canvas.getContext('2d').getImageData(0, 0, 1, 1).data[3] === 0, 'Kreisecke ist nicht transparent');
+    entries.push({ id: layout.id, data: sample, packId: manifest.id, packVersion: manifest.version, layoutId: layout.id, quantity: 1, widthMm: 60 });
+    log(`${layout.name}: alle 21 Einzelstufen, drei Mischungen, kurze/lange Namen, Umlaute und PNG-Pixelgleichheit`);
+  }
+  const plan = layoutSheets(entries, configs, { mixSizes: true, cropMarks: false });
+  const bytes = await generatePdf(plan, async (entry, config) => { const target = document.createElement('canvas'); await renderLabel(target, entry.data, { config }); return target; });
+  assert((await PDFDocument.load(bytes)).getPageCount() === 1, 'PDF-Bogen fehlt');
+  for (const placement of plan.pages[0].placements) assert(Math.abs(placement.originalHeightMm / placement.originalWidthMm - placement.config.height / placement.config.width) < 1e-7, 'PDF-Proportionen falsch');
+  log('Beide Layouts im maßstäblichen A4-PDF über den gemeinsamen Renderer');
+  const manager = new TexturePackManager({ importedStore: null });
+  const inspected = await inspectPackArchive(await manager.exportPack(manifest.id, manifest.version));
+  assert(inspected.files['fonts/shrikhand/OFL.txt'] && inspected.files['fonts/lora/OFL.txt'], 'Fontlizenzen fehlen im Export');
+  // A private test ID avoids the intentional protection of bundled ID/version pairs.
+  const localManifest = { ...structuredClone(inspected.manifest), id: 'natural-boho-review-' + crypto.randomUUID().slice(0, 8) };
+  const zip = buildPackArchive(localManifest, inspected.files);
+  const dbName = 'natural-boho-review-' + crypto.randomUUID(), store = new IndexedDBPackStore({ dbName });
+  const local = new TexturePackManager({ importedStore: store });
+  try {
+    await local.importPack(zip);
+    for (const design of manifest.layouts) {
+      const config = await local.getConfig(localManifest.id, design.id, manifest.version);
+      const original = document.createElement('canvas'); await renderLabel(original, sample, { config: configs.get(`natural-boho@1.0.0:${design.id}`) });
+      await renderLabel(canvas, sample, { config }); assert(canvas.toDataURL() === original.toDataURL(), 'Import verändert Pixel');
+    }
+    const restored = await inspectPackArchive(await local.exportPack(localManifest.id, manifest.version));
+    assert(restored.files['ASSET-LICENSE.txt'] && restored.files['fonts/shrikhand/OFL.txt'], 'ZIP-Reexport verliert Lizenzen');
+    log('ZIP-Export, echter IndexedDB-Import, Blob-Rendering und Reexport; beide Layouts pixelgleich');
+  } finally {
+    local.dispose(); store.close(); manager.dispose();
+    await new Promise((resolve, reject) => { const deletion = indexedDB.deleteDatabase(dbName); deletion.onsuccess = resolve; deletion.onerror = () => reject(deletion.error); });
+  }
+  const frame = document.createElement('iframe'), appStore = new IndexedDBPackStore(); frame.style.cssText = 'width:390px;height:800px';
+  const until = async predicate => { for (let i = 0; i < 1500; i++) { if (predicate()) return; await new Promise(resolve => setTimeout(resolve, 20)); } throw Error('Oberflächentest: Zeitüberschreitung'); };
+  try {
+    const loaded = new Promise(resolve => frame.onload = resolve); frame.src = '../index.html'; document.body.append(frame); await loaded;
+    const doc = frame.contentDocument; await until(() => !doc.querySelector('#export').disabled);
+    assert([...doc.querySelector('#pack').options].some(option => option.value === 'natural-boho@1.0.0'), 'Natural Boho fehlt im echten Texturepack-Menü');
+    doc.querySelector('#pack').value = 'natural-boho@1.0.0'; doc.querySelector('#pack').dispatchEvent(new Event('input', { bubbles: true }));
+    await until(() => doc.querySelector('#asset-version').textContent.includes('Natural Boho') && !doc.querySelector('#export').disabled);
+    for (const design of manifest.layouts) {
+      doc.querySelector('#layout').value = design.id; doc.querySelector('#layout').dispatchEvent(new Event('input', { bubbles: true }));
+      await until(() => !doc.querySelector('#export').disabled && doc.querySelector('#preview').width === design.width && doc.querySelector('#preview').height === design.height);
+    }
+    log('Mitgeliefertes Natural Boho im echten Texturepack-Menü gewählt; beide Layouts erfolgreich gerendert');
+    const transfer = new DataTransfer(); transfer.items.add(new File([zip], 'natural-boho-review.zip', { type: 'application/zip' }));
+    doc.querySelector('#pack-file').files = transfer.files; doc.querySelector('#pack-file').dispatchEvent(new Event('change', { bubbles: true }));
+    await until(() => !doc.querySelector('#pack-file').disabled);
+    assert(doc.querySelector('#pack-error').hidden, 'ZIP-Oberfläche: ' + doc.querySelector('#pack-error').textContent);
+    assert(doc.querySelector('#pack').value === localManifest.id + '@1.0.0', 'Importiertes Pack nicht gewählt');
+    assert(doc.querySelector('#layout').options.length === 2, 'Eigene Layoutauswahl fehlt');
+    for (const design of manifest.layouts) {
+      doc.querySelector('#layout').value = design.id; doc.querySelector('#layout').dispatchEvent(new Event('input', { bubbles: true }));
+      await until(() => !doc.querySelector('#export').disabled); assert(doc.querySelector('#form-error').hidden, 'Beschriftung in Oberfläche fehlgeschlagen');
+    }
+    log('ZIP-Datei über echten Datei-Input importiert; beide Layouts in der Oberfläche ausgewählt');
+  } finally { frame.remove(); await appStore.remove(localManifest.id, manifest.version); appStore.close(); }
+  artifacts['contact-sheet.png'] = sheet.toDataURL(); artifacts['stage-sheet.png'] = stages.toDataURL(); window.__packArtifacts = artifacts;
+  document.querySelector('#art').append(sheet); sheet.style.cssText = 'width:100%;max-width:1100px;height:auto';
+  document.body.dataset.testStatus = 'passed';
+} catch (error) { document.querySelector('#results').textContent = results.join('\n') + '\nFAIL ' + error.stack; document.body.dataset.testStatus = 'failed'; }
+</script></body></html>

@@ -1,177 +1,282 @@
-# Texturepack-Format, Kompatibilitätsversion 1
+# Eigene Texturepacks für Label Generator v3
 
-Texturepacks definieren Dateien und Textgeometrie. Die bestehende Canvas-Engine lädt diese Daten und zeichnet dieselben fünf Ebenen für alle Designs. Ein Pack erzeugt während des Renderns keine neuen Illustrationen. Alle Dateien werden lokal mit der statischen Website ausgeliefert; ein externes Konto oder ein CDN ist nicht erforderlich.
+Diese Anleitung beschreibt **compatibilityVersion 2**. Ein Texturepack besteht aus JSON, lokalen Schriften und PNG-Dateien. Es definiert die vollständige visuelle Komposition; Sortenname, Produzent und Messwerte bleiben unabhängig vom Design. Die Anwendung arbeitet vollständig im Browser und auf GitHub Pages.
 
-**Watercolor Forest** ist das erste illustrierte Pack mit KI-generierten Waldlandschaften, Wetter und botanischer Ornamentik in traditioneller Aquarelloptik. Die Grafiken sind keine menschlich gemalten Originalaquarelle. Die enthaltenen Packs **Woodland Study** und **Ink Study** bleiben technische Platzhalter. Die runden Kompositionen besitzen eigene Grafiken und Textpositionen; sie sind keine kreisförmig abgeschnittenen rechteckigen Illustrationen.
+## 1. Einführung und Architektur
 
-## Layouts und Dateien
+Ein Pack enthält ein oder mehrere frei benannte Layouts. Jedes Layout besitzt eine native Canvas-Auflösung, vier Grafik-Kategorien (`base`, `genetics`, `thc`, `cbd`) und die Kategorie `text` für Texte und Dekorationen. Der Renderer wählt genau ein Sprite pro dynamischer Kategorie aus und sortiert alle sichtbaren Elemente gemeinsam nach `zIndex`. Vorschau, PNG und PDF verwenden dieselbe Komposition.
+
+Ein grafischer Texturepack-Editor ist noch nicht implementiert. Stabile Element-IDs, unabhängige Geometrie und die gemeinsame Renderliste ermöglichen dessen spätere Ergänzung. Manifeste enthalten ausschließlich Daten, keinen ausführbaren Code.
+
+## 2. Verzeichnisstruktur
 
 ```text
-texturepacks/
-  catalog.json
-  woodland/
-    pack.json
-    preview.png
-    fonts/label-serif.ttf
-    fonts/OFL.txt
-    rectangular/
-      base.png
-      genetics/1.png … 7.png
-      thc/1.png … 7.png
-      cbd/1.png … 7.png
-    circular/
-      base.png
-      genetics/1.png … 7.png
-      thc/1.png … 7.png
-      cbd/1.png … 7.png
-    layouts/wide-landscape/
-      base.png
-      genetics/1.png … 7.png
-      thc/1.png … 7.png
-      cbd/1.png … 7.png
+mein-pack/
+  pack.json
+  ASSET-LICENSE.txt
+  README.md
+  fonts/
+    lora/label-serif.ttf
+    lora/OFL.txt
+    abel/Abel-Regular.ttf
+    abel/OFL.txt
+  decorations/
+    plaque.png
+    ornament.png
+  layouts/portrait/
+    base.png
+    genetics/1.png … 7.png
+    thc/1.png … 7.png
+    cbd/1.png … 7.png
 ```
 
-Layouts sind frei definierte Manifest-Einträge und nicht auf eine feste Zahl oder Seitenverhältnisse beschränkt. Alle drei mitgelieferten Packs bieten Hochformat, Rund und Querformat mit jeweils eigener Canvas-Geometrie und eigenständiger Komposition. Jedes Layout enthält eine Basis und 21 dynamische Sprites (je sieben für Genetik, THC und CBD), also 66 Layer-PNGs je Pack und 198 über alle drei Packs. Preview, Masken und Schriften zählen zusätzlich. Die mitgelieferten Lora-Schriften stehen unter SIL OFL; die Lizenz muss beim Verteilen erhalten bleiben.
+Jedes weitere Layout benötigt eine eigene Basis und 21 dynamische PNGs. Font- und Dekorationsdateien dürfen mehrere Layouts gemeinsam verwenden. Optional sind PNG-Vorschauen und Masken möglich.
 
-Watercolor Forest verwendet `classic-portrait` (1024 × 1536 px), `wide-landscape` (1536 × 1024 px) und `round-lid` (1254 × 1254 px), jeweils unter `layouts/<layout-id>/`. Die unterschiedlichen nativen Auflösungen werden direkt aus den Manifesten gelesen und nicht auf ein packübergreifendes Raster verzerrt. [Pack-Dokumentation und Herkunft](texturepacks/watercolor-forest/README.md).
+## 3. Manifest-Schema
 
-## Katalog und Versionen
+Die verbindliche maschinenlesbare Beschreibung steht in [schemas/texturepack.schema.json](schemas/texturepack.schema.json). Das [vollständige Beispielmanifest](examples/composition/pack.json) ist direkt verwendbar. Unbekannte Eigenschaften werden abgewiesen.
 
-`catalog.json` enthält `compatibilityVersion: 1` und ein `packs`-Array. Jeder Eintrag benötigt `id`, `name`, `version` und einen relativen `manifest`-Pfad, beispielsweise `woodland/pack.json`. `description`, `status` und `preview` ergänzen die Pack-Auswahl.
-
-```json
-{
-  "compatibilityVersion": 1,
-  "packs": [{
-    "id": "woodland",
-    "name": "Woodland Study",
-    "version": "1.0.0",
-    "status": "placeholder",
-    "manifest": "woodland/pack.json",
-    "preview": "woodland/preview.png"
-  }]
-}
-```
-
-Der Warenkorb speichert Pack-ID und Version. Ist eine gespeicherte Version nicht mehr installiert, wird ein kontrollierter Fehler angezeigt; der Renderer ersetzt sie nicht unbemerkt durch andere Assets. Mitgelieferte Packs werden aus dem statischen Katalog gelesen. Importierte Packs werden pro ID und Version lokal in IndexedDB gespeichert; mehrere Versionen derselben ID können parallel installiert sein. Unterschiedlicher Inhalt unter bereits installierter ID/Version wird abgewiesen, daher bei geändertem Inhalt die Version erhöhen. Ein bytegleicher Reimport ist ein No-op. Die Pack-Version archiviert keine entfernten Dateien automatisch.
-
-## Manifest
-
-Die vollständigen `pack.json` der drei Packs im Repository sind ausführbare Beispiele. Folgende Felder werden validiert:
-
-| Feld | Inhalt |
+| Pack-Eigenschaft | Bedeutung |
 | --- | --- |
-| `id` | Eindeutige ID aus Kleinbuchstaben, Ziffern und Bindestrichen, beginnend mit einem Buchstaben |
-| `name`, `description`, `author` | Nicht leere Texte |
-| `version` | Versionsnummer wie `1.0.0` oder `1.0.0-preview` |
-| `compatibilityVersion` | Exakt `1` |
-| `status` | Optional `placeholder` oder `illustrated` |
+| `id` | Eindeutig, Muster `^[a-z][a-z0-9-]{0,63}$` |
+| `name`, `description`, `author` | Nicht leere Texte, höchstens 1000 Zeichen |
+| `version` | Inhaltliche Version, z. B. `1.0.0` oder `1.1.0-preview` |
+| `compatibilityVersion` | Genau `2` |
+| `fonts` | 1–8 lokale Schriftfamilien mit eindeutigem `family`, `path`, optional `weight` |
+| `layouts` | 1–16 Layouts mit eindeutigen IDs |
 | `preview` | Optionaler packrelativer PNG-Pfad |
-| `fonts` | Mindestens eine lokale Schrift, jeweils `family`, `path`, optional `weight`, etwa `400 700` |
-| `layerOrder` | `base`, `genetics`, `thc`, `cbd`, `text` jeweils genau einmal in gewünschter Reihenfolge |
-| `layouts` | Nicht leeres Array aus benannten Layouts mit eindeutiger `id` und den unten beschriebenen Geometrie-, Layer- und Typografiefeldern |
+| `status` | Optional `placeholder` oder `illustrated` |
+| `$schema` | Optionaler Hinweis für JSON-Editoren; wird nicht als Asset geladen |
 
-Jedes Layout enthält:
+Ein Katalogeintrag für statisch mitgelieferte Packs benötigt `id`, `name`, `version`, `manifest` und optional `preview`, `description`, `status`. Auch `texturepacks/catalog.json` trägt `compatibilityVersion: 2`. Für den ZIP-Import wird kein Katalogeintrag benötigt.
 
-- Ganzzahlige `width` und `height` zwischen 64 und 4096 Pixeln.
-- `shape: "rectangle"` beziehungsweise `"circle"`; ein Kreis benötigt ein quadratisches Canvas.
-- `layers.base` als PNG-Pfad und `layers.genetics`, `layers.thc`, `layers.cbd` als Arrays mit **exakt sieben verschiedenen PNG-Pfaden**, in Reihenfolge von Stufe 1 bis 7.
-- `typography` mit Schriftfamilie, Farben, Textflächen und festen Textpositionen.
-- `id` (eindeutige Layout-ID) und `name` (Anzeigename); optionale `preview`-Pfade bleiben packrelativ.
-- Optional `bleedMm` als empfohlene Beschnittzugabe für dieses Layout (0–20 mm). Die Empfehlung setzt den globalen Druckwert nicht automatisch.
-- Optional eine eigene `layerOrder`, die die globale Reihenfolge ersetzt.
-- Optional `masks`, ein Objekt mit Ebenen-ID und PNG-Pfad, zum Beispiel `{"thc":"circular/sky-mask.png"}`. Weiß beziehungsweise jeder andere sichtbare Farbwert erhält Pixel gemäß Maskenalpha; transparente Pixel entfernen sie. Masken werden nicht als zusätzliche sichtbare Ebene gezeichnet.
+## 4. Eigene Layouts definieren
 
-Alle Asset-Pfade beziehen sich auf das Verzeichnis des Manifests. Absolute Pfade, URLs, `..`, Backslashes, Prozentkodierung und Query-Strings sind unzulässig. Dadurch bleiben Packs auch unter einem GitHub-Pages-Projektpfad wie `/label-generator/v3/` funktionsfähig. Schriften dürfen TTF, OTF, WOFF oder WOFF2 sein; Sprites und Masken benötigen PNG.
+Jedes Layout benötigt `id`, `name`, `width`, `height`, `shape`, `layers`, `zIndex`, `typography`. Pixelabmessungen sind ganzzahlig von 64 bis 4096. `rectangle` erlaubt beliebige Seitenverhältnisse; `circle` benötigt gleiche Breite und Höhe. Ein Kreis wird beim Rendern beschnitten. Textgeometrie wird unabhängig von der Kontur berechnet: Platziere alle Elemente selbst innerhalb der sichtbaren Kontur.
 
-## Textlayout
+`layers.base` ist ein PNG-Pfad; `layers.genetics`, `layers.thc`, `layers.cbd` sind Arrays mit je sieben unterschiedlichen PNG-Pfaden. `zIndex` ist ein Objekt mit den vier Schlüsseln `base`, `genetics`, `thc`, `cbd` und je einem ganzzahligen Wert.
 
-`typography.family` verweist auf eine registrierte Schriftfamilie. Schriftdateien werden vor dem Vermessen geladen. Der Renderer verwendet pro Pack und Font-Datei einen eigenen internen Familiennamen, damit ein Pack-Wechsel keine vorherigen Schriftdefinitionen überschreibt.
+Optionale Layoutfelder: `preview`, `bleedMm` (0–20, Empfehlung, setzt keinen Druckwert automatisch) und `masks`. Masken sind PNGs mit Canvas-Abmessungen; ihre Alpha-Werte begrenzen die jeweilige Kategorie, z. B. `"masks":{"thc":"layouts/portrait/sky-mask.png"}`. Auch `text` kann maskiert werden; dieselbe Maske gilt dann einzeln für alle Texte und Dekorationen.
+
+Alle Positionen und Größen sind **native Canvas-Pixel**, keine Millimeter oder Prozentwerte. Die Druckbreite bestimmt die spätere physische Skalierung ohne Veränderung der Proportionen.
+
+## 5. Dynamische Sprite-Layer und sieben Stufen
+
+| Kategorie | Bedeutung | Inklusive Obergrenzen von Stufe 1 bis 7 |
+| --- | --- | --- |
+| `genetics` | Sativa-Anteil | 14, 29, 44, 59, 74, 89, 100 % |
+| `thc` | THC | 5, 11, 17, 23, 29, 35, 40 % |
+| `cbd` | CBD | 2, 5, 8, 11, 14, 17, 20 % |
+
+Es gilt der erste passende obere Grenzwert. Beispiel: THC 23 → Stufe 4, THC 23,1 → Stufe 5. Es gibt keine Überblendung. Die Stufen ändern sich nicht durch das Manifest. Pro Layout existieren **21 dynamische Sprites plus eine Basis**. Jeder Layer hat die volle Canvas-Größe und denselben Ursprung, auch wenn nur wenige Pixel bemalt sind. Für 0 % kann die erste THC-/CBD-Stufe vollständig transparent sein.
+
+Gestaltungsvorschlag der Wald-Packs: Genetik wandelt die Tageszeit von Nacht zu Morgen, THC steigert das Wetter von klarem Himmel bis Gewitter, CBD steigert botanische Ornamente von wenigen Blättern bis zum dichten Rahmen. Andere Motive sind erlaubt, solange die sieben Stufen erkennbar und sauber übereinanderlegbar bleiben.
+
+## 6. Eigene Schriftarten
+
+```json
+"fonts": [
+  {"family":"Lora","path":"fonts/lora/label-serif.ttf","weight":"400 700"},
+  {"family":"Abel","path":"fonts/abel/Abel-Regular.ttf","weight":"400"}
+]
+```
+
+Unterstützt werden TTF, OTF, WOFF und WOFF2. Jedes Feld verweist über `font` auf genau eine registrierte Familie. Mehrere Familien werden vor der Textvermessung geladen. Die internen Browsernamen enthalten Pack-Identität, Version und Datei; gleich benannte Familien verschiedener Packs überschreiben sich nicht. Ein fehlender oder defekter Font ist ein verständlicher Ladefehler.
+
+`weight` ist eine Zeichenfolge wie `400` oder `400 700`; ohne Angabe gilt `400 700`. Verwende den tatsächlich von der Datei unterstützten Bereich. `fontWeight` am Textfeld ist eine Ganzzahl von 100 bis 900. Andere Gewichte können vom Browser synthetisiert werden. Behalte die vollständige Lizenz jeder Schrift bei, möglichst unter `fonts/<familie>/OFL.txt`.
+
+## 7. Textfelder konfigurieren
+
+`typography` benötigt die Arrays `fields` und `decorations`; beide dürfen leer sein. Insgesamt sind höchstens 128 Elemente pro Layout erlaubt, einschließlich eingebetteter Hintergründe. IDs müssen innerhalb des Layouts über Texte, Hintergründe und Dekorationen eindeutig sein. `base`, `genetics`, `thc`, `cbd`, `text` sind reserviert.
 
 ```json
 {
-  "family": "LabelSerif",
-  "ink": "#21382d",
-  "panel": "rgba(249, 241, 218, 0.94)",
-  "panels": [{"x":140,"y":625,"width":920,"height":420,"radius":48}],
-  "name": {"centerX":600,"centerY":760,"maxWidth":840,"maxLines":3,"maxSize":76,"minSize":30,"lineHeight":1.14},
-  "producer": {"x":600,"y":925,"maxWidth":800,"maxSize":34,"minSize":16},
-  "year": {"x":600,"y":990,"size":46},
-  "footer": {"x":600,"y":1460,"gap":58,"size":38,"maxWidth":880}
+  "id":"strain-name", "source":"name", "font":"Lora",
+  "x":256, "y":330, "fontSize":38, "minFontSize":16,
+  "maxFontSize":38, "fontWeight":600, "color":"#253e32",
+  "align":"center", "verticalAlign":"middle",
+  "maxWidth":420, "maxHeight":120, "maxLines":2,
+  "wrap":true, "lineHeight":1.15, "letterSpacing":0,
+  "rotation":-4, "opacity":1, "zIndex":500
 }
 ```
 
-Koordinaten sind native Canvas-Pixel. `panels` dürfen auch leer sein. Namen werden umgebrochen und bei Bedarf verkleinert; lange einzelne Wörter werden geteilt. Produzenten sind optional und werden in ihrer Zeile angepasst. Schrift, halbtransparente Leseflächen und Prozentwerte stehen ausschließlich im dynamischen Text-Layer.
+Pflichtfelder sind `id`, `source`, `font`, `fontSize`, `color`, `zIndex` und entweder `x`/`y` oder `path`. Quellen: `name`, `producer`, `year`, `thc`, `cbd`, `indica`, `sativa`, `static`. `static` benötigt zusätzlich `text`. Dieselbe Quelle darf beliebig oft innerhalb des Elementlimits vorkommen. Leere optionale Werte zeichnen keinen Text; Präfix und Suffix entfallen ebenfalls.
 
-### Eigenes Layout ergänzen
-
-Füge in `layouts` einen Eintrag ein. `id` muss innerhalb des Packs eindeutig sein; beliebige IDs und Namen wie `long-label` / `Langes Etikett` sind möglich. Beispiel für ein zusätzliches Rechteck-Layout (die Typografie kann aus einem vorhandenen Layout übernommen und an die neue Canvas-Größe angepasst werden):
-
-```json
-{
-  "id": "long-label",
-  "name": "Langes Etikett",
-  "width": 900,
-  "height": 1800,
-  "shape": "rectangle",
-  "layers": {
-    "base": "layouts/long-label/base.png",
-    "genetics": ["layouts/long-label/genetics/1.png", "layouts/long-label/genetics/2.png", "layouts/long-label/genetics/3.png", "layouts/long-label/genetics/4.png", "layouts/long-label/genetics/5.png", "layouts/long-label/genetics/6.png", "layouts/long-label/genetics/7.png"],
-    "thc": ["layouts/long-label/thc/1.png", "layouts/long-label/thc/2.png", "layouts/long-label/thc/3.png", "layouts/long-label/thc/4.png", "layouts/long-label/thc/5.png", "layouts/long-label/thc/6.png", "layouts/long-label/thc/7.png"],
-    "cbd": ["layouts/long-label/cbd/1.png", "layouts/long-label/cbd/2.png", "layouts/long-label/cbd/3.png", "layouts/long-label/cbd/4.png", "layouts/long-label/cbd/5.png", "layouts/long-label/cbd/6.png", "layouts/long-label/cbd/7.png"]
-  },
-  "typography": {
-    "family": "LabelSerif", "ink": "#21382d", "panel": "rgba(249, 241, 218, 0.94)",
-    "panels": [],
-    "name": {"centerX": 450, "centerY": 700, "maxWidth": 720, "maxLines": 3, "maxSize": 68, "minSize": 28, "lineHeight": 1.13},
-    "producer": {"x": 450, "y": 850, "maxWidth": 700, "maxSize": 32, "minSize": 16},
-    "year": {"x": 450, "y": 910, "size": 40},
-    "footer": {"x": 450, "y": 1500, "gap": 50, "size": 32, "maxWidth": 760}
-  }
-}
-```
-
-Neue Rechteck-Seitenverhältnisse funktionieren über das Manifest. Eine neue Form außer `rectangle` oder `circle` erfordert zusätzlich Engine-Anpassungen für Formvalidierung, physische Druckgeometrie und Renderer-Clipping. Im Warenkorb bleibt die Layoutreferenz über `layoutId` erhalten.
-
-## Die sieben Stufen
-
-Die globalen Auswahlgrenzen liegen zentral in `src/config.js`; sie gehören nicht zum individuellen Zeichenstil. `src/types.d.ts` beschreibt Stufen, Eingaben und Manifeststruktur.
-
-| Layer | Aufsteigende inklusive Obergrenzen |
+| Eigenschaft | Verhalten und Standard |
 | --- | --- |
-| Genetik, Sativa | 14, 29, 44, 59, 74, 89, 100 |
-| THC | 5, 11, 17, 23, 29, 35, 40 |
-| CBD | 2, 5, 8, 11, 14, 17, 20 |
+| `fontSize` | Anfangsgröße, 8–512 px |
+| `minFontSize` | Untergrenze; ohne Angabe kein Verkleinern |
+| `maxFontSize` | Optionale Obergrenze, mindestens `fontSize`; Text wird nicht über die Anfangsgröße vergrößert |
+| `fontWeight` | Standard 400 |
+| `align` | `left`, `center` (Standard), `right`; x ist der entsprechende Textanker |
+| `verticalAlign` | `top`, `middle` (Standard), `bottom`; y ist Oberkante, Mittelpunkt oder Unterkante des Zeilenblocks |
+| `maxWidth` | 1–8192 px; Standard 8192 bei geradem Text |
+| `maxHeight` | Optional 1–8192 px; begrenzt die nominale Zeilenblockhöhe |
+| `maxLines` | 1–16, Standard 1 |
+| `wrap` | Standard true; Wörter und überlange Wörter werden umgebrochen; false lässt nur explizite Zeilenumbrüche zu |
+| `lineHeight` | Multiplikator der Schriftgröße, 0,5–3, Standard 1,2 |
+| `letterSpacing` | Zusätzlicher Abstand in Pixeln, −20 bis 100, Standard 0 |
+| `rotation` | Grad, −360 bis 360, Standard 0 |
+| `opacity` | 0–1, Standard 1 |
+| `shadow` | Optional `{ "color":"#000000", "blur":8, "offsetX":2, "offsetY":3 }` |
 
-Der erste passende Wert gewinnt. Beispielsweise liegt THC 5,0 in Stufe 1 und THC 5,1 in Stufe 2. Diese Regel schließt bei Dezimalwerten alle Zwischenräume. Die neue Spezifikation verwendet feste Stufen: Es findet keine Überblendung zwischen Stufen und keine frühere CBD-Höhenmaske statt. Jeder ausgewählte Layer wird mit seiner eigenen unveränderten PNG-Deckkraft gezeichnet. Sieben Ebenen pro Eigenschaft ergeben 343 Kombinationen pro Layout und Pack.
+Nominale Blockhöhe: Schriftgröße plus `(Zeilenanzahl − 1) × Schriftgröße × lineHeight`. Glyphen können entsprechend den Fontmetriken darüber hinausragen. Der Renderer verkleinert in Pixelschritten bis zur Untergrenze. Passt der Inhalt weiterhin nicht, erscheint ein kontrollierter Fehler mit der Feld-ID; Text wird nicht still abgeschnitten. Stelle genug Platz für lange Namen und Produzenten bereit.
 
-THC 0–5 zeigt einen klaren Himmel; die erste Wetter-PNG darf vollständig transparent sein. Stufe 6 enthält Gewitter, Stufe 7 ein deutlich stärkeres Gewitter. CBD beginnt bereits mit wenigen Blättern und erhöht bis Stufe 7 Anzahl, Größe und Komplexität der Ornamente. Textfreiflächen müssen in allen 343 Kombinationen je Layout erhalten bleiben.
+Werteformatierung ist zentral und erlaubt nur:
 
-## Grafikvertrag und eigene Packs
+| `format` | Beispiel |
+| --- | --- |
+| `raw` (Standard) | unveränderter Wert |
+| `percent` | THC 24.5 → `24,5 %`, höchstens zwei Nachkommastellen; nur THC, CBD, Indica, Sativa |
+| `year-full` | Jahr 2026 → `2026`; nur `year` |
+| `year-short` | Jahr 2026 → `26`; nur `year` |
 
-1. Eigenes Pack-Verzeichnis anlegen und ein Beispielmanifest kopieren; ID, Autor und Version anpassen.
-2. Für jedes Layout 22 PNGs in der angegebenen Canvas-Größe erzeugen. Transparente Ränder niemals beschneiden.
-3. Die Waldkomposition innerhalb eines Layouts möglichst beibehalten. Wolken, Wetter, Ornamente und Schrift nicht in fremde Layer einbauen.
-4. Für runde Etiketten eigene Kreiskompositionen mit radialen Ornamenten und geeigneten Textpositionen zeichnen. Transparenz außerhalb des Kreises ist Pflicht. Die Engine erzwingt zusätzlich einen kreisförmigen Sicherheitsclip. IDs und Namen sind frei wählbar, z. B. `round-lid` / `Runder Deckel` oder `wide-landscape` / `Breites Querformat`.
-5. Statische Regen- und Blitzillustrationen im Himmel halten; optional eine gleich große Himmelmaske verwenden.
-6. Fonts mit ausreichender Lizenz und Lizenzdatei beilegen; Vorschau-PNG erzeugen.
-7. Manifest im Katalog registrieren, lokal mit `npm start` öffnen und alle sieben Stufen, Pack-Wechsel, jedes Layout, lange Namen und fehlende Assets prüfen.
-8. `npm test` und `tests/browser.html` ausführen; anschließend Probe-PDF bei 100 % beziehungsweise „Tatsächliche Größe“ drucken.
+`prefix` und `suffix` sind einfache Texte mit je höchstens 200 Zeichen. Beispiel `source: "thc", format: "percent", prefix: "THC: "` ergibt `THC: 24,5 %`; `source: "sativa", format: "percent", suffix: " Sativa"` ergibt `80 % Sativa`. Apostrophe bei Jahreszahlen müssen als Präfix eingetragen werden. HTML bleibt wörtlicher Text, Formeln und JavaScript-Ausdrücke werden nicht ausgewertet.
 
-Der Manager lädt und validiert JSON-Manifeste. PNG-Abmessungen und Datei-Erreichbarkeit prüft der Renderer beim Laden. `preloadAssets(config)` prüft einen vollständigen Layout-Satz vorab. Fehlerhafte Cache-Einträge werden entfernt, damit korrigierte Dateien erneut geladen werden können. Ein fehlendes Bild ersetzt niemals stillschweigend ein anderes Sprite.
+## 8. Text-Hintergründe als PNG-Sprites oder Flächen
 
-### Migration älterer Manifeste
+Ein Feld darf `background` mit einer vollständigen Dekoration enthalten. Es benötigt eine eigene ID und einen eigenen `zIndex`; `relativeTo` muss auf dieses Feld zeigen. Dieselben Dekorationen können auch frei in `typography.decorations` stehen.
 
-Kompatibilitätsversion 1 bleibt erhalten. Ältere Manifeste mit `formats` als Objekt werden beim Laden als Layouts interpretiert: die Objektschlüssel werden zu IDs und die vorhandenen Geometrie-, Layer- und Typografieangaben bleiben gleich. Neue und exportierte Manifeste verwenden ausschließlich `layouts` als Array; zusätzliche Layouts werden als weitere Einträge ergänzt. Alte Schema-1-Warenkörbe mit `format` werden beim Laden automatisch zu `layoutId` migriert und beim nächsten Speichern als Warenkorb-Schema 2 geschrieben. Dadurch können Packs mit eigenen Seitenverhältnissen, etwa schmalen Querformaten oder anderen runden Durchmessern, ohne Änderung der Manifest-Kompatibilitätsversion mehrere Designs anbieten.
+```json
+"background": {
+  "id":"name-plaque", "type":"sprite",
+  "asset":"decorations/plaque.png", "relativeTo":"strain-name",
+  "x":0, "y":0, "width":450, "height":110,
+  "anchorX":0.5, "anchorY":0.5, "scale":1,
+  "rotation":0, "opacity":1, "zIndex":450
+}
+```
 
-## ZIP-Import und lokaler Speicher
+`width`/`height` bestimmen die Zielgröße; die PNG-Datei selbst darf eine andere Größe besitzen. `anchorX`/`anchorY` sind Bruchteile von 0 bis 1 (Standard 0,5): 0/0 verankert die linke obere Ecke. `scale` ist ein zusätzlicher gleichmäßiger Faktor von 0,01 bis 8, Standard 1. Einzelne skalierte Abmessungen dürfen 16384 nicht überschreiten. PNGs können florale Plaketten, HUD-Panels oder unregelmäßige Papierflächen enthalten.
 
-Im Bereich **Texturepacks** eine ZIP-Datei über die Dateiauswahl wählen. Das Archiv darf `pack.json` direkt im ZIP-Wurzelverzeichnis enthalten oder in einem gemeinsamen umschließenden Ordner (etwa `my-pack/pack.json`). Ablegen per ZIP-Datei-Drop ist nicht implementiert. Assetpfade im Manifest bleiben relativ zum Manifest. Nach dem Import wird das Pack lokal verfügbar und kann ausgewählt, als ZIP exportiert oder entfernt werden. Mitgelieferte Packs können als ZIP-Vorlage exportiert werden; identische ID und Version zu einem mitgelieferten Pack werden beim Import abgewiesen. Ein importiertes Pack kann nur entfernt werden, wenn keine Warenkorbeinträge genau diese ID und Version verwenden.
+Geometrische Hintergründe verwenden `type: "rect"` und `color` statt `asset`:
 
-Grenzen je Archiv: 128 MiB komprimiert, 150 MiB entpackt, 256 Einträge, 16 MiB je Datei, 256 KiB für `pack.json`; unterstützte Bilder müssen PNGs mit 8-Bit-RGBA sein und höchstens 4096 × 4096 Pixel haben. Verschlüsselte, mehrteilige und ZIP64-Archive, Links und Spezialdateien werden abgewiesen. Dateipfade werden auf Traversal und doppelte Namen geprüft; ZIP- und PNG-Prüfsummen werden kontrolliert. Die PNGs dürfen zusammen höchstens 128 × 1024 × 1024 Pixel enthalten, um den Dekodierspeicher im Browser zu begrenzen. Manifest, erforderliche Assets und Schriften müssen gültig sein. Vor dem Speichern lädt der Browser für jedes unterstützte Layout alle benötigten Bilder und die Schrift über die bestehenden Renderer-Lader. Anschließend wird jedes unterstützte Layout mit Beispieldaten über dieselbe Canvas-Engine gerendert. Erst nach erfolgreicher Lade- und Renderprüfung wird der Datensatz atomar in IndexedDB abgelegt.
+```json
+{
+  "id":"readability-panel", "type":"rect", "relativeTo":"strain-name",
+  "x":0, "y":0, "width":420, "height":100,
+  "padding":12, "radius":16, "color":"rgba(255,255,255,0.85)",
+  "border":{"color":"#ad8c41","width":2},
+  "shadow":{"color":"rgba(0,0,0,0.2)","blur":8,"offsetY":4},
+  "zIndex":440
+}
+```
 
-Der Import benötigt HTTPS oder `localhost`, Web Crypto und IndexedDB. Die Packs bleiben ausschließlich in den Browserdaten dieses Geräts; sie werden weder an einen Server übertragen noch automatisch gesichert. Browserdatenlöschung entfernt die Installation. ZIP-Export dient als manuelle Sicherung. Pack-Vererbung und ZIP-Datei-Drop sind nicht implementiert; Etikettenziehen im Druckbogeneditor ist verfügbar.
+`padding` erweitert die feste Fläche gleichmäßig auf allen Seiten, ohne den Anker zu verschieben. Es wird nicht automatisch an Textmaße angepasst. `radius` wird auf die halbe tatsächliche Kantenlänge begrenzt. Rahmen und Schatten sind optional. Farben sind Hex, numerische rgb(a)/hsl(a), `black`, `white`, `transparent`. Transparenz ergibt sich aus Farbe und `opacity`. Sprite-Hintergründe akzeptieren keine Flächenfarbe, Radius, Padding oder Rahmen.
 
-## Reproduzierbarkeit
+## 9. Dekorative Sprites
 
-Identische Daten, Pack-Version, Assets, Sichtbarkeit und Browser-Rendering-Umgebung liefern identische Pixel. Browser und Betriebssysteme können Schrift-Rasterisierung und PNG-Kompression unterschiedlich ausführen. Byteidentische Ergebnisse über sämtliche Plattformen erfordern eine festgelegte Rendering-Umgebung. Die Pack-Version ist kein Archiv: Wer alte Projekte exakt reproduzieren möchte, muss die damaligen Assets weiter aufbewahren.
+In `typography.decorations` sind PNG-Sprites und geometrische Flächen auch ohne Feldbindung erlaubt. Ohne `relativeTo` beziehen sich x/y auf das Canvas. Mit `relativeTo` werden x/y als lokaler Versatz im gedrehten Koordinatensystem des Textfelds behandelt; Position und Rotation des Felds werden übernommen, die eigene Rotation wird addiert. Bei Bogentext ist der Bezugspunkt dessen Kreismittelpunkt.
+
+Referenzen dürfen ausschließlich auf Textfelder zeigen. Texte können selbst keine `relativeTo`-Referenz besitzen. Dadurch sind Ketten und Zyklen ausgeschlossen; fehlende Referenzen und Referenzen auf andere Dekorationen werden abgewiesen. Eine Dekoration übernimmt weder Schriftgröße noch Textlänge oder Textdeckkraft.
+
+## 10. zIndex und Zeichenreihenfolge
+
+**Jeder Layer und jedes Element hat einen expliziten ganzzahligen zIndex von −10000 bis 10000.** Aufsteigend zeichnen, höhere Werte liegen darüber. Typische Werte:
+
+| Element | zIndex |
+| --- | --- |
+| Basis | 0 |
+| Genetik | 100 |
+| THC | 200 |
+| CBD | 300 |
+| Leseflächen | 400 |
+| Textplakette | 450 |
+| Texte | 500 |
+| Vordergrundornament | 600 |
+
+Diese Werte sind Konventionen und keine Beschränkung. Ein Text mit zIndex 50 liegt zwischen Basis und Genetik. Auch negative Werte sind erlaubt.
+
+Bei gleichem zIndex gilt deterministisch folgende Einfügereihenfolge: zuerst `base`, `genetics`, `thc`, `cbd`; danach eingebettete `background`-Elemente in Feldreihenfolge; danach `decorations` in Arrayreihenfolge; zuletzt `fields` in Arrayreihenfolge. Später eingefügte Elemente liegen darüber. IDs beeinflussen die Sortierung nicht. Für eine bewusst unterschiedliche Zeichenreihenfolge sind verschiedene zIndex-Werte leichter verständlich.
+
+Die bisherigen drei Packs wurden vollständig umgestellt. Die ehemaligen Textkategorien bleiben als Sichtbarkeitsschalter erhalten; `text: false` blendet Texte und Dekorationen aus. Intern können Elemente zusätzlich anhand ihrer ID ausgeblendet werden.
+
+## 11. Textrotation und Kreisbögen
+
+Gerader Text rotiert um seinen x/y-Anker mittels `save`, `translate`, `rotate`, `restore`. Positive Winkel drehen im sichtbaren Canvas im Uhrzeigersinn. Flächen und Sprites verwenden dieselbe Konvention.
+
+```json
+{
+  "id":"round-title", "source":"name", "font":"Lora",
+  "path":{"type":"arc","centerX":256,"centerY":256,"radius":205,
+    "startAngle":-150,"endAngle":-30,"direction":"clockwise"},
+  "fontSize":22,"minFontSize":12,"letterSpacing":1,
+  "color":"#735c31","zIndex":500
+}
+```
+
+Winkel werden in Grad angegeben: 0° rechts (+X), 90° unten (+Y), −90° oben. `clockwise` liest vom Start zum Ende mit zunehmendem Winkel, `counterclockwise` mit abnehmendem Winkel, jeweils modulo 360. Gleiche Start-/Endwinkel bedeuten einen vollen Kreis. Zeichen stehen tangential; gegen den Uhrzeigersinn wird auch die Tangentendrehung umgekehrt. Der Leser folgt der angegebenen Bahnrichtung; der Renderer dreht Buchstaben nicht automatisch aufrecht.
+
+`align` verteilt den Text am Start (`left`), mittig (`center`) oder am Ende (`right`) der Bahn. Tatsächliche einzeln vermessene Zeichenbreiten und `letterSpacing` bestimmen die Abstände. `verticalAlign` legt die Glyphenbaseline auf die Bahn (`top`, `middle`, `bottom`). `rotation` dreht die gesamte Bahn zusätzlich um ihren Mittelpunkt.
+
+Bogentext hat genau eine Zeile; Zeilenumbrüche im formatierten Text werden kontrolliert abgewiesen. Verwende keine x/y, `maxWidth`, `maxLines > 1` oder `wrap: true`. Die verfügbare Breite ist Radius × Bogenwinkel in Radiant. Zu langer Inhalt wird bis `minFontSize` verkleinert und dann kontrolliert abgewiesen. Für komplexe verbundene Schriftsysteme ist gerader Text geeigneter, da Bögen einzelne Unicode-Codepunkte zeichnen.
+
+## 12. PNG-Anforderungen und Transparenz
+
+Alle PNGs benötigen **8 Bit RGBA** (PNG-Farbtyp 6), maximal 4096 × 4096 Pixel. RGB-, Palette-, 16-Bit- und animierte PNGs werden beim ZIP-Import abgewiesen. Layer und Masken besitzen genau die Canvas-Abmessungen; Dekorationen und Vorschauen dürfen kleiner sein.
+
+Erhalte echte Alpha-Transparenz. Ein weißes Rechteck oder Schachbrett ist kein transparenter Hintergrund. Zeichne keine dynamischen Zahlen oder Sortennamen in Sprite-Dateien. Lass die vorgesehenen Textflächen frei. Für Rundlayouts empfiehlt sich eine eigene Komposition statt eines Zuschnitts vom Hochformat.
+
+## 13. Asset-Pfade und Sicherheit
+
+Alle Assets sind relativ zur `pack.json`. Erlaubt sind ASCII-Buchstaben, Ziffern, Unterstriche, Bindestriche, Punkte innerhalb eines Dateinamens und `/` als Trenner. Verboten sind absolute Pfade, Netzwerk-URLs, `..`- oder `.`-Segmente, Backslashes, Prozentkodierung, Leerzeichen, Query-Strings und Fragmente.
+
+Manifestwerte sind begrenzt: Positionen ±8192, Rotation ±360°, Deckkraft 0–1, Schriftgrößen 8–512, Schattenunschärfe 0–100, Schattenversatz ±200. Das JSON Schema nennt alle Bereiche. Zusätzliche semantische Prüfungen kontrollieren eindeutige IDs, registrierte Familien, Größenbeziehungen, Kreisgeometrie, die Gesamtzahl der Elemente und Referenzen. JSON Schema allein kann diese layoutübergreifenden Beziehungen nicht vollständig ausdrücken; der Packvalidator muss ebenfalls laufen.
+
+## 14. Texturepack-Versionierung
+
+`compatibilityVersion: 2` bezeichnet diese Spezifikation; `version` bezeichnet den eigenen Packinhalt. Erhöhe `version` bei veröffentlichten Änderungen an Manifest oder Dateien. Alte Packs mit Kompatibilitätsversion 1 werden beim Import und beim Laden aus IndexedDB mit Aktualisierungshinweis abgewiesen. Es gibt keine automatische Migration fremder Packs.
+
+Ein Warenkorb mit einem inkompatiblen Pack bleibt erhalten. Betroffene Vorschaubilder und Druckbögen zeigen einen kontrollierten Fehler; andere Etiketten lassen sich weiterhin konfigurieren. Aktualisiere das Pack und lege den Eintrag bei Bedarf neu an. v1 und v2 der Anwendung sind unabhängig und bleiben unverändert.
+
+## 15. ZIP-Import und Export
+
+Packe den Inhalt des Packverzeichnisses als ZIP, mit `pack.json` direkt an der Wurzel. Ein einzelner umschließender Ordner ist ebenfalls erlaubt. Öffne v3 unter HTTPS oder localhost und verwende den ZIP-Import in der Texturepack-Verwaltung. Der Import prüft Manifest, erforderliche Dateien, PNG-Köpfe und Prüfsummen, Größen und Fonts; anschließend dekodiert und rendert der Browser jedes Layout, bevor atomar gespeichert wird.
+
+Limits: ZIP 128 MiB, entpackt 150 MiB, höchstens 256 Einträge, pro Datei 16 MiB, Manifest 256 KiB und insgesamt 128 × 1024 × 1024 PNG-Pixel. Keine Symlinks, verschlüsselten Archive oder ZIP64. Lizenzen und Hinweise als `.txt`/`.md` sind erlaubt und bleiben bei Import und Reexport erhalten.
+
+Packs werden lokal in IndexedDB gespeichert. Ein identischer Reimport ist ein No-op; anderer Inhalt unter derselben ID und Version wird abgewiesen. Mitgelieferte ID-/Versionspaare sind geschützt. Der ZIP-Export dient als Sicherung und Vorlage. Behalte Fonts samt Lizenzen unter getrennten Familienordnern mit `OFL.txt`, damit auch beim Export mitgelieferter Packs die Lizenzen gefunden werden.
+
+## 16. Fehlerbehebung
+
+| Meldung oder Symptom | Abhilfe |
+| --- | --- |
+| Inkompatibles Texturepack | Manifest und sämtliche Typografie auf diese Spezifikation aktualisieren, nicht nur die Versionszahl ändern |
+| Textfeld ist zu klein | Breite/Zeilenanzahl vergrößern, Mindestgröße senken oder Inhalt kürzen |
+| Schrift nicht registriert | `font` muss exakt einer Familie in `fonts` entsprechen |
+| PNG-Abmessungen falsch | Layer/Masken in voller nativer Canvas-Größe exportieren |
+| Sprite verdeckt Text | Eigene zIndex-Werte prüfen; Transparenz im PNG erhalten |
+| Ungültige Referenz | `relativeTo` muss eine Textfeld-ID desselben Layouts sein |
+| Unbekannte Eigenschaft | Schreibweise im Schema prüfen; Eigenschaften älterer Spezifikationen entfernen |
+| Pack-ID und Version bereits installiert | Inhaltsversion erhöhen oder eigene ID wählen |
+| Export/Import unter file:// scheitert | Statischen Server oder GitHub Pages verwenden |
+
+## 17. Vollständiges Beispieltexturepack und Vorlage
+
+[Composition Demo](examples/composition/README.md) ist ein vollständiges, importierbares Pack mit zwei Familien, Hochformat und Rund, unabhängigen Feldern, Sprite-Plakette, Vordergrundornament, Rotation und Bogentext. [pack.json](examples/composition/pack.json) und alle referenzierten Dateien sind enthalten.
+
+Die [kleine Vorlage](examples/template/README.md) besitzt ein 128 × 192-Layout, eine Schrift, ein Feld und 22 kleine PNGs. Kopiere das Verzeichnis, ändere ID/Metadaten, gestalte die PNGs und erweitere die Felder. Die Vorlage ist bereits gültig; sie enthält keine fehlenden Platzhalterdateien.
+
+Beispiel-PNGs sind CC0-1.0; Lora und Abel stehen unter SIL OFL 1.1. Die genauen Copyrightvermerke liegen bei den Fonts. [Abels Original-Lizenz](https://github.com/google/fonts/blob/main/ofl/abel/OFL.txt) erlaubt die Weitergabe unter ihren Bedingungen. Bestehende Waldillustrationen werden bei der Migration wiederverwendet; sie wurden nicht neu erzeugt.
+
+## 18. Testen und Validieren
+
+Ab Repositorywurzel:
+
+```sh
+node v3/scripts/validate-pack.js v3/examples/composition
+npm --prefix v3 test
+npm --prefix v3 run check
+npm --prefix v3 start
+```
+
+In einem zweiten Terminal bei laufendem Server:
+
+```sh
+npm --prefix v3 run test:browser
+```
+
+Die CLI prüft das Manifest und den ZIP-Roundtrip einschließlich Assets, PNGs und Fontköpfen und kann mit `--zip ausgabe.zip` ein importierbares Archiv erstellen. Im Browser zusätzlich lange Sortennamen, leere Produzenten, Grenzwerte aller sieben Stufen, jedes Layout, Vorder-/Hintergrundüberlagerungen und kleinen Druckmaßstab testen. Exportiere PNG und PDF und vergleiche mit der Vorschau.
+
+`src/manifest-schema.js` ist die Schemaquelle. Nach Änderungen `node v3/scripts/write-schema.js` ausführen; ein Test stellt sicher, dass die veröffentlichte JSON-Datei exakt dem Runtime-Schema entspricht. Die normale Anwendung benötigt weder Schema-Downloads noch einen Build-Schritt.

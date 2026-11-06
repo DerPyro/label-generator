@@ -1,0 +1,1123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Label Generator v3 Texturepack, compatibilityVersion 2",
+  "description": "Local PNG composition. Coordinates use native canvas pixels; zIndex ascending, stable category/declaration order. Cross references and geometry also require semantic validation.",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,63}$",
+      "description": "Stable lowercase ID. Unique within the containing pack or layout; base/genetics/thc/cbd/text are reserved element IDs."
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "author": {
+      "type": "string",
+      "maxLength": 1000,
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[a-zA-Z0-9.-]+)?$",
+      "description": "Pack content version; increment for published manifest or asset changes."
+    },
+    "compatibilityVersion": {
+      "const": 2,
+      "description": "Exactly 2. Earlier manifests require an author update and are rejected."
+    },
+    "status": {
+      "enum": [
+        "placeholder",
+        "illustrated"
+      ]
+    },
+    "preview": {
+      "type": "string",
+      "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+      "maxLength": 240,
+      "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+    },
+    "fonts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "string",
+            "pattern": "^[a-zA-Z][a-zA-Z0-9 -]{0,63}$",
+            "description": "Pack-local font family name; isolated from other packs at load time."
+          },
+          "path": {
+            "type": "string",
+            "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+            "maxLength": 240,
+            "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.(?:ttf|otf|woff|woff2)$"
+          },
+          "weight": {
+            "type": "string",
+            "pattern": "^[1-9]00(?: [1-9]00)?$"
+          }
+        },
+        "required": [
+          "family",
+          "path"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 8,
+      "description": "Local TTF, OTF, WOFF or WOFF2 files. Include redistribution licenses."
+    },
+    "layouts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,63}$",
+            "description": "Stable lowercase ID. Unique within the containing pack or layout; base/genetics/thc/cbd/text are reserved element IDs."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "width": {
+            "type": "integer",
+            "minimum": 64,
+            "maximum": 4096,
+            "description": "Native canvas dimension or explicit decoration destination width in pixels."
+          },
+          "height": {
+            "type": "integer",
+            "minimum": 64,
+            "maximum": 4096,
+            "description": "Native canvas dimension or explicit decoration destination height in pixels."
+          },
+          "shape": {
+            "enum": [
+              "circle",
+              "rectangle"
+            ],
+            "description": "Rectangle, or circle with equal canvas width and height."
+          },
+          "preview": {
+            "type": "string",
+            "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+            "maxLength": 240,
+            "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+          },
+          "bleedMm": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 20
+          },
+          "layers": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "string",
+                "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                "maxLength": 240,
+                "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+              },
+              "genetics": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                  "maxLength": 240,
+                  "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+                },
+                "minItems": 7,
+                "maxItems": 7,
+                "uniqueItems": true
+              },
+              "thc": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                  "maxLength": 240,
+                  "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+                },
+                "minItems": 7,
+                "maxItems": 7,
+                "uniqueItems": true
+              },
+              "cbd": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                  "maxLength": 240,
+                  "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+                },
+                "minItems": 7,
+                "maxItems": 7,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "base",
+              "genetics",
+              "thc",
+              "cbd"
+            ],
+            "additionalProperties": false,
+            "description": "One full-canvas base and seven distinct sprites for each dynamic category."
+          },
+          "zIndex": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "integer",
+                "minimum": -10000,
+                "maximum": 10000,
+                "description": "Explicit integer paint order, ascending. Equal values use documented category and declaration order."
+              },
+              "genetics": {
+                "type": "integer",
+                "minimum": -10000,
+                "maximum": 10000,
+                "description": "Explicit integer paint order, ascending. Equal values use documented category and declaration order."
+              },
+              "thc": {
+                "type": "integer",
+                "minimum": -10000,
+                "maximum": 10000,
+                "description": "Explicit integer paint order, ascending. Equal values use documented category and declaration order."
+              },
+              "cbd": {
+                "type": "integer",
+                "minimum": -10000,
+                "maximum": 10000,
+                "description": "Explicit integer paint order, ascending. Equal values use documented category and declaration order."
+              }
+            },
+            "required": [
+              "base",
+              "genetics",
+              "thc",
+              "cbd"
+            ],
+            "additionalProperties": false,
+            "description": "Explicit zIndex for each of the four logical image layers."
+          },
+          "masks": {
+            "type": "object",
+            "properties": {
+              "base": {
+                "type": "string",
+                "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                "maxLength": 240,
+                "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+              },
+              "genetics": {
+                "type": "string",
+                "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                "maxLength": 240,
+                "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+              },
+              "thc": {
+                "type": "string",
+                "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                "maxLength": 240,
+                "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+              },
+              "cbd": {
+                "type": "string",
+                "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                "maxLength": 240,
+                "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+              },
+              "text": {
+                "type": "string",
+                "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                "maxLength": 240,
+                "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+              }
+            },
+            "required": [],
+            "additionalProperties": false,
+            "description": "Full-canvas alpha masks applied per element in the selected logical category."
+          },
+          "typography": {
+            "type": "object",
+            "properties": {
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,63}$",
+                      "description": "Stable lowercase ID. Unique within the containing pack or layout; base/genetics/thc/cbd/text are reserved element IDs."
+                    },
+                    "source": {
+                      "enum": [
+                        "name",
+                        "producer",
+                        "year",
+                        "thc",
+                        "cbd",
+                        "indica",
+                        "sativa",
+                        "static"
+                      ],
+                      "description": "Input data source; sources may be repeated. static requires text."
+                    },
+                    "text": {
+                      "type": "string",
+                      "maxLength": 1000
+                    },
+                    "font": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "description": "Exact family registered in the pack fonts array."
+                    },
+                    "x": {
+                      "type": "number",
+                      "minimum": -8192,
+                      "maximum": 8192,
+                      "description": "Native canvas pixel X, or local offset for relativeTo decorations."
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": -8192,
+                      "maximum": 8192,
+                      "description": "Native canvas pixel Y, or local offset for relativeTo decorations."
+                    },
+                    "rotation": {
+                      "type": "number",
+                      "minimum": -360,
+                      "maximum": 360,
+                      "description": "Degrees, positive clockwise. Rotate around text anchor, decoration anchor or arc centre."
+                    },
+                    "opacity": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "description": "Additional alpha multiplier, default 1."
+                    },
+                    "zIndex": {
+                      "type": "integer",
+                      "minimum": -10000,
+                      "maximum": 10000,
+                      "description": "Explicit integer paint order, ascending. Equal values use documented category and declaration order."
+                    },
+                    "fontSize": {
+                      "type": "number",
+                      "minimum": 8,
+                      "maximum": 512,
+                      "description": "Initial font size in native pixels."
+                    },
+                    "minFontSize": {
+                      "type": "number",
+                      "minimum": 8,
+                      "maximum": 512,
+                      "description": "Minimum fitting size; omitted means no shrinking."
+                    },
+                    "maxFontSize": {
+                      "type": "number",
+                      "minimum": 8,
+                      "maximum": 512,
+                      "description": "Upper bound, at least fontSize. Fitting never enlarges above fontSize."
+                    },
+                    "fontWeight": {
+                      "type": "integer",
+                      "minimum": 100,
+                      "maximum": 900
+                    },
+                    "color": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]|[0-9a-fA-F]{3}|[0-9a-fA-F]{5})?|rgb\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\)|rgba\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|hsl\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\)|hsla\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|black|white|transparent)$",
+                      "description": "Validated hexadecimal 3/4/6/8 digits, numeric rgb(a)/hsl(a), black, white or transparent."
+                    },
+                    "align": {
+                      "enum": [
+                        "left",
+                        "center",
+                        "right"
+                      ],
+                      "description": "Horizontal anchor for straight text; start/centre/end placement along arc paths."
+                    },
+                    "verticalAlign": {
+                      "enum": [
+                        "top",
+                        "middle",
+                        "bottom"
+                      ],
+                      "description": "Top/middle/bottom of nominal straight text block, or glyph baseline alignment on an arc."
+                    },
+                    "maxWidth": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 8192,
+                      "description": "Maximum nominal line width, straight text only; default 8192 pixels."
+                    },
+                    "maxHeight": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 8192,
+                      "description": "Maximum nominal line-block height; glyph ink can extend beyond nominal metrics."
+                    },
+                    "maxLines": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 16,
+                      "description": "Maximum wrapped lines, default 1; arcs always use one line."
+                    },
+                    "wrap": {
+                      "type": "boolean",
+                      "description": "Default true for straight text, explicit newlines remain supported when false. Arc paths cannot wrap."
+                    },
+                    "lineHeight": {
+                      "type": "number",
+                      "minimum": 0.5,
+                      "maximum": 3
+                    },
+                    "letterSpacing": {
+                      "type": "number",
+                      "minimum": -20,
+                      "maximum": 100,
+                      "description": "Extra pixel advance between codepoints, default 0. Measurement accounts for overlapping or reversed advances."
+                    },
+                    "shadow": {
+                      "type": "object",
+                      "properties": {
+                        "color": {
+                          "type": "string",
+                          "pattern": "^(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]|[0-9a-fA-F]{3}|[0-9a-fA-F]{5})?|rgb\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\)|rgba\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|hsl\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\)|hsla\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|black|white|transparent)$",
+                          "description": "Validated hexadecimal 3/4/6/8 digits, numeric rgb(a)/hsl(a), black, white or transparent."
+                        },
+                        "blur": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100
+                        },
+                        "offsetX": {
+                          "type": "number",
+                          "minimum": -200,
+                          "maximum": 200
+                        },
+                        "offsetY": {
+                          "type": "number",
+                          "minimum": -200,
+                          "maximum": 200
+                        }
+                      },
+                      "required": [
+                        "color"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Optional Canvas shadow; bounded blur and offsets."
+                    },
+                    "format": {
+                      "enum": [
+                        "raw",
+                        "percent",
+                        "year-full",
+                        "year-short"
+                      ],
+                      "description": "Only defined data formats, never executable expressions. Percent uses decimal comma and at most two decimal places."
+                    },
+                    "prefix": {
+                      "type": "string",
+                      "maxLength": 200,
+                      "description": "Literal text before a nonempty formatted value."
+                    },
+                    "suffix": {
+                      "type": "string",
+                      "maxLength": 200,
+                      "description": "Literal text after a nonempty formatted value."
+                    },
+                    "background": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{0,63}$",
+                          "description": "Stable lowercase ID. Unique within the containing pack or layout; base/genetics/thc/cbd/text are reserved element IDs."
+                        },
+                        "type": {
+                          "enum": [
+                            "sprite",
+                            "rect"
+                          ]
+                        },
+                        "x": {
+                          "type": "number",
+                          "minimum": -8192,
+                          "maximum": 8192,
+                          "description": "Native canvas pixel X, or local offset for relativeTo decorations."
+                        },
+                        "y": {
+                          "type": "number",
+                          "minimum": -8192,
+                          "maximum": 8192,
+                          "description": "Native canvas pixel Y, or local offset for relativeTo decorations."
+                        },
+                        "rotation": {
+                          "type": "number",
+                          "minimum": -360,
+                          "maximum": 360,
+                          "description": "Degrees, positive clockwise. Rotate around text anchor, decoration anchor or arc centre."
+                        },
+                        "opacity": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "description": "Additional alpha multiplier, default 1."
+                        },
+                        "zIndex": {
+                          "type": "integer",
+                          "minimum": -10000,
+                          "maximum": 10000,
+                          "description": "Explicit integer paint order, ascending. Equal values use documented category and declaration order."
+                        },
+                        "relativeTo": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{0,63}$",
+                          "description": "Text-field ID in this layout. Inherit position and rotation with local offsets. Decoration references and cycles are forbidden."
+                        },
+                        "width": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 8192,
+                          "description": "Native canvas dimension or explicit decoration destination width in pixels."
+                        },
+                        "height": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 8192,
+                          "description": "Native canvas dimension or explicit decoration destination height in pixels."
+                        },
+                        "anchorX": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "description": "Horizontal fraction of decoration width used as anchor, default 0.5."
+                        },
+                        "anchorY": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1,
+                          "description": "Vertical fraction of decoration height used as anchor, default 0.5."
+                        },
+                        "scale": {
+                          "type": "number",
+                          "minimum": 0.01,
+                          "maximum": 8,
+                          "description": "Additional uniform scale, default 1; actual padded dimensions must remain bounded."
+                        },
+                        "asset": {
+                          "type": "string",
+                          "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                          "maxLength": 240,
+                          "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+                        },
+                        "color": {
+                          "type": "string",
+                          "pattern": "^(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]|[0-9a-fA-F]{3}|[0-9a-fA-F]{5})?|rgb\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\)|rgba\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|hsl\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\)|hsla\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|black|white|transparent)$",
+                          "description": "Validated hexadecimal 3/4/6/8 digits, numeric rgb(a)/hsl(a), black, white or transparent."
+                        },
+                        "radius": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 4096,
+                          "description": "Rounded rectangle corner radius or arc radius in pixels."
+                        },
+                        "padding": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 512,
+                          "description": "Fixed geometric padding on every side, not automatically calculated from text."
+                        },
+                        "border": {
+                          "type": "object",
+                          "properties": {
+                            "color": {
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]|[0-9a-fA-F]{3}|[0-9a-fA-F]{5})?|rgb\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\)|rgba\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|hsl\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\)|hsla\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|black|white|transparent)$",
+                              "description": "Validated hexadecimal 3/4/6/8 digits, numeric rgb(a)/hsl(a), black, white or transparent."
+                            },
+                            "width": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100,
+                              "description": "Native canvas dimension or explicit decoration destination width in pixels."
+                            }
+                          },
+                          "required": [
+                            "color",
+                            "width"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Optional geometric rectangle stroke."
+                        },
+                        "shadow": {
+                          "type": "object",
+                          "properties": {
+                            "color": {
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]|[0-9a-fA-F]{3}|[0-9a-fA-F]{5})?|rgb\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\)|rgba\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|hsl\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\)|hsla\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|black|white|transparent)$",
+                              "description": "Validated hexadecimal 3/4/6/8 digits, numeric rgb(a)/hsl(a), black, white or transparent."
+                            },
+                            "blur": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100
+                            },
+                            "offsetX": {
+                              "type": "number",
+                              "minimum": -200,
+                              "maximum": 200
+                            },
+                            "offsetY": {
+                              "type": "number",
+                              "minimum": -200,
+                              "maximum": 200
+                            }
+                          },
+                          "required": [
+                            "color"
+                          ],
+                          "additionalProperties": false,
+                          "description": "Optional Canvas shadow; bounded blur and offsets."
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "type",
+                        "x",
+                        "y",
+                        "width",
+                        "height",
+                        "zIndex"
+                      ],
+                      "additionalProperties": false,
+                      "allOf": [
+                        {
+                          "if": {
+                            "properties": {
+                              "type": {
+                                "const": "sprite"
+                              }
+                            }
+                          },
+                          "then": {
+                            "required": [
+                              "asset"
+                            ],
+                            "not": {
+                              "anyOf": [
+                                {
+                                  "required": [
+                                    "color"
+                                  ]
+                                },
+                                {
+                                  "required": [
+                                    "radius"
+                                  ]
+                                },
+                                {
+                                  "required": [
+                                    "padding"
+                                  ]
+                                },
+                                {
+                                  "required": [
+                                    "border"
+                                  ]
+                                }
+                              ]
+                            }
+                          },
+                          "else": {
+                            "required": [
+                              "color"
+                            ],
+                            "not": {
+                              "required": [
+                                "asset"
+                              ]
+                            }
+                          }
+                        }
+                      ],
+                      "description": "Separate ordered decoration bound to this text field using relativeTo and its own unique ID."
+                    },
+                    "path": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "enum": [
+                            "arc"
+                          ]
+                        },
+                        "centerX": {
+                          "type": "number",
+                          "minimum": -8192,
+                          "maximum": 8192
+                        },
+                        "centerY": {
+                          "type": "number",
+                          "minimum": -8192,
+                          "maximum": 8192
+                        },
+                        "radius": {
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 8192,
+                          "description": "Rounded rectangle corner radius or arc radius in pixels."
+                        },
+                        "startAngle": {
+                          "type": "number",
+                          "minimum": -360,
+                          "maximum": 360,
+                          "description": "Degrees from +X, positive toward +Y."
+                        },
+                        "endAngle": {
+                          "type": "number",
+                          "minimum": -360,
+                          "maximum": 360,
+                          "description": "Degrees from +X; direction selects the modular sweep."
+                        },
+                        "direction": {
+                          "enum": [
+                            "clockwise",
+                            "counterclockwise"
+                          ],
+                          "description": "Character order follows clockwise increasing angles or counterclockwise decreasing angles, with tangential glyph orientation."
+                        }
+                      },
+                      "required": [
+                        "type",
+                        "centerX",
+                        "centerY",
+                        "radius",
+                        "startAngle",
+                        "endAngle",
+                        "direction"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Single-line circular path replacing x/y. Angles: 0 right, 90 down; equal endpoints mean full circle."
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "source",
+                    "font",
+                    "fontSize",
+                    "color",
+                    "zIndex"
+                  ],
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "required": [
+                          "path"
+                        ]
+                      },
+                      "then": {
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "x"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "y"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "maxWidth"
+                              ]
+                            }
+                          ]
+                        },
+                        "properties": {
+                          "maxLines": {
+                            "const": 1,
+                            "description": "Maximum wrapped lines, default 1; arcs always use one line."
+                          },
+                          "wrap": {
+                            "const": false,
+                            "description": "Default true for straight text, explicit newlines remain supported when false. Arc paths cannot wrap."
+                          },
+                          "text": {
+                            "pattern": "^(?![\\s\\S]*[\\r\\n])"
+                          },
+                          "prefix": {
+                            "pattern": "^(?![\\s\\S]*[\\r\\n])",
+                            "description": "Literal text before a nonempty formatted value."
+                          },
+                          "suffix": {
+                            "pattern": "^(?![\\s\\S]*[\\r\\n])",
+                            "description": "Literal text after a nonempty formatted value."
+                          }
+                        }
+                      },
+                      "else": {
+                        "required": [
+                          "x",
+                          "y"
+                        ]
+                      }
+                    },
+                    {
+                      "if": {
+                        "properties": {
+                          "source": {
+                            "const": "static",
+                            "description": "Input data source; sources may be repeated. static requires text."
+                          }
+                        }
+                      },
+                      "then": {
+                        "required": [
+                          "text"
+                        ]
+                      }
+                    },
+                    {
+                      "if": {
+                        "required": [
+                          "format"
+                        ],
+                        "properties": {
+                          "format": {
+                            "const": "percent",
+                            "description": "Only defined data formats, never executable expressions. Percent uses decimal comma and at most two decimal places."
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "source": {
+                            "enum": [
+                              "thc",
+                              "cbd",
+                              "indica",
+                              "sativa"
+                            ],
+                            "description": "Input data source; sources may be repeated. static requires text."
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "if": {
+                        "required": [
+                          "format"
+                        ],
+                        "properties": {
+                          "format": {
+                            "enum": [
+                              "year-full",
+                              "year-short"
+                            ],
+                            "description": "Only defined data formats, never executable expressions. Percent uses decimal comma and at most two decimal places."
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "source": {
+                            "const": "year",
+                            "description": "Input data source; sources may be repeated. static requires text."
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "minItems": 0,
+                "maxItems": 128,
+                "description": "Text fields in stable declaration order, including repeated data sources."
+              },
+              "decorations": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,63}$",
+                      "description": "Stable lowercase ID. Unique within the containing pack or layout; base/genetics/thc/cbd/text are reserved element IDs."
+                    },
+                    "type": {
+                      "enum": [
+                        "sprite",
+                        "rect"
+                      ]
+                    },
+                    "x": {
+                      "type": "number",
+                      "minimum": -8192,
+                      "maximum": 8192,
+                      "description": "Native canvas pixel X, or local offset for relativeTo decorations."
+                    },
+                    "y": {
+                      "type": "number",
+                      "minimum": -8192,
+                      "maximum": 8192,
+                      "description": "Native canvas pixel Y, or local offset for relativeTo decorations."
+                    },
+                    "rotation": {
+                      "type": "number",
+                      "minimum": -360,
+                      "maximum": 360,
+                      "description": "Degrees, positive clockwise. Rotate around text anchor, decoration anchor or arc centre."
+                    },
+                    "opacity": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "description": "Additional alpha multiplier, default 1."
+                    },
+                    "zIndex": {
+                      "type": "integer",
+                      "minimum": -10000,
+                      "maximum": 10000,
+                      "description": "Explicit integer paint order, ascending. Equal values use documented category and declaration order."
+                    },
+                    "relativeTo": {
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,63}$",
+                      "description": "Text-field ID in this layout. Inherit position and rotation with local offsets. Decoration references and cycles are forbidden."
+                    },
+                    "width": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 8192,
+                      "description": "Native canvas dimension or explicit decoration destination width in pixels."
+                    },
+                    "height": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 8192,
+                      "description": "Native canvas dimension or explicit decoration destination height in pixels."
+                    },
+                    "anchorX": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "description": "Horizontal fraction of decoration width used as anchor, default 0.5."
+                    },
+                    "anchorY": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1,
+                      "description": "Vertical fraction of decoration height used as anchor, default 0.5."
+                    },
+                    "scale": {
+                      "type": "number",
+                      "minimum": 0.01,
+                      "maximum": 8,
+                      "description": "Additional uniform scale, default 1; actual padded dimensions must remain bounded."
+                    },
+                    "asset": {
+                      "type": "string",
+                      "description": "Safe pack-relative local file path, without URLs, empty or parent segments, query strings or percent encoding.",
+                      "maxLength": 240,
+                      "pattern": "^(?!.*(?:^|/)\\.\\.?(?:/|$))[a-zA-Z0-9_.-]+(?:/[a-zA-Z0-9_.-]+)*\\.png$"
+                    },
+                    "color": {
+                      "type": "string",
+                      "pattern": "^(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]|[0-9a-fA-F]{3}|[0-9a-fA-F]{5})?|rgb\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\)|rgba\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|hsl\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\)|hsla\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|black|white|transparent)$",
+                      "description": "Validated hexadecimal 3/4/6/8 digits, numeric rgb(a)/hsl(a), black, white or transparent."
+                    },
+                    "radius": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 4096,
+                      "description": "Rounded rectangle corner radius or arc radius in pixels."
+                    },
+                    "padding": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 512,
+                      "description": "Fixed geometric padding on every side, not automatically calculated from text."
+                    },
+                    "border": {
+                      "type": "object",
+                      "properties": {
+                        "color": {
+                          "type": "string",
+                          "pattern": "^(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]|[0-9a-fA-F]{3}|[0-9a-fA-F]{5})?|rgb\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\)|rgba\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|hsl\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\)|hsla\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|black|white|transparent)$",
+                          "description": "Validated hexadecimal 3/4/6/8 digits, numeric rgb(a)/hsl(a), black, white or transparent."
+                        },
+                        "width": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "description": "Native canvas dimension or explicit decoration destination width in pixels."
+                        }
+                      },
+                      "required": [
+                        "color",
+                        "width"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Optional geometric rectangle stroke."
+                    },
+                    "shadow": {
+                      "type": "object",
+                      "properties": {
+                        "color": {
+                          "type": "string",
+                          "pattern": "^(#[0-9a-fA-F]{3}(?:[0-9a-fA-F]|[0-9a-fA-F]{3}|[0-9a-fA-F]{5})?|rgb\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\)|rgba\\((?:\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*|\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|hsl\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\)|hsla\\(\\s*[-+]?(?:\\d*\\.\\d+|\\d+)\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%\\s*\\s*,\\s*[-+]?(?:\\d*\\.\\d+|\\d+)%?\\s*\\)|black|white|transparent)$",
+                          "description": "Validated hexadecimal 3/4/6/8 digits, numeric rgb(a)/hsl(a), black, white or transparent."
+                        },
+                        "blur": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100
+                        },
+                        "offsetX": {
+                          "type": "number",
+                          "minimum": -200,
+                          "maximum": 200
+                        },
+                        "offsetY": {
+                          "type": "number",
+                          "minimum": -200,
+                          "maximum": 200
+                        }
+                      },
+                      "required": [
+                        "color"
+                      ],
+                      "additionalProperties": false,
+                      "description": "Optional Canvas shadow; bounded blur and offsets."
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "type",
+                    "x",
+                    "y",
+                    "width",
+                    "height",
+                    "zIndex"
+                  ],
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "type": {
+                            "const": "sprite"
+                          }
+                        }
+                      },
+                      "then": {
+                        "required": [
+                          "asset"
+                        ],
+                        "not": {
+                          "anyOf": [
+                            {
+                              "required": [
+                                "color"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "radius"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "padding"
+                              ]
+                            },
+                            {
+                              "required": [
+                                "border"
+                              ]
+                            }
+                          ]
+                        }
+                      },
+                      "else": {
+                        "required": [
+                          "color"
+                        ],
+                        "not": {
+                          "required": [
+                            "asset"
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  "description": "Geometric rectangle or local PNG decoration, standalone or bound to a text field."
+                },
+                "minItems": 0,
+                "maxItems": 128,
+                "description": "Standalone geometric or PNG elements; optionally linked to a text field."
+              }
+            },
+            "required": [
+              "fields",
+              "decorations"
+            ],
+            "additionalProperties": false,
+            "description": "Independent text fields and independently ordered decorations. At most 128 total elements including backgrounds."
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "width",
+          "height",
+          "shape",
+          "layers",
+          "zIndex",
+          "typography"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 16,
+      "description": "Independent native-resolution compositions with unique IDs."
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "author",
+    "version",
+    "compatibilityVersion",
+    "fonts",
+    "layouts"
+  ],
+  "additionalProperties": false
+}

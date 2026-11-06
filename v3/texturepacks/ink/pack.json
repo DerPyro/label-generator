@@ -4,7 +4,7 @@
   "description": "Monochromes Beispielpack mit eigener Farbpalette. Technische Platzhalterillustrationen.",
   "author": "Label Generator contributors",
   "version": "1.0.0",
-  "compatibilityVersion": 1,
+  "compatibilityVersion": 2,
   "status": "placeholder",
   "preview": "preview.png",
   "fonts": [
@@ -13,13 +13,6 @@
       "path": "fonts/label-serif.ttf",
       "weight": "400 700"
     }
-  ],
-  "layerOrder": [
-    "base",
-    "genetics",
-    "thc",
-    "cbd",
-    "text"
   ],
   "layouts": [
     {
@@ -57,56 +50,158 @@
         ]
       },
       "typography": {
-        "family": "LabelSerif",
-        "ink": "#20272a",
-        "panel": "rgba(249, 246, 231, 0.96)",
-        "panels": [
+        "fields": [
           {
+            "id": "strain-name",
+            "source": "name",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 760,
+            "fontSize": 76,
+            "minFontSize": 30,
+            "maxWidth": 840,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "maxLines": 3,
+            "lineHeight": 1.14,
+            "fontWeight": 600
+          },
+          {
+            "id": "producer",
+            "source": "producer",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 925,
+            "fontSize": 34,
+            "minFontSize": 16,
+            "maxWidth": 800,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401
+          },
+          {
+            "id": "year",
+            "source": "year",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 990,
+            "fontSize": 46,
+            "minFontSize": 46,
+            "maxWidth": 1200,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "year-short",
+            "prefix": "’"
+          },
+          {
+            "id": "thc-value",
+            "source": "thc",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 1460,
+            "fontSize": 38,
+            "minFontSize": 16,
+            "maxWidth": 440,
+            "align": "right",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "THC: ",
+            "suffix": "  |  "
+          },
+          {
+            "id": "cbd-value",
+            "source": "cbd",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 1460,
+            "fontSize": 38,
+            "minFontSize": 16,
+            "maxWidth": 440,
+            "align": "left",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "CBD: "
+          },
+          {
+            "id": "indica",
+            "source": "indica",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 1518,
+            "fontSize": 38,
+            "minFontSize": 16,
+            "maxWidth": 440,
+            "align": "right",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "Indica: ",
+            "suffix": "  |  "
+          },
+          {
+            "id": "sativa",
+            "source": "sativa",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 1518,
+            "fontSize": 38,
+            "minFontSize": 16,
+            "maxWidth": 440,
+            "align": "left",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "Sativa: "
+          }
+        ],
+        "decorations": [
+          {
+            "id": "panel-0",
+            "type": "rect",
             "x": 140,
             "y": 625,
             "width": 920,
             "height": 420,
-            "radius": 48
+            "radius": 48,
+            "color": "rgba(249, 246, 231, 0.96)",
+            "anchorX": 0,
+            "anchorY": 0,
+            "zIndex": 400
           },
           {
+            "id": "panel-1",
+            "type": "rect",
             "x": 120,
             "y": 1385,
             "width": 960,
             "height": 190,
-            "radius": 32
+            "radius": 32,
+            "color": "rgba(249, 246, 231, 0.96)",
+            "anchorX": 0,
+            "anchorY": 0,
+            "zIndex": 400
           }
-        ],
-        "name": {
-          "centerX": 600,
-          "centerY": 760,
-          "maxWidth": 840,
-          "maxLines": 3,
-          "maxSize": 76,
-          "minSize": 30,
-          "lineHeight": 1.14
-        },
-        "producer": {
-          "x": 600,
-          "y": 925,
-          "maxWidth": 800,
-          "maxSize": 34,
-          "minSize": 16
-        },
-        "year": {
-          "x": 600,
-          "y": 990,
-          "size": 46
-        },
-        "footer": {
-          "x": 600,
-          "y": 1460,
-          "gap": 58,
-          "size": 38,
-          "maxWidth": 880
-        }
+        ]
       },
       "id": "rectangular",
-      "name": "Klassisches Hochformat"
+      "name": "Klassisches Hochformat",
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300
+      }
     },
     {
       "width": 1200,
@@ -143,56 +238,158 @@
         ]
       },
       "typography": {
-        "family": "LabelSerif",
-        "ink": "#20272a",
-        "panel": "rgba(249, 246, 231, 0.96)",
-        "panels": [
+        "fields": [
           {
+            "id": "strain-name",
+            "source": "name",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 510,
+            "fontSize": 66,
+            "minFontSize": 28,
+            "maxWidth": 740,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "maxLines": 2,
+            "lineHeight": 1.13,
+            "fontWeight": 600
+          },
+          {
+            "id": "producer",
+            "source": "producer",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 625,
+            "fontSize": 31,
+            "minFontSize": 16,
+            "maxWidth": 700,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401
+          },
+          {
+            "id": "year",
+            "source": "year",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 688,
+            "fontSize": 40,
+            "minFontSize": 40,
+            "maxWidth": 1200,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "year-short",
+            "prefix": "’"
+          },
+          {
+            "id": "thc-value",
+            "source": "thc",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 907,
+            "fontSize": 32,
+            "minFontSize": 16,
+            "maxWidth": 350,
+            "align": "right",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "THC: ",
+            "suffix": "  |  "
+          },
+          {
+            "id": "cbd-value",
+            "source": "cbd",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 907,
+            "fontSize": 32,
+            "minFontSize": 16,
+            "maxWidth": 350,
+            "align": "left",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "CBD: "
+          },
+          {
+            "id": "indica",
+            "source": "indica",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 956,
+            "fontSize": 32,
+            "minFontSize": 16,
+            "maxWidth": 350,
+            "align": "right",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "Indica: ",
+            "suffix": "  |  "
+          },
+          {
+            "id": "sativa",
+            "source": "sativa",
+            "font": "LabelSerif",
+            "x": 600,
+            "y": 956,
+            "fontSize": 32,
+            "minFontSize": 16,
+            "maxWidth": 350,
+            "align": "left",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "Sativa: "
+          }
+        ],
+        "decorations": [
+          {
+            "id": "panel-0",
+            "type": "rect",
             "x": 180,
             "y": 405,
             "width": 840,
             "height": 330,
-            "radius": 80
+            "radius": 80,
+            "color": "rgba(249, 246, 231, 0.96)",
+            "anchorX": 0,
+            "anchorY": 0,
+            "zIndex": 400
           },
           {
+            "id": "panel-1",
+            "type": "rect",
             "x": 215,
             "y": 860,
             "width": 770,
             "height": 142,
-            "radius": 45
+            "radius": 45,
+            "color": "rgba(249, 246, 231, 0.96)",
+            "anchorX": 0,
+            "anchorY": 0,
+            "zIndex": 400
           }
-        ],
-        "name": {
-          "centerX": 600,
-          "centerY": 510,
-          "maxWidth": 740,
-          "maxLines": 2,
-          "maxSize": 66,
-          "minSize": 28,
-          "lineHeight": 1.13
-        },
-        "producer": {
-          "x": 600,
-          "y": 625,
-          "maxWidth": 700,
-          "maxSize": 31,
-          "minSize": 16
-        },
-        "year": {
-          "x": 600,
-          "y": 688,
-          "size": 40
-        },
-        "footer": {
-          "x": 600,
-          "y": 907,
-          "gap": 49,
-          "size": 32,
-          "maxWidth": 700
-        }
+        ]
       },
       "id": "circular",
-      "name": "Runder Deckel"
+      "name": "Runder Deckel",
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300
+      }
     },
     {
       "id": "wide-landscape",
@@ -231,53 +428,155 @@
         ]
       },
       "typography": {
-        "family": "LabelSerif",
-        "ink": "#20272a",
-        "panel": "rgba(249, 246, 231, 0.96)",
-        "panels": [
+        "fields": [
           {
+            "id": "strain-name",
+            "source": "name",
+            "font": "LabelSerif",
+            "x": 900,
+            "y": 475,
+            "fontSize": 70,
+            "minFontSize": 28,
+            "maxWidth": 750,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "maxLines": 2,
+            "lineHeight": 1.13,
+            "fontWeight": 600
+          },
+          {
+            "id": "producer",
+            "source": "producer",
+            "font": "LabelSerif",
+            "x": 900,
+            "y": 635,
+            "fontSize": 31,
+            "minFontSize": 16,
+            "maxWidth": 700,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401
+          },
+          {
+            "id": "year",
+            "source": "year",
+            "font": "LabelSerif",
+            "x": 900,
+            "y": 690,
+            "fontSize": 40,
+            "minFontSize": 40,
+            "maxWidth": 1800,
+            "align": "center",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "year-short",
+            "prefix": "’"
+          },
+          {
+            "id": "thc-value",
+            "source": "thc",
+            "font": "LabelSerif",
+            "x": 900,
+            "y": 890,
+            "fontSize": 32,
+            "minFontSize": 16,
+            "maxWidth": 325,
+            "align": "right",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "THC: ",
+            "suffix": "  |  "
+          },
+          {
+            "id": "cbd-value",
+            "source": "cbd",
+            "font": "LabelSerif",
+            "x": 900,
+            "y": 890,
+            "fontSize": 32,
+            "minFontSize": 16,
+            "maxWidth": 325,
+            "align": "left",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "CBD: "
+          },
+          {
+            "id": "indica",
+            "source": "indica",
+            "font": "LabelSerif",
+            "x": 900,
+            "y": 940,
+            "fontSize": 32,
+            "minFontSize": 16,
+            "maxWidth": 325,
+            "align": "right",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "Indica: ",
+            "suffix": "  |  "
+          },
+          {
+            "id": "sativa",
+            "source": "sativa",
+            "font": "LabelSerif",
+            "x": 900,
+            "y": 940,
+            "fontSize": 32,
+            "minFontSize": 16,
+            "maxWidth": 325,
+            "align": "left",
+            "verticalAlign": "middle",
+            "color": "#20272a",
+            "zIndex": 401,
+            "format": "percent",
+            "prefix": "Sativa: "
+          }
+        ],
+        "decorations": [
+          {
+            "id": "panel-0",
+            "type": "rect",
             "x": 480,
             "y": 340,
             "radius": 42,
             "height": 420,
-            "width": 840
+            "width": 840,
+            "color": "rgba(249, 246, 231, 0.96)",
+            "anchorX": 0,
+            "anchorY": 0,
+            "zIndex": 400
           },
           {
+            "id": "panel-1",
+            "type": "rect",
             "x": 540,
             "y": 835,
             "radius": 30,
             "height": 170,
-            "width": 720
+            "width": 720,
+            "color": "rgba(249, 246, 231, 0.96)",
+            "anchorX": 0,
+            "anchorY": 0,
+            "zIndex": 400
           }
-        ],
-        "name": {
-          "centerX": 900,
-          "centerY": 475,
-          "maxSize": 70,
-          "maxWidth": 750,
-          "lineHeight": 1.13,
-          "maxLines": 2,
-          "minSize": 28
-        },
-        "producer": {
-          "maxSize": 31,
-          "x": 900,
-          "minSize": 16,
-          "y": 635,
-          "maxWidth": 700
-        },
-        "year": {
-          "x": 900,
-          "size": 40,
-          "y": 690
-        },
-        "footer": {
-          "size": 32,
-          "x": 900,
-          "gap": 50,
-          "y": 890,
-          "maxWidth": 650
-        }
+        ]
+      },
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300
       }
     }
   ]

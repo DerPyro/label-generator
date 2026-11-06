@@ -1,4 +1,4 @@
-import { CONFIG, THRESHOLDS, LAYER_ORDER } from './config.js';
+import { CONFIG, THRESHOLDS } from './config.js';
 
 function number(value, label, min, max) {
   if ((typeof value === 'string' && !value.trim()) || value === null || value === undefined || typeof value === 'boolean') {
@@ -54,7 +54,12 @@ export function selectLayers(input, config = CONFIG) {
 
 export function getRenderPlan(input, config = CONFIG) {
  const model=normalizeInput(input,config);const selected=selectLayers(model,config);
- const order=config.layerOrder||LAYER_ORDER;
- if(order.length!==5||new Set(order).size!==5||order.some(id=>!LAYER_ORDER.includes(id)))throw new Error('Ungültige Layer-Reihenfolge.');
- return {input:model,assetVersion:config.assetVersion,packId:config.packId||config.id,packVersion:config.packVersion,layoutId:config.layoutId||config.format,width:config.width,height:config.height,levels:Object.fromEntries(['genetics','thc','cbd'].map(id=>[id,selected[id].level])),layers:order.map(id=>id==='text'?{id:'text',label:'Dynamischer Text',sources:[],...(config.masks?.text?{mask:config.masks.text}:{})}:selected[id])};
+ const fields=config.typography.fields;
+ const elements=(config.spriteOrder||['base','genetics','thc','cbd']).map(id=>({...selected[id],type:'layer',category:id,zIndex:config.zIndex[id]}));
+ for(const field of fields)if(field.background)elements.push({...field.background,category:'text'});
+ elements.push(...config.typography.decorations.map(element=>({...element,category:'text'})));
+ elements.push(...fields.map(field=>({...field,type:'text',category:'text'})));
+ elements.forEach((element,index)=>{element.order=index;if(!Number.isInteger(element.zIndex)||Math.abs(element.zIndex)>10000)throw Error('Ungültiger zIndex.');});
+ elements.sort((a,b)=>a.zIndex-b.zIndex||a.order-b.order);
+ return {input:model,assetVersion:config.assetVersion,packId:config.packId||config.id,packVersion:config.packVersion,layoutId:config.layoutId||config.format,width:config.width,height:config.height,levels:Object.fromEntries(['genetics','thc','cbd'].map(id=>[id,selected[id].level])),layers:[...Object.values(selected),{id:'text',label:'Text & Dekoration',sources:[]}],elements};
 }

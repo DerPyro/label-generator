@@ -37,9 +37,9 @@ test('Alle343 visuellen Kombinationen erreichbar',()=>{
  assert.equal(combos.size,343);
 });
 test('Deterministischer Renderplan und konfigurierbare Reihenfolge',()=>{
- assert.deepEqual(getRenderPlan(sample),getRenderPlan({...sample}));const order=['base','genetics','text','thc','cbd'];
- assert.deepEqual(getRenderPlan(sample,{...CONFIG,layerOrder:order}).layers.map(x=>x.id),order);
- assert.throws(()=>getRenderPlan(sample,{...CONFIG,layerOrder:['base','text']}));
+ assert.deepEqual(getRenderPlan(sample),getRenderPlan({...sample}));const zIndex={base:0,genetics:100,thc:700,cbd:800};
+ assert.deepEqual(getRenderPlan(sample,{...CONFIG,zIndex}).elements.slice(-2).map(x=>x.id),['thc','cbd']);
+ assert.throws(()=>getRenderPlan(sample,{...CONFIG,zIndex:{...zIndex,thc:Infinity}}));
  const plan=getRenderPlan(sample);assert.equal(plan.packId,'woodland');assert.equal(plan.packVersion,'1.0.0');assert.equal(plan.layoutId,'rectangular');assert.equal(plan.format,undefined);
 });
 test('Zentrale Regeln und Sprite-Sätze austauschbar',()=>{
