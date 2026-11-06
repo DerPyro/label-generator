@@ -91,8 +91,8 @@ test('CRC-Fehler, Verschlüsselung und Symlinks werden vor der Installation abge
   await assert.rejects(() => inspectPackArchive(unsupported), /Kompression/);
 });
 test('ZIP-Limits werden anhand von Metadaten und tatsächlicher entpackter Größe durchgesetzt', async () => {
-  assert.equal(ARCHIVE_LIMITS.archiveBytes, 128 * 1024 * 1024);
-  await assert.rejects(() => inspectPackArchive(new Uint8Array(ARCHIVE_LIMITS.archiveBytes + 1)), /128 MiB/);
+  assert.equal(ARCHIVE_LIMITS.archiveBytes, 160 * 1024 * 1024);
+  await assert.rejects(() => inspectPackArchive(new Uint8Array(ARCHIVE_LIMITS.archiveBytes + 1)), /160 MiB/);
   const base = zip(original.files);
   const tooBig = setMetadata(base, (view, central, local) => { view.setUint32(central + 24, ARCHIVE_LIMITS.fileBytes + 1, true); view.setUint32(local + 22, ARCHIVE_LIMITS.fileBytes + 1, true); });
   await assert.rejects(() => inspectPackArchive(tooBig), /16 MB/);
@@ -130,15 +130,10 @@ test('Stark komprimierte Bilddateien dürfen das gesamte Dekodierbudget nicht ü
   await assert.rejects(inspectPackArchive(zip(files)),/zu viele Bildpunkte/);
 });
 
-test('Legacy-ZIPs migrieren zu Layouts und neue ZIPs behalten beliebige Layout-IDs', async () => {
-  const manifest = structuredClone(original.manifest);
-  const legacy = {...manifest, formats:Object.fromEntries(manifest.layouts.filter(x=>['rectangular','circular'].includes(x.id)).map(({id,name,...design})=>[id,design]))};
-  delete legacy.layouts;
-  const importedLegacy = await inspectPackArchive(zip({...original.files,'pack.json':strToU8(JSON.stringify(legacy))}));
-  assert.equal(importedLegacy.manifest.formats, undefined);
-  assert.deepEqual(importedLegacy.manifest.layouts.map(x=>x.id), ['rectangular','circular']);
-  manifest.layouts = manifest.layouts.map((layout,index)=>({...layout,id:`custom-layout-${index+1}`,name:`Eigenes Layout ${index+1}`}));
-  const imported = await inspectPackArchive(buildPackArchive(manifest, original.files));
-  assert.deepEqual(imported.manifest.layouts.map(x=>x.id), manifest.layouts.map(x=>x.id));
-  assert.deepEqual(imported.manifest.layouts.map(x=>[x.width,x.height]),manifest.layouts.map(x=>[x.width,x.height]));
+test('Alte ZIPs werden abgewiesen, neue ZIPs behalten beliebige Layout-IDs', async () => {
+ const manifest=structuredClone(original.manifest),legacy={...manifest,compatibilityVersion:1};
+ await assert.rejects(inspectPackArchive(zip({...original.files,'pack.json':strToU8(JSON.stringify(legacy))})),/aktualisieren/);
+ manifest.layouts=manifest.layouts.map((layout,i)=>({...layout,id:'custom-layout-'+i,name:'Eigenes Layout'}));
+ const imported=await inspectPackArchive(buildPackArchive(manifest,original.files));
+ assert.deepEqual(imported.manifest.layouts,manifest.layouts);
 });

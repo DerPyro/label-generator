@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Language checks</title>
+<body><h1>Language checks</h1><pre id="results">Running …</pre>
+<script type="module">
+import { detectLanguage } from '../src/i18n.js';
+const key='label-generator-v3-language',cartKey='label-generator-v3-print-cart';
+const saved=localStorage.getItem(key),savedCart=localStorage.getItem(cartKey),checks=[];
+const assert=(ok,message)=>{if(!ok)throw Error(message);};
+async function until(fn){for(let i=0;i<500;i++){if(fn())return;await new Promise(resolve=>setTimeout(resolve,20));}throw Error('Timed out');}
+async function check(name,fn){try{await fn();checks.push('PASS '+name);}catch(error){checks.push('FAIL '+name+': '+error.message);}document.querySelector('#results').textContent=checks.join('\n');}
+const frame=document.createElement('iframe');frame.style.cssText='width:390px;height:900px';let doc;
+const ready=()=>until(()=>doc.querySelector('#export')?.disabled===false);
+async function load(){const loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html?i18n='+Date.now();if(!frame.isConnected)document.body.append(frame);await loaded;doc=frame.contentDocument;await ready();}
+try {
+ localStorage.removeItem(key);localStorage.removeItem(cartKey);
+ await check('Detect browser language on first visit',async()=>{
+  await load();assert(doc.documentElement.lang===detectLanguage(navigator.languages),'Browser preference ignored');
+ });
+ await check('English UI, search messages, accessible names and validation',async()=>{
+  localStorage.setItem(key,'en');await load();
+  assert(doc.querySelector('#preview-title').textContent==='Your label','Heading not translated');
+  assert(doc.querySelector('label[for="producer"]').textContent.includes('Seed producer'),'Nested label lost');
+  assert(doc.querySelector('#reset-sprite-order').textContent==='Reset layer order','Layer control not translated');
+  assert(doc.querySelector('#layout option').textContent==='Classic portrait','Layout name not translated');
+  assert(doc.querySelector('#strain-toggle').getAttribute('aria-label')==='Open or close strain selection','Accessible name not translated');
+  await until(()=>!doc.querySelector('#strain-search').disabled);
+  assert(doc.querySelector('#strain-status').textContent.includes('strains available'),'Catalog message not translated');
+  doc.querySelector('#language-toggle').click();await ready();assert(doc.querySelector('#sheet-summary').textContent==='Füge zuerst Etiketten hinzu.','Empty sheet status not translated to German');
+  doc.querySelector('#language-toggle').click();await ready();assert(doc.querySelector('#sheet-summary').textContent==='Add labels to get started.','Empty sheet status not translated to English');
+  doc.querySelector('#name').value='';doc.querySelector('#name').dispatchEvent(new Event('input',{bubbles:true}));
+  await until(()=>!doc.querySelector('#form-error').hidden);assert(doc.querySelector('#form-error').textContent.startsWith('Please check'),'Validation not translated');
+  doc.querySelector('#name').value='Meine Sorte';doc.querySelector('#name').dispatchEvent(new Event('input',{bubbles:true}));await ready();
+ });
+ await check('Switch languages without changing artwork, cart, layer order or manual placement',async()=>{
+  doc.querySelector('[data-layer-id="genetics"] [data-action="front"]').click();await ready();
+  const before=doc.querySelector('#preview').toDataURL();
+  doc.querySelector('#add-cart').click();await until(()=>!doc.querySelector('#export-pdf').disabled);
+  const savedEntries=localStorage.getItem(cartKey);
+  const toggle=doc.querySelector('#manual-mode');toggle.checked=true;toggle.dispatchEvent(new Event('input',{bubbles:true}));
+  doc.querySelector('#sheet-add-page').click();assert(doc.querySelector('#sheet-undo').disabled===false,'Manual edit missing');
+  const pages=doc.querySelector('#sheet-page').options.length;
+  doc.querySelector('#language-toggle').click();await ready();
+  assert(doc.documentElement.lang==='de'&&doc.querySelector('#preview-title').textContent==='Dein Etikett','German switch failed');
+  assert(doc.querySelector('#name').value==='Meine Sorte','User text changed');
+  assert(doc.querySelector('#preview').toDataURL()===before,'Language switch changed pixels');
+  assert(localStorage.getItem(cartKey)===savedEntries,'Saved cart changed');
+  assert(doc.querySelector('#sheet-page').options.length===pages&&!doc.querySelector('#sheet-undo').disabled,'Manual print layout reset');
+  assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Mobile overflow');
+  doc.querySelector('#language-toggle').click();await ready();
+  assert(doc.querySelector('#preview-title').textContent==='Your label','Switch back failed');
+  assert(doc.querySelector('#layout option').textContent==='Classic portrait','Dynamic layout label lost');
+  await load();assert(doc.documentElement.lang==='en','Manual choice not saved');
+ });
+} finally {
+ frame.remove();
+ if(saved===null)localStorage.removeItem(key);else localStorage.setItem(key,saved);
+ if(savedCart===null)localStorage.removeItem(cartKey);else localStorage.setItem(cartKey,savedCart);
+}
+document.body.dataset.testStatus=checks.some(x=>x.startsWith('FAIL'))?'failed':'passed';
+</script></body></html>

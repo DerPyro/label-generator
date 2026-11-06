@@ -3,9 +3,10 @@
 <body style="font:15px system-ui;margin:2rem;background:#f3eee3;color:#21382d">
 <h1>v3 Browserprüfungen</h1><pre id="results">Prüfung läuft …</pre><canvas id="preview" style="max-width:320px;width:100%;height:auto"></canvas>
 <script type="module">
+import { checkTypography } from './browser-typography.js';
 import { CONFIG,THRESHOLDS } from '../src/config.js';
 import { getRenderPlan,getLayerLevel } from '../src/model.js';
-import { TexturePackManager,validateManifest,getLayouts } from '../src/texturepacks.js';
+import { TexturePackManager,validateManifest,getLayouts,resolvePackConfig } from '../src/texturepacks.js';
 import { renderLabel,canvasToPng,preloadAssets } from '../src/renderer.js';
 import { PrintCartService } from '../src/cart.js';
 import { IndexedDBPackStore } from '../src/pack-store.js';
@@ -13,21 +14,67 @@ import { inspectPackArchive,buildPackArchive } from '../src/pack-archive.js';
 import { layoutSheets,generatePdf,configKey,getPhysicalSize,MM_TO_PT } from '../src/print.js';
 import { SheetEditor } from '../src/sheet-editor.js';
 import { PDFDocument } from '../vendor/pdf-lib.esm.min.js';
+const savedLanguage=localStorage.getItem('label-generator-v3-language');localStorage.setItem('label-generator-v3-language','de');
 const sample={name:'Super Silver Haze',producer:'Royal Queen Seeds',year:2026,sativa:75,thc:20,cbd:3};
 const canvas=document.querySelector('canvas'),checks=[],manager=new TexturePackManager(),configs=new Map();
 const assert=(ok,message)=>{if(!ok)throw Error(message);};
 const close=(a,b)=>assert(Math.abs(a-b)<1e-7,`${a} ≠ ${b}`);
 async function check(name,fn){try{await fn();checks.push('PASS '+name);}catch(error){checks.push('FAIL '+name+': '+error.message);}document.querySelector('#results').textContent=checks.join('\n');}
 async function until(fn){for(let i=0;i<400;i++){if(fn())return;await new Promise(resolve=>setTimeout(resolve,20));}throw Error('Zeitüberschreitung');}
-await check('Drei validierte Packs mit Hochformat, Querformat und Rund laden',async()=>{
- const packs=(await manager.listPacks()).filter(pack=>pack.source==='bundled');assert(packs.length===3&&packs.some(pack=>pack.id==='watercolor-forest'),'Packs fehlen');
- for(const pack of packs){const layouts=getLayouts(await manager.loadPack(pack.id));assert(layouts.length>=3,'Drei Beispiel-Layouts fehlen');for(const layout of layouts){const config=await manager.getConfig(pack.id,layout.id);await preloadAssets(config);configs.set(`${pack.id}@${config.packVersion}:${layout.id}`,config);}}
+await check('Alle Katalogpacks mit ihren eigenen Layouts laden',async()=>{
+ const packs=(await manager.listPacks()).filter(pack=>pack.source==='bundled');assert(packs.length===(await manager.catalog()).packs.length&&packs.some(pack=>pack.id==='watercolor-forest')&&packs.some(pack=>pack.id==='natural-boho'),'Packs fehlen');
+ for(const pack of packs){const layouts=getLayouts(await manager.loadPack(pack.id));assert(layouts.length>=2,'Hochformat und Rund fehlen');for(const layout of layouts){const config=await manager.getConfig(pack.id,layout.id);await preloadAssets(config);configs.set(`${pack.id}@${config.packVersion}:${layout.id}`,config);}}
 });
 const rect=()=>configs.get('woodland@1.0.0:rectangular'),circle=()=>configs.get('woodland@1.0.0:circular');
+await check('Eigene THC-, CBD- und Genetikskalen rendern passende PNGs an jeder Grenze',async()=>{
+ const manifest=await manager.loadPack('woodland');manifest.layouts=[manifest.layouts[0]];
+ const design=manifest.layouts[0];
+ for(const[id,bounds]of Object.entries({genetics:[25,50,75],thc:[5,10],cbd:[2]})){
+  const paths=design.layers[id];design.layers[id]=[...bounds.map((below,index)=>({below,asset:paths[index]})),{asset:paths[bounds.length]}];
+ }
+ const config=resolvePackConfig(manifest,design.id,new URL('../texturepacks/woodland/',import.meta.url));
+ for(const[id,property,values]of [['genetics','sativa',[0,24.9,25,50,75,100]],['thc','thc',[0,4.9,5,9.9,10,40]],['cbd','cbd',[0,1.9,2,20]]]){
+  for(const value of values){
+   const data={...sample,[property]:value};
+   const expected=design.layers[id].findIndex(rule=>rule.below===undefined||value<rule.below);
+   const visibility={base:false,genetics:false,thc:false,cbd:false,text:false,[id]:true};
+   await renderLabel(canvas,data,{config,visibility});const actual=canvas.toDataURL();
+   const target=document.createElement('canvas');target.width=config.width;target.height=config.height;
+   const image=new Image();image.src=config[id][expected].path;await image.decode();target.getContext('2d').drawImage(image,0,0);
+   assert(actual===target.toDataURL(),`${id} ${value}: falsche Textur`);
+  }
+ }
+ const entries=[{id:'custom',data:sample,packId:config.packId,packVersion:config.packVersion,layoutId:config.layoutId,quantity:1,widthMm:60}];
+ const map=new Map([[configKey(entries[0]),config]]),layout=layoutSheets(entries,map,{cropMarks:false});
+ const bytes=await generatePdf(layout,async(entry,config)=>{const out=document.createElement('canvas');await renderLabel(out,entry.data,{config});return out;});
+ assert((await PDFDocument.load(bytes)).getPageCount()===1,'PDF mit eigenen Skalen fehlt');
+});
+await check('Watercolor: Wolken liegen vor den Bergen und hinter den Bäumen; Vordergrund separat ausblendbar',async()=>{
+ const manifest=await manager.loadPack('watercolor-forest');
+ for(const design of manifest.layouts){
+  const config=configs.get(`watercolor-forest@${manifest.version}:${design.id}`);
+  for(const sativa of [0,50,100]){
+   const data={...sample,sativa,thc:40,cbd:0};
+   const result=await renderLabel(canvas,data,{config,visibility:{cbd:false,text:false}});
+   const ids=result.plan.elements.filter(e=>e.type==='layer').map(e=>e.id);
+   assert(ids.indexOf('genetics')<ids.indexOf('thc')&&ids.indexOf('thc')<ids.indexOf('foreground'),'Falsche Landschaftsreihenfolge');
+   const expected=document.createElement('canvas');expected.width=config.width;expected.height=config.height;const ctx=expected.getContext('2d');
+   if(config.shape==='circle'){ctx.beginPath();ctx.arc(config.width/2,config.height/2,config.width/2,0,Math.PI*2);ctx.clip();}
+   for(const id of ['base','genetics','thc','foreground']){
+    const image=new Image();image.src=result.plan.layers.find(layer=>layer.id===id).path;await image.decode();ctx.drawImage(image,0,0);
+   }
+   const actual=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data,wanted=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+   for(let i=0;i<actual.length;i+=148)for(let c=0;c<4;c++)assert(Math.abs(actual[i+c]-wanted[i+c])<=3,'Vordergrund/Wetter falsch komponiert');
+   const before=canvas.toDataURL();await renderLabel(canvas,data,{config,visibility:{cbd:false,text:false,foreground:false}});
+   assert(before!==canvas.toDataURL(),'Vordergrund nicht unabhängig ausblendbar');
+   assert((await canvasToPng(canvas)).type==='image/png','PNG-Export mit Vordergrund fehlt');
+  }
+ }
+});
 await check('Watercolor Forest: drei native PNG-Layouts und gemeinsamer maßstäblicher PDF-Bogen',async()=>{
  const manifest=await manager.loadPack('watercolor-forest'),entries=[];
  for(const [index,layout]of manifest.layouts.entries()){
-  const config=configs.get('watercolor-forest@1.0.0:'+layout.id);await renderLabel(canvas,{...sample,name:'Watercolor Forest',sativa:0,thc:40,cbd:20},{config});
+  const config=configs.get('watercolor-forest@1.1.0:'+layout.id);await renderLabel(canvas,{...sample,name:'Watercolor Forest',sativa:0,thc:40,cbd:20},{config});
   assert(canvas.width===layout.width&&canvas.height===layout.height,'Illustration nicht nativ gerendert');
   if(layout.shape==='circle')assert(canvas.getContext('2d').getImageData(0,0,1,1).data[3]===0,'Runder Außenbereich nicht transparent');
   const blob=await canvasToPng(canvas);assert(blob.type==='image/png'&&blob.size>100000,'Illustriertes PNG fehlt');
@@ -78,8 +125,8 @@ await check('Optionale Himmel- und Textmasken werden in derselben Pipeline angew
 await check('Lange Namen und optionaler Produzent bleiben in beiden Layouts lesbar',async()=>{
  for(const config of [rect(),circle(),configs.get('woodland@1.0.0:wide-landscape')]){
   const data={...sample,name:'Super Silver Haze mit einem besonders langen botanischen Sortennamen',producer:'Internationale Saatgutmanufaktur für traditionelle botanische Sammlungen'};
-  const result=await renderLabel(canvas,data,{config});assert(result.textLayout.lines.join(' ')===data.name,'Name abgeschnitten');assert(result.textLayout.producer.width<=config.typography.producer.maxWidth,'Produzent zu breit');
-  const without=await renderLabel(canvas,{...sample,producer:''},{config});assert(without.textLayout.producer===null,'Leerer Produzent wird gezeichnet');
+  const result=await renderLabel(canvas,data,{config});assert(result.textLayout['strain-name'].lines.join(' ')===data.name,'Name abgeschnitten');assert(result.textLayout.producer.width<=config.typography.fields.find(f=>f.id==='producer').maxWidth,'Produzent zu breit');
+  const without=await renderLabel(canvas,{...sample,producer:''},{config});assert(without.textLayout.producer.text==='','Leerer Produzent wird gezeichnet');
  }
 });
 await check('Fehlende Bilder und inkompatible Manifeste liefern kontrollierte Fehler',async()=>{
@@ -109,7 +156,7 @@ await check('Oberfläche: Form-/Packwechsel, Größen, Mengen, Bearbeitung und m
   await ready();assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Mobile Seite läuft horizontal über');assert(doc.querySelector('#thc').max==='40'&&doc.querySelector('#cbd').max==='20','Wertebereiche falsch');
   input('name','Test Sorte A');input('producer','Beispielzüchter');input('editor-quantity','3');await ready();doc.querySelector('#add-cart').click();await until(()=>doc.querySelectorAll('.cart-row').length===1);
   assert(doc.querySelector('#layout').options.length===3&&doc.querySelectorAll('.layout-card').length===3,'Layoutauswahl nicht vom Pack erzeugt');
-  assert(doc.querySelector('#pack').value==='watercolor-forest@1.0.0','Illustriertes Startpack nicht gewählt');
+  assert(doc.querySelector('#pack').value==='watercolor-forest@1.1.0','Illustriertes Startpack nicht gewählt');
   input('layout','wide-landscape');await ready();assert(doc.querySelector('#preview').width===1536&&doc.querySelector('#preview').height===1024,'Querformat nicht aktiviert');
   input('pack','ink@1.0.0');await ready();assert(doc.querySelector('#layout').value==='wide-landscape','Vergleichbares Layout beim Packwechsel verloren');
   input('layout','circular');await ready();assert(doc.querySelector('#name').value==='Test Sorte A'&&doc.querySelector('#producer').value==='Beispielzüchter','Daten beim Wechsel verloren');assert(doc.querySelector('#preview').height===1200,'Kreis nicht aktiviert');assert(doc.querySelector('#size-label').textContent.includes('Durchmesser'),'Geometrie nicht vom Layout übernommen');
@@ -118,6 +165,26 @@ await check('Oberfläche: Form-/Packwechsel, Größen, Mengen, Bearbeitung und m
   const first=doc.querySelector('.cart-row');first.querySelector('.cart-actions button').click();await until(()=>doc.querySelector('#name').value==='Test Sorte A');await ready();input('name','Bearbeitete Sorte');await ready();doc.querySelector('#add-cart').click();assert(doc.querySelector('.cart-description strong').textContent==='Bearbeitete Sorte','Bearbeitung nicht gespeichert');
   input('print-width','150');await until(()=>!doc.querySelector('#print-warnings').hidden||!doc.querySelector('#print-error').hidden);assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Druckbereich läuft mobil über');
   input('name','');assert(doc.querySelector('#export').disabled,'Ungültige Eingabe exportierbar');
+ }finally{frame.remove();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
+});
+await check('Offene Ebenenliste: Reihenfolge, Rücksetzen, Warenkorb und Wiederherstellen',async()=>{
+ const key='label-generator-v3-print-cart',original=localStorage.getItem(key),frame=document.createElement('iframe');frame.style.cssText='width:390px;height:900px';
+ try{
+  localStorage.removeItem(key);let loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html';document.body.append(frame);await loaded;let doc=frame.contentDocument;
+  const ready=()=>until(()=>!doc.querySelector('#export').disabled);
+  const ids=()=>[...doc.querySelectorAll('.layer-row')].map(row=>row.dataset.layerId);
+  await ready();assert(doc.querySelector('.layer-inspector').tagName==='SECTION','Ebenen einklappbar');assert(ids().includes('foreground'),'Vordergrund fehlt in der Ebenenliste');
+  const initial=ids(),before=doc.querySelector('#preview').toDataURL();
+  const move=doc.querySelector('[data-layer-id="genetics"] [data-action="front"]');move.click();await ready();
+  const changed=ids(),after=doc.querySelector('#preview').toDataURL();assert(initial.join()!==changed.join(),'Reihenfolge unverändert');assert(after!==before,'Spriteänderung nicht gerendert');
+  assert(doc.activeElement.closest('.layer-row')?.dataset.layerId==='genetics','Tastaturfokus verloren');
+  assert(doc.documentElement.scrollWidth<=frame.clientWidth,'Ebenenliste läuft mobil über');
+  doc.querySelector('#add-cart').click();const saved=JSON.parse(localStorage.getItem(key)).entries[0];assert(saved.spriteOrder.join()===changed.filter(id=>id!=='text').reverse().join(),'Reihenfolge nicht gespeichert');
+  doc.querySelector('#reset-sprite-order').click();await ready();assert(doc.querySelector('#preview').toDataURL()===before,'Zurücksetzen verändert Original');
+  loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html?order='+Date.now();await loaded;doc=frame.contentDocument;await ready();
+  doc.querySelector('.cart-actions button').click();await until(()=>!doc.querySelector('#edit-cancel').hidden);await ready();assert(ids().join()===changed.join(),'Gespeicherte Reihenfolge beim Bearbeiten verloren');assert(doc.querySelector('#preview').toDataURL()===after,'Bearbeitung rendert andere Pixel');
+  await until(()=>!doc.querySelector('#export-pdf').disabled);
+  const checkbox=doc.querySelector('[data-layer-id="thc"] input');checkbox.click();await ready();assert(!doc.querySelector('[data-layer-id="thc"] input').checked,'Ausblenden fehlt');
  }finally{frame.remove();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
 });
 await check('Gemischte Layouts: manuelle Position, Drehung, Ziehen und Rückgängig im mobilen Editor',async()=>{
@@ -179,7 +246,7 @@ await check('Defekte Schrift wird vor dem Speichern abgefangen, installierte Pac
   const manifest={...structuredClone(archiveFixture.manifest),id:'invalid-font-pack',version:'1.0.0'};
   const files={...archiveFixture.files,[manifest.fonts[0].path]:archiveFixture.files[manifest.fonts[0].path].slice(0,2048)};
   try{await local.importPack(buildPackArchive(manifest,files));throw Error('Beschädigtes Pack installiert');}catch(error){assert(/schrift/i.test(error.message),'Schriftdekodierung nicht geprüft: '+error.message);}
-  assert((await store.list()).length===0,'Fehlerhaftes Pack wurde gespeichert');assert((await local.listPacks()).length===3,'Mitgelieferte Packs beschädigt');
+  assert((await store.list()).length===0,'Fehlerhaftes Pack wurde gespeichert');assert((await local.listPacks()).length===(await local.catalog()).packs.length,'Mitgelieferte Packs beschädigt');
  }finally{local.dispose();store.close();await new Promise(resolve=>{const deletion=indexedDB.deleteDatabase(dbName);deletion.onsuccess=resolve;deletion.onerror=resolve;});}
 });
 await check('Ein-Layout-ZIP: dynamische Auswahl, vergleichbarer Packwechsel, Neustart und Warenkorbschutz',async()=>{
@@ -210,6 +277,8 @@ await check('Ein-Layout-ZIP: dynamische Auswahl, vergleichbarer Packwechsel, Neu
   assert(![...doc.querySelector('#pack').options].some(x=>x.value===id+'@'+version),'Entferntes Pack bleibt auswählbar');
  }finally{frame.remove();await store.remove(id,version);store.close();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
 });
+await checkTypography(check);
 await renderLabel(canvas,sample,{config:circle()});
+if(savedLanguage===null)localStorage.removeItem('label-generator-v3-language');else localStorage.setItem('label-generator-v3-language',savedLanguage);
 document.body.dataset.testStatus=checks.some(x=>x.startsWith('FAIL'))?'failed':'passed';
 </script></body></html>

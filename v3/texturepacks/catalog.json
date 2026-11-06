@@ -1,5 +1,5 @@
 {
-  "compatibilityVersion": 1,
+  "compatibilityVersion": 2,
   "packs": [
     {
       "id": "woodland",
@@ -23,10 +23,19 @@
       "id": "watercolor-forest",
       "name": "Watercolor Forest",
       "description": "Illustriertes Wald-Texturepack in Aquarelloptik: sieben Tageszeiten, zunehmendes Wetter und wachsende botanische Ornamente. KI-generierte Illustrationen.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "status": "illustrated",
       "manifest": "watercolor-forest/pack.json",
       "preview": "watercolor-forest/preview.png"
+    },
+    {
+      "id": "natural-boho",
+      "name": "Natural Boho",
+      "description": "Märchenhafte Pilze, Wildblumen und Groovy-Rauch in warmen 70er-Jahre-Farben. Eigenständige Hochformat- und Rundkompositionen mit sieben Tageszeiten.",
+      "version": "1.1.0",
+      "status": "illustrated",
+      "manifest": "natural-boho/pack.json",
+      "preview": "natural-boho/preview.png"
     }
   ]
 }

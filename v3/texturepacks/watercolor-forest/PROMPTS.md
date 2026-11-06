@@ -403,3 +403,344 @@ Ursprungsdatei: `exec-e876c54b-88e5-43b3-bd38-4054a3ef5da0.png`.
 Use case: stylized-concept. Asset type: ONE transparent PNG SPRITE overlay for premium Watercolor Forest botanical label. Canvas EXACTLY 1024x1024 pixels SQUARE canvas. Genuine fully transparent alpha BACKGROUND, absolutely NO white/colored paper rectangle, NO checkerboard painted in, NO landscape/trees/text/border/mockup. Only watercolor botanical ornament. Premium fine traditional watercolor realistic hand-painted small wildflowers, delicate pigment granulation, soft natural paint edges. Geometry: inside a perfect circular rim centered512,512 radius500, growing from bottom arc upward symmetrically along outer circular edge; all art within circle and outside remains transparent; no rectangular corners. CBD ornament stage7/7: Fully grown dense botanical floral FRAME along whole outer rim,32 varied small/large blushpink ivory dustyrose woodland blossoms with warm ochre centers, richly interwoven sage foliage and ferns, thin top and bottom garlands. Stage7 visibly denser more complex and more flowers thanstage6, perimeter only, do not overgrow centraltext. CRITICAL: the entire central rectangle x20..80%,y27..91% must remain EMPTY transparent for later typography; all foliage confined narrow outermargins or bottommost9% and topmost16%, never put a flower in centraltext. No cannabis leaves required, natural woodland flowers. Do NOT fade entire ornament by global transparency; use fully colored painted components and naturally translucent watercolor edges. Single sprite full native canvas; no contact sheet.
 
 Ursprungsdatei: `exec-704b4ffd-161e-4e60-bc3c-c534bc3e280c.png`.
+
+
+## Version 1.1.0: getrennte Landschaft und Bäume
+
+42 Bilder wurden mit dem integrierten Imagegen-Werkzeug anhand der bisherigen 21 vollständigen Landschaften bearbeitet. Je Layout und Tageszeit wurden die großen Vordergrundbäume und nahen Bodenpflanzen als transparentes PNG extrahiert und die dahinterliegenden Bereiche der Landschaft ergänzt. Die native Auflösung und die bestehenden Textkoordinaten bleiben erhalten. Generative Bearbeitungen sind keine pixelidentische Zerlegung; kleine Details können abweichen. RGB-Ausgaben wurden verlustfrei zu RGBA8 normalisiert. Keine CLI/API-Fallbacks.
+
+### Split: layouts/classic-portrait/genetics/1.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/1.png.
+
+Use case: precise-object-edit. EDIT TARGET is the provided watercolor landscape. Output exactly ONE full-canvas 1024x1536 portrait background PNG. Remove ONLY the close large fir trees at the extreme left and right edges and the foreground moss rocks ferns across the bottom. Reconstruct the sky and distant misty mountain/forest valley seamlessly behind the removed foreground, all the way to canvas edges. Preserve the existing distant ridge horizon position, colors, time of day, lighting, moon/sun/stars if present, delicate paper watercolor texture and open central typography area. Do not add clouds, rain or lightning; those are separate layers. No new large trees, no text, frame or montage. Opaque full-canvas background. This is the rear half of a two-layer split: all close trees and plants will be on a separate transparent foreground PNG. Save a local PNG and return path.
+
+Generierte Datei: exec-34d18567-a8d2-44a6-acbc-8b7d4eaa28ce.png.
+
+### Split: layouts/classic-portrait/genetics/2.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/2.png.
+
+Use case: precise-object-edit. EDIT TARGET is the provided watercolor landscape. Output exactly ONE full-canvas 1024x1536 portrait background PNG. Remove ONLY the close large fir trees at the extreme left and right edges and the foreground moss rocks ferns across the bottom. Reconstruct the sky and distant misty mountain/forest valley seamlessly behind the removed foreground, all the way to canvas edges. Preserve the existing distant ridge horizon position, colors, time of day, lighting, moon/sun/stars if present, delicate paper watercolor texture and open central typography area. Do not add clouds, rain or lightning; those are separate layers. No new large trees, no text, frame or montage. Opaque full-canvas background. This is the rear half of a two-layer split: all close trees and plants will be on a separate transparent foreground PNG. Save a local PNG and return path.
+
+Generierte Datei: exec-2d67b3c5-09bc-418b-a8f4-c91603c8ef81.png.
+
+### Split: layouts/classic-portrait/genetics/3.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/3.png.
+
+Use case: precise-object-edit. EDIT TARGET is the provided watercolor landscape. Output exactly ONE full-canvas 1024x1536 portrait background PNG. Remove ONLY the close large fir trees at the extreme left and right edges and the foreground moss rocks ferns across the bottom. Reconstruct the sky and distant misty mountain/forest valley seamlessly behind the removed foreground, all the way to canvas edges. Preserve the existing distant ridge horizon position, colors, time of day, lighting, moon/sun/stars if present, delicate paper watercolor texture and open central typography area. Do not add clouds, rain or lightning; those are separate layers. No new large trees, no text, frame or montage. Opaque full-canvas background. This is the rear half of a two-layer split: all close trees and plants will be on a separate transparent foreground PNG. Save a local PNG and return path.
+
+Generierte Datei: exec-5b2eae4e-1530-42a7-b8f9-ad479ac3060a.png.
+
+### Split: layouts/classic-portrait/genetics/4.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/4.png.
+
+Use case: precise-object-edit. EDIT TARGET is the provided watercolor landscape. Output exactly ONE full-canvas 1024x1536 portrait background PNG. Remove ONLY the close large fir trees at the extreme left and right edges and the foreground moss rocks ferns across the bottom. Reconstruct the sky and distant misty mountain/forest valley seamlessly behind the removed foreground, all the way to canvas edges. Preserve the existing distant ridge horizon position, colors, time of day, lighting, moon/sun/stars if present, delicate paper watercolor texture and open central typography area. Do not add clouds, rain or lightning; those are separate layers. No new large trees, no text, frame or montage. Opaque full-canvas background. This is the rear half of a two-layer split: all close trees and plants will be on a separate transparent foreground PNG. Save a local PNG and return path.
+
+Generierte Datei: exec-92c6838f-7b22-4310-b875-d66c3d74c7b7.png.
+
+### Split: layouts/classic-portrait/genetics/5.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/5.png.
+
+Use case: precise-object-edit. EDIT TARGET is the provided watercolor landscape. Output exactly ONE full-canvas 1024x1536 portrait background PNG. Remove ONLY the close large fir trees at the extreme left and right edges and the foreground moss rocks ferns across the bottom. Reconstruct the sky and distant misty mountain/forest valley seamlessly behind the removed foreground, all the way to canvas edges. Preserve the existing distant ridge horizon position, colors, time of day, lighting, moon/sun/stars if present, delicate paper watercolor texture and open central typography area. Do not add clouds, rain or lightning; those are separate layers. No new large trees, no text, frame or montage. Opaque full-canvas background. This is the rear half of a two-layer split: all close trees and plants will be on a separate transparent foreground PNG. Save a local PNG and return path.
+
+Generierte Datei: exec-b46a8f33-1caa-432a-aae2-0dde7d4a5532.png.
+
+### Split: layouts/classic-portrait/genetics/6.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/6.png.
+
+Use case: precise-object-edit. EDIT TARGET is the provided watercolor landscape. Output exactly ONE full-canvas 1024x1536 portrait background PNG. Remove ONLY the close large fir trees at the extreme left and right edges and the foreground moss rocks ferns across the bottom. Reconstruct the sky and distant misty mountain/forest valley seamlessly behind the removed foreground, all the way to canvas edges. Preserve the existing distant ridge horizon position, colors, time of day, lighting, moon/sun/stars if present, delicate paper watercolor texture and open central typography area. Do not add clouds, rain or lightning; those are separate layers. No new large trees, no text, frame or montage. Opaque full-canvas background. This is the rear half of a two-layer split: all close trees and plants will be on a separate transparent foreground PNG. Save a local PNG and return path.
+
+Generierte Datei: exec-89dfe897-310e-4c41-a30d-7cdb9ef9dfee.png.
+
+### Split: layouts/classic-portrait/genetics/7.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/7.png.
+
+Use case: precise-object-edit. EDIT TARGET is the provided watercolor landscape. Output exactly ONE full-canvas 1024x1536 portrait background PNG. Remove ONLY the close large fir trees at the extreme left and right edges and the foreground moss rocks ferns across the bottom. Reconstruct the sky and distant misty mountain/forest valley seamlessly behind the removed foreground, all the way to canvas edges. Preserve the existing distant ridge horizon position, colors, time of day, lighting, moon/sun/stars if present, delicate paper watercolor texture and open central typography area. Do not add clouds, rain or lightning; those are separate layers. No new large trees, no text, frame or montage. Opaque full-canvas background. This is the rear half of a two-layer split: all close trees and plants will be on a separate transparent foreground PNG. Save a local PNG and return path.
+
+Generierte Datei: exec-c2a143cb-2516-4f3b-8f95-6c376281600f.png.
+
+### Split: layouts/classic-portrait/foreground/1.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/1.png.
+
+Use case: background-extraction. EDIT TARGET is provided watercolor forest. Output ONE transparent foreground PNG with full original portrait canvas 1024x1536. Extract ONLY large close fir trees left/right edges and close bottom moss rocks ferns. Erase ALL sky, mountain ridges, mist and distant small forest completely to alpha zero. Retain original positions, full canvas, exact scale, fine needle silhouettes, watercolor texture and original time-of-day colors/lighting. No gray/white matte, haze or residual background across the open center. Do not recenter, crop or add anything. This layer sits above weather on the separately reconstructed rear landscape. Genuine transparent PNG; save local file and return path.
+
+Generierte Datei: exec-8bd0e6fc-e3b5-4e85-bdeb-6897e5a176c0.png.
+
+### Split: layouts/classic-portrait/foreground/2.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/2.png.
+
+Use case: background-extraction. EDIT TARGET is provided watercolor forest. Output ONE transparent foreground PNG with full original portrait canvas 1024x1536. Extract ONLY large close fir trees left/right edges and close bottom moss rocks ferns. Erase ALL sky, mountain ridges, mist and distant small forest completely to alpha zero. Retain original positions, full canvas, exact scale, fine needle silhouettes, watercolor texture and original time-of-day colors/lighting. No gray/white matte, haze or residual background across the open center. Do not recenter, crop or add anything. This layer sits above weather on the separately reconstructed rear landscape. Genuine transparent PNG; save local file and return path.
+
+Generierte Datei: exec-7546c615-f702-4602-9416-0cd43a49838c.png.
+
+### Split: layouts/classic-portrait/foreground/3.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/3.png.
+
+Use case: background-extraction. EDIT TARGET is provided watercolor forest. Output ONE transparent foreground PNG with full original portrait canvas 1024x1536. Extract ONLY large close fir trees left/right edges and close bottom moss rocks ferns. Erase ALL sky, mountain ridges, mist and distant small forest completely to alpha zero. Retain original positions, full canvas, exact scale, fine needle silhouettes, watercolor texture and original time-of-day colors/lighting. No gray/white matte, haze or residual background across the open center. Do not recenter, crop or add anything. This layer sits above weather on the separately reconstructed rear landscape. Genuine transparent PNG; save local file and return path.
+
+Generierte Datei: exec-cf15cea8-4976-4348-80bb-75d8cb29e533.png.
+
+### Split: layouts/classic-portrait/foreground/5.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/5.png.
+
+Use case: background-extraction. EDIT TARGET is provided watercolor forest. Output ONE transparent foreground PNG with full original portrait canvas 1024x1536. Extract ONLY large close fir trees left/right edges and close bottom moss rocks ferns. Erase ALL sky, mountain ridges, mist and distant small forest completely to alpha zero. Retain original positions, full canvas, exact scale, fine needle silhouettes, watercolor texture and original time-of-day colors/lighting. No gray/white matte, haze or residual background across the open center. Do not recenter, crop or add anything. This layer sits above weather on the separately reconstructed rear landscape. Genuine transparent PNG; save local file and return path.
+
+Generierte Datei: exec-f140eede-56af-4fc1-9fe7-753cace9055d.png.
+
+### Split: layouts/classic-portrait/foreground/6.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/6.png.
+
+Use case: background-extraction. EDIT TARGET is provided watercolor forest. Output ONE transparent foreground PNG with full original portrait canvas 1024x1536. Extract ONLY large close fir trees left/right edges and close bottom moss rocks ferns. Erase ALL sky, mountain ridges, mist and distant small forest completely to alpha zero. Retain original positions, full canvas, exact scale, fine needle silhouettes, watercolor texture and original time-of-day colors/lighting. No gray/white matte, haze or residual background across the open center. Do not recenter, crop or add anything. This layer sits above weather on the separately reconstructed rear landscape. Genuine transparent PNG; save local file and return path.
+
+Generierte Datei: exec-3bfcc212-9879-4de2-bb1a-f2d829d57226.png.
+
+### Split: layouts/classic-portrait/foreground/7.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/7.png.
+
+Use case: background-extraction. EDIT TARGET is provided watercolor forest. Output ONE transparent foreground PNG with full original portrait canvas 1024x1536. Extract ONLY large close fir trees left/right edges and close bottom moss rocks ferns. Erase ALL sky, mountain ridges, mist and distant small forest completely to alpha zero. Retain original positions, full canvas, exact scale, fine needle silhouettes, watercolor texture and original time-of-day colors/lighting. No gray/white matte, haze or residual background across the open center. Do not recenter, crop or add anything. This layer sits above weather on the separately reconstructed rear landscape. Genuine transparent PNG; save local file and return path.
+
+Generierte Datei: exec-f9391651-e7c3-4c24-98b0-8afaed4ee813.png.
+
+### Split: layouts/classic-portrait/foreground/4.png
+
+Edit target: bisherige vollständige Landschaft layouts/classic-portrait/genetics/4.png.
+
+Extract close trees and bottom plants preserving full canvas and golden afternoon colors; remove sky and distant landscape to alpha transparency.
+
+Generierte Datei: exec-df42a7d1-46c3-489a-bf70-a5c10963e6f6.png.
+
+### Split: layouts/wide-landscape/genetics/1.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/1.png.
+
+Use case: precise-object-edit. Create the BACKGROUND half of a two-layer split of the provided watercolor edit target. Full original landscape canvas exactly 1536x1024. Remove the close large fir trees at extreme left/right edges and the near ground moss rocks ferns at bottom. Seamlessly reconstruct sky, distant mountain/forest ridges and misty valley in those areas to all canvas edges. Preserve original time-of-day palette, watercolor paper texture, distant horizon coordinates and lighting, moon/sun/stars if present. Retain open quiet center. No large foreground trees, plants, rocks, clouds, rain, lightning, text or border. Opaque full-canvas background. Save local PNG and return path.
+
+Generierte Datei: exec-6028f115-7264-48c6-9d48-54a69823e877.png.
+
+### Split: layouts/wide-landscape/genetics/2.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/2.png.
+
+Use case: precise-object-edit. Create the BACKGROUND half of a two-layer split of the provided watercolor edit target. Full original landscape canvas exactly 1536x1024. Remove the close large fir trees at extreme left/right edges and the near ground moss rocks ferns at bottom. Seamlessly reconstruct sky, distant mountain/forest ridges and misty valley in those areas to all canvas edges. Preserve original time-of-day palette, watercolor paper texture, distant horizon coordinates and lighting, moon/sun/stars if present. Retain open quiet center. No large foreground trees, plants, rocks, clouds, rain, lightning, text or border. Opaque full-canvas background. Save local PNG and return path.
+
+Generierte Datei: exec-75342a6c-15a8-4d82-a059-024abf2e6320.png.
+
+### Split: layouts/wide-landscape/genetics/3.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/3.png.
+
+Use case: precise-object-edit. Create the BACKGROUND half of a two-layer split of the provided watercolor edit target. Full original landscape canvas exactly 1536x1024. Remove the close large fir trees at extreme left/right edges and the near ground moss rocks ferns at bottom. Seamlessly reconstruct sky, distant mountain/forest ridges and misty valley in those areas to all canvas edges. Preserve original time-of-day palette, watercolor paper texture, distant horizon coordinates and lighting, moon/sun/stars if present. Retain open quiet center. No large foreground trees, plants, rocks, clouds, rain, lightning, text or border. Opaque full-canvas background. Save local PNG and return path.
+
+Generierte Datei: exec-1db2241c-9a38-4581-906b-138d0d5558ed.png.
+
+### Split: layouts/wide-landscape/genetics/4.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/4.png.
+
+Use case: precise-object-edit. Create the BACKGROUND half of a two-layer split of the provided watercolor edit target. Full original landscape canvas exactly 1536x1024. Remove the close large fir trees at extreme left/right edges and the near ground moss rocks ferns at bottom. Seamlessly reconstruct sky, distant mountain/forest ridges and misty valley in those areas to all canvas edges. Preserve original time-of-day palette, watercolor paper texture, distant horizon coordinates and lighting, moon/sun/stars if present. Retain open quiet center. No large foreground trees, plants, rocks, clouds, rain, lightning, text or border. Opaque full-canvas background. Save local PNG and return path.
+
+Generierte Datei: exec-51fd209d-3207-4f88-b521-82de9716b533.png.
+
+### Split: layouts/wide-landscape/genetics/5.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/5.png.
+
+Use case: precise-object-edit. Create the BACKGROUND half of a two-layer split of the provided watercolor edit target. Full original landscape canvas exactly 1536x1024. Remove the close large fir trees at extreme left/right edges and the near ground moss rocks ferns at bottom. Seamlessly reconstruct sky, distant mountain/forest ridges and misty valley in those areas to all canvas edges. Preserve original time-of-day palette, watercolor paper texture, distant horizon coordinates and lighting, moon/sun/stars if present. Retain open quiet center. No large foreground trees, plants, rocks, clouds, rain, lightning, text or border. Opaque full-canvas background. Save local PNG and return path.
+
+Generierte Datei: exec-a1ceddfa-a28a-479f-8bbb-214412f4c008.png.
+
+### Split: layouts/wide-landscape/genetics/6.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/6.png.
+
+Use case: precise-object-edit. Create the BACKGROUND half of a two-layer split of the provided watercolor edit target. Full original landscape canvas exactly 1536x1024. Remove the close large fir trees at extreme left/right edges and the near ground moss rocks ferns at bottom. Seamlessly reconstruct sky, distant mountain/forest ridges and misty valley in those areas to all canvas edges. Preserve original time-of-day palette, watercolor paper texture, distant horizon coordinates and lighting, moon/sun/stars if present. Retain open quiet center. No large foreground trees, plants, rocks, clouds, rain, lightning, text or border. Opaque full-canvas background. Save local PNG and return path.
+
+Generierte Datei: exec-5768a5d3-1399-43ff-89cc-7617f6526b47.png.
+
+### Split: layouts/wide-landscape/genetics/7.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/7.png.
+
+Use case: precise-object-edit. Create the BACKGROUND half of a two-layer split of the provided watercolor edit target. Full original landscape canvas exactly 1536x1024. Remove the close large fir trees at extreme left/right edges and the near ground moss rocks ferns at bottom. Seamlessly reconstruct sky, distant mountain/forest ridges and misty valley in those areas to all canvas edges. Preserve original time-of-day palette, watercolor paper texture, distant horizon coordinates and lighting, moon/sun/stars if present. Retain open quiet center. No large foreground trees, plants, rocks, clouds, rain, lightning, text or border. Opaque full-canvas background. Save local PNG and return path.
+
+Generierte Datei: exec-98b68623-fd8d-4e70-8327-ff2707f7120e.png.
+
+### Split: layouts/wide-landscape/foreground/1.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/1.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided edit target. Keep full original landscape canvas exactly 1536x1024 and all original positions. Retain ONLY close large fir trees framing far left/right edges and the close ground with moss rocks ferns along bottom. Erase sky, distant mountain ridges, valley mist and distant small trees completely to alpha zero. Preserve fine branch silhouettes, watercolor textures, original time-of-day colors and lighting. No matte, gray haze or background across open center; real alpha transparency. Do not recenter or crop objects. No additions or text. Save a local PNG and return path.
+
+Generierte Datei: exec-3c36c65a-dc49-4184-94eb-826da88df11e.png.
+
+### Split: layouts/wide-landscape/foreground/2.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/2.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided edit target. Keep full original landscape canvas exactly 1536x1024 and all original positions. Retain ONLY close large fir trees framing far left/right edges and the close ground with moss rocks ferns along bottom. Erase sky, distant mountain ridges, valley mist and distant small trees completely to alpha zero. Preserve fine branch silhouettes, watercolor textures, original time-of-day colors and lighting. No matte, gray haze or background across open center; real alpha transparency. Do not recenter or crop objects. No additions or text. Save a local PNG and return path.
+
+Generierte Datei: exec-5f10e0c5-ebde-444f-af90-6b33fec38ad5.png.
+
+### Split: layouts/wide-landscape/foreground/3.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/3.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided edit target. Keep full original landscape canvas exactly 1536x1024 and all original positions. Retain ONLY close large fir trees framing far left/right edges and the close ground with moss rocks ferns along bottom. Erase sky, distant mountain ridges, valley mist and distant small trees completely to alpha zero. Preserve fine branch silhouettes, watercolor textures, original time-of-day colors and lighting. No matte, gray haze or background across open center; real alpha transparency. Do not recenter or crop objects. No additions or text. Save a local PNG and return path.
+
+Generierte Datei: exec-80c823e1-afe6-47c1-b5ed-17cf6222525d.png.
+
+### Split: layouts/wide-landscape/foreground/4.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/4.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided edit target. Keep full original landscape canvas exactly 1536x1024 and all original positions. Retain ONLY close large fir trees framing far left/right edges and the close ground with moss rocks ferns along bottom. Erase sky, distant mountain ridges, valley mist and distant small trees completely to alpha zero. Preserve fine branch silhouettes, watercolor textures, original time-of-day colors and lighting. No matte, gray haze or background across open center; real alpha transparency. Do not recenter or crop objects. No additions or text. Save a local PNG and return path.
+
+Generierte Datei: exec-2c128cc0-fd9d-48a4-934d-c3ae6a5f6b7b.png.
+
+### Split: layouts/wide-landscape/foreground/5.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/5.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided edit target. Keep full original landscape canvas exactly 1536x1024 and all original positions. Retain ONLY close large fir trees framing far left/right edges and the close ground with moss rocks ferns along bottom. Erase sky, distant mountain ridges, valley mist and distant small trees completely to alpha zero. Preserve fine branch silhouettes, watercolor textures, original time-of-day colors and lighting. No matte, gray haze or background across open center; real alpha transparency. Do not recenter or crop objects. No additions or text. Save a local PNG and return path.
+
+Generierte Datei: exec-66a64f8a-1924-4d91-9778-0a14f354050a.png.
+
+### Split: layouts/wide-landscape/foreground/6.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/6.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided edit target. Keep full original landscape canvas exactly 1536x1024 and all original positions. Retain ONLY close large fir trees framing far left/right edges and the close ground with moss rocks ferns along bottom. Erase sky, distant mountain ridges, valley mist and distant small trees completely to alpha zero. Preserve fine branch silhouettes, watercolor textures, original time-of-day colors and lighting. No matte, gray haze or background across open center; real alpha transparency. Do not recenter or crop objects. No additions or text. Save a local PNG and return path.
+
+Generierte Datei: exec-21ba86d5-5c7d-4bf7-8f5b-35d004018fc5.png.
+
+### Split: layouts/wide-landscape/foreground/7.png
+
+Edit target: bisherige vollständige Landschaft layouts/wide-landscape/genetics/7.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided edit target. Keep full original landscape canvas exactly 1536x1024 and all original positions. Retain ONLY close large fir trees framing far left/right edges and the close ground with moss rocks ferns along bottom. Erase sky, distant mountain ridges, valley mist and distant small trees completely to alpha zero. Preserve fine branch silhouettes, watercolor textures, original time-of-day colors and lighting. No matte, gray haze or background across open center; real alpha transparency. Do not recenter or crop objects. No additions or text. Save a local PNG and return path.
+
+Generierte Datei: exec-8b709ee9-55d9-45c1-b913-f60cbe64104b.png.
+
+### Split: layouts/round-lid/genetics/1.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/1.png.
+
+Use case: precise-object-edit. Create BACKGROUND half of a two-layer split of provided circular watercolor edit target. Keep exact original square canvas 1254x1254, with same centered circle boundary and transparent outside. Remove ONLY close large fir trees left/right and near bottom moss rocks ferns. Reconstruct the sky and distant mountain forest misty valley behind them continuously to circle edge. Preserve original distant ridge horizon positions, colors, time of day, lighting, watercolor texture and moon/sun/stars if present. No clouds, rain, lightning, large foreground trees or plants, lettering or border. Interior circle opaque, outside circle alpha zero. Save local PNG and return path.
+
+Generierte Datei: exec-9608eef1-293c-419a-99b9-36072d545d52.png.
+
+### Split: layouts/round-lid/genetics/2.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/2.png.
+
+Use case: precise-object-edit. Create BACKGROUND half of a two-layer split of provided circular watercolor edit target. Keep exact original square canvas 1254x1254, with same centered circle boundary and transparent outside. Remove ONLY close large fir trees left/right and near bottom moss rocks ferns. Reconstruct the sky and distant mountain forest misty valley behind them continuously to circle edge. Preserve original distant ridge horizon positions, colors, time of day, lighting, watercolor texture and moon/sun/stars if present. No clouds, rain, lightning, large foreground trees or plants, lettering or border. Interior circle opaque, outside circle alpha zero. Save local PNG and return path.
+
+Generierte Datei: exec-ea47e956-3a94-48a9-9655-c284491edc9f.png.
+
+### Split: layouts/round-lid/genetics/3.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/3.png.
+
+Use case: precise-object-edit. Create BACKGROUND half of a two-layer split of provided circular watercolor edit target. Keep exact original square canvas 1254x1254, with same centered circle boundary and transparent outside. Remove ONLY close large fir trees left/right and near bottom moss rocks ferns. Reconstruct the sky and distant mountain forest misty valley behind them continuously to circle edge. Preserve original distant ridge horizon positions, colors, time of day, lighting, watercolor texture and moon/sun/stars if present. No clouds, rain, lightning, large foreground trees or plants, lettering or border. Interior circle opaque, outside circle alpha zero. Save local PNG and return path.
+
+Generierte Datei: exec-cefbf9fb-db17-4985-bcb4-e367ad491c6d.png.
+
+### Split: layouts/round-lid/genetics/4.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/4.png.
+
+Use case: precise-object-edit. Create BACKGROUND half of a two-layer split of provided circular watercolor edit target. Keep exact original square canvas 1254x1254, with same centered circle boundary and transparent outside. Remove ONLY close large fir trees left/right and near bottom moss rocks ferns. Reconstruct the sky and distant mountain forest misty valley behind them continuously to circle edge. Preserve original distant ridge horizon positions, colors, time of day, lighting, watercolor texture and moon/sun/stars if present. No clouds, rain, lightning, large foreground trees or plants, lettering or border. Interior circle opaque, outside circle alpha zero. Save local PNG and return path.
+
+Generierte Datei: exec-ca95d8d8-9be9-4513-8f74-47f35b953186.png.
+
+### Split: layouts/round-lid/genetics/5.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/5.png.
+
+Use case: precise-object-edit. Create BACKGROUND half of a two-layer split of provided circular watercolor edit target. Keep exact original square canvas 1254x1254, with same centered circle boundary and transparent outside. Remove ONLY close large fir trees left/right and near bottom moss rocks ferns. Reconstruct the sky and distant mountain forest misty valley behind them continuously to circle edge. Preserve original distant ridge horizon positions, colors, time of day, lighting, watercolor texture and moon/sun/stars if present. No clouds, rain, lightning, large foreground trees or plants, lettering or border. Interior circle opaque, outside circle alpha zero. Save local PNG and return path.
+
+Generierte Datei: exec-559b2f24-fbef-4c84-bdcd-f16af80cf437.png.
+
+### Split: layouts/round-lid/genetics/6.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/6.png.
+
+Use case: precise-object-edit. Create BACKGROUND half of a two-layer split of provided circular watercolor edit target. Keep exact original square canvas 1254x1254, with same centered circle boundary and transparent outside. Remove ONLY close large fir trees left/right and near bottom moss rocks ferns. Reconstruct the sky and distant mountain forest misty valley behind them continuously to circle edge. Preserve original distant ridge horizon positions, colors, time of day, lighting, watercolor texture and moon/sun/stars if present. No clouds, rain, lightning, large foreground trees or plants, lettering or border. Interior circle opaque, outside circle alpha zero. Save local PNG and return path.
+
+Generierte Datei: exec-d7f07aa9-f0f2-4deb-bddb-b8f0845fba70.png.
+
+### Split: layouts/round-lid/genetics/7.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/7.png.
+
+Use case: precise-object-edit. Create BACKGROUND half of a two-layer split of provided circular watercolor edit target. Keep exact original square canvas 1254x1254, with same centered circle boundary and transparent outside. Remove ONLY close large fir trees left/right and near bottom moss rocks ferns. Reconstruct the sky and distant mountain forest misty valley behind them continuously to circle edge. Preserve original distant ridge horizon positions, colors, time of day, lighting, watercolor texture and moon/sun/stars if present. No clouds, rain, lightning, large foreground trees or plants, lettering or border. Interior circle opaque, outside circle alpha zero. Save local PNG and return path.
+
+Generierte Datei: exec-773e7e3a-8fa2-411e-9685-5b6103470a75.png.
+
+### Split: layouts/round-lid/foreground/1.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/1.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided circular watercolor landscape edit target. Keep exact original square canvas 1254x1254 and original circle boundary and tree coordinates. Retain ONLY the CLOSE large fir trees along the left/right circular edges and close bottom moss rocks ferns. Erase ALL sky, distant mountain ridges, valley mist and far smaller forest to completely transparent alpha zero; keep the center fully transparent. Preserve original fine branch silhouettes, watercolor texture, time-of-day color and lighting. Keep outside the original circle fully transparent. Do not recenter, crop or enlarge. No matte, haze, frame, text or additions. Save local PNG and return path.
+
+Generierte Datei: exec-111ec3b9-a200-4aaf-af5b-d9058bd27f67.png.
+
+### Split: layouts/round-lid/foreground/2.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/2.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided circular watercolor landscape edit target. Keep exact original square canvas 1254x1254 and original circle boundary and tree coordinates. Retain ONLY the CLOSE large fir trees along the left/right circular edges and close bottom moss rocks ferns. Erase ALL sky, distant mountain ridges, valley mist and far smaller forest to completely transparent alpha zero; keep the center fully transparent. Preserve original fine branch silhouettes, watercolor texture, time-of-day color and lighting. Keep outside the original circle fully transparent. Do not recenter, crop or enlarge. No matte, haze, frame, text or additions. Save local PNG and return path.
+
+Generierte Datei: exec-c23dabce-b00c-46d0-8851-22af21ac7943.png.
+
+### Split: layouts/round-lid/foreground/3.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/3.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided circular watercolor landscape edit target. Keep exact original square canvas 1254x1254 and original circle boundary and tree coordinates. Retain ONLY the CLOSE large fir trees along the left/right circular edges and close bottom moss rocks ferns. Erase ALL sky, distant mountain ridges, valley mist and far smaller forest to completely transparent alpha zero; keep the center fully transparent. Preserve original fine branch silhouettes, watercolor texture, time-of-day color and lighting. Keep outside the original circle fully transparent. Do not recenter, crop or enlarge. No matte, haze, frame, text or additions. Save local PNG and return path.
+
+Generierte Datei: exec-cd7e32a5-50a0-4cdd-9fa2-779d521935d1.png.
+
+### Split: layouts/round-lid/foreground/4.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/4.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided circular watercolor landscape edit target. Keep exact original square canvas 1254x1254 and original circle boundary and tree coordinates. Retain ONLY the CLOSE large fir trees along the left/right circular edges and close bottom moss rocks ferns. Erase ALL sky, distant mountain ridges, valley mist and far smaller forest to completely transparent alpha zero; keep the center fully transparent. Preserve original fine branch silhouettes, watercolor texture, time-of-day color and lighting. Keep outside the original circle fully transparent. Do not recenter, crop or enlarge. No matte, haze, frame, text or additions. Save local PNG and return path.
+
+Generierte Datei: exec-c64cd2e1-8fbb-4cc6-9d68-596b9665fc8f.png.
+
+### Split: layouts/round-lid/foreground/5.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/5.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided circular watercolor landscape edit target. Keep exact original square canvas 1254x1254 and original circle boundary and tree coordinates. Retain ONLY the CLOSE large fir trees along the left/right circular edges and close bottom moss rocks ferns. Erase ALL sky, distant mountain ridges, valley mist and far smaller forest to completely transparent alpha zero; keep the center fully transparent. Preserve original fine branch silhouettes, watercolor texture, time-of-day color and lighting. Keep outside the original circle fully transparent. Do not recenter, crop or enlarge. No matte, haze, frame, text or additions. Save local PNG and return path.
+
+Generierte Datei: exec-37f5c174-fe13-484c-bdf8-d3223341259c.png.
+
+### Split: layouts/round-lid/foreground/6.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/6.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided circular watercolor landscape edit target. Keep exact original square canvas 1254x1254 and original circle boundary and tree coordinates. Retain ONLY the CLOSE large fir trees along the left/right circular edges and close bottom moss rocks ferns. Erase ALL sky, distant mountain ridges, valley mist and far smaller forest to completely transparent alpha zero; keep the center fully transparent. Preserve original fine branch silhouettes, watercolor texture, time-of-day color and lighting. Keep outside the original circle fully transparent. Do not recenter, crop or enlarge. No matte, haze, frame, text or additions. Save local PNG and return path.
+
+Generierte Datei: exec-ebd38075-2442-4889-a291-3f82bbb8edb0.png.
+
+### Split: layouts/round-lid/foreground/7.png
+
+Edit target: bisherige vollständige Landschaft layouts/round-lid/genetics/7.png.
+
+Use case: background-extraction. Extract a transparent FOREGROUND PNG from the provided circular watercolor landscape edit target. Keep exact original square canvas 1254x1254 and original circle boundary and tree coordinates. Retain ONLY the CLOSE large fir trees along the left/right circular edges and close bottom moss rocks ferns. Erase ALL sky, distant mountain ridges, valley mist and far smaller forest to completely transparent alpha zero; keep the center fully transparent. Preserve original fine branch silhouettes, watercolor texture, time-of-day color and lighting. Keep outside the original circle fully transparent. Do not recenter, crop or enlarge. No matte, haze, frame, text or additions. Save local PNG and return path.
+
+Generierte Datei: exec-5ff98a16-8c73-4e20-83f6-a2e2806101cb.png.

@@ -56,11 +56,12 @@ test('Watercolor Forest enthält drei illustrierte Layouts mit je sieben tatsäc
   for (const layout of pack.layouts) {
     const base = rgbaPixels(await readFile(new URL(layout.layers.base, watercolorRoot)), layout.layers.base);
     assert.equal(base.width, layout.width); assert.equal(base.height, layout.height);
-    for (const layer of ['genetics', 'thc', 'cbd']) {
+    for (const layer of ['genetics', 'thc', 'cbd', 'foreground']) {
       const signatures = new Set();
       for (const [index, path] of layout.layers[layer].entries()) {
         const { width, height, pixels } = rgbaPixels(await readFile(new URL(path, watercolorRoot)), path);
         assert.equal(width, layout.width, path); assert.equal(height, layout.height, path);
+        if(layer==='foreground')assert.equal(pixels[(Math.floor(height*.3)*width+Math.floor(width*.5))*4+3],0,`${path}: freie transparente Mitte`);
         signatures.add(createHash('sha256').update(pixels).digest('hex'));
         if (layer !== 'genetics') {
           let transparent = 0, painted = 0;
@@ -89,7 +90,7 @@ test('Watercolor Forest lässt sich vollständig innerhalb der Browser-Limits al
   const manager = new TexturePackManager({ catalogUrl: new URL('catalog.json', root), fetchImpl, importedStore: null });
   t.after(() => manager.dispose());
   assert.ok((await manager.listPacks()).some(pack => pack.id === 'watercolor-forest' && pack.source === 'bundled'));
-  const zip = await manager.exportPack('watercolor-forest', '1.0.0');
+  const zip = await manager.exportPack('watercolor-forest', '1.1.0');
   assert.ok(zip.size <= ARCHIVE_LIMITS.archiveBytes, 'Ausgeliefertes Pack bleibt importierbar');
   const restored = await inspectPackArchive(zip);
   assert.equal(restored.manifest.layouts.length, 3);

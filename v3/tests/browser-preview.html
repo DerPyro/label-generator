@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Slider preview checks</title>
+<body><h1>Slider preview checks</h1><pre id="results">Running …</pre>
+<script type="module">
+const saved=localStorage.getItem('label-generator-v3-language'),cart=localStorage.getItem('label-generator-v3-print-cart');
+const frame=document.createElement('iframe');frame.style.cssText='width:390px;height:900px';
+const checks=[],assert=(ok,message)=>{if(!ok)throw Error(message);};
+async function until(fn){for(let i=0;i<1500;i++){if(fn())return;await new Promise(resolve=>setTimeout(resolve,20));}throw Error('Timed out');}
+async function check(name,fn){try{await fn();checks.push('PASS '+name);}catch(error){checks.push('FAIL '+name+': '+error.message);}document.querySelector('#results').textContent=checks.join('\n');}
+try{
+ localStorage.setItem('label-generator-v3-language','de');localStorage.removeItem('label-generator-v3-print-cart');
+ const loaded=new Promise(resolve=>frame.onload=resolve);frame.src='../index.html';document.body.append(frame);await loaded;
+ const doc=frame.contentDocument,win=frame.contentWindow;await until(()=>!doc.querySelector('#export').disabled);
+ const requests=[],NativeImage=win.Image;
+ win.Image=class extends NativeImage{set src(value){requests.push(value);super.src=value;}get src(){return super.src;}};
+ await check('Dragging skips intermediate PNG requests and shows the final value',async()=>{
+  const slider=doc.querySelector('#thc');const start=performance.now();
+  for(const value of [1,7,13,25,31]){slider.value=value;slider.dispatchEvent(new win.Event('input',{bubbles:true}));await new Promise(resolve=>setTimeout(resolve,30));}
+  slider.value='37';slider.dispatchEvent(new win.Event('input',{bubbles:true}));
+  assert(doc.querySelector('#thc-output').value==='37','Slider readout is delayed');
+  assert(doc.querySelector('#export').disabled,'Old preview can be exported during pending input');
+  slider.dispatchEvent(new win.Event('change',{bubbles:true}));
+  await until(()=>!doc.querySelector('#export').disabled);
+  const pngs=requests.filter(url=>url.includes('/thc/'));
+  assert(pngs.length===1,'Requested '+pngs.length+' THC images instead of only the final stage');
+  assert(pngs[0].includes('/7.png'),'Wrong final stage');
+  assert(doc.querySelector('#preview').getAttribute('aria-label').includes('37'),'Final text is stale');
+  checks.push('INFO Final update '+Math.round(performance.now()-start)+' ms; '+pngs.length+' PNG request');
+ });
+ await check('Cached values stay responsive and quantity changes keep the current label valid',async()=>{
+  const before=requests.length,slider=doc.querySelector('#thc');slider.value='38';slider.dispatchEvent(new win.Event('input',{bubbles:true}));
+  await until(()=>!doc.querySelector('#export').disabled);
+  assert(requests.length===before,'Same stage downloaded again');
+  assert(doc.querySelector('#preview').getAttribute('aria-label').includes('38'),'Debounced update did not finish');
+ });
+}finally{
+ frame.remove();if(saved===null)localStorage.removeItem('label-generator-v3-language');else localStorage.setItem('label-generator-v3-language',saved);
+ if(cart===null)localStorage.removeItem('label-generator-v3-print-cart');else localStorage.setItem('label-generator-v3-print-cart',cart);
+}
+document.querySelector('#results').textContent=checks.join('\n');document.body.dataset.testStatus=checks.some(x=>x.startsWith('FAIL'))?'failed':'passed';
+</script></body></html>

@@ -1,3 +1,4 @@
+import { validateSpriteOrder } from './sprite-order.js';
 import { normalizeInput } from './model.js';
 
 const clone = value => JSON.parse(JSON.stringify(value));
@@ -16,7 +17,7 @@ export function validateCartEntry(value) {
   const widthMm = Number(value.widthMm ?? 60);
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 999) throw new Error('Die Stückzahl muss zwischen 1 und 999 liegen.');
   if (!Number.isFinite(widthMm) || widthMm < 1 || widthMm > 300) throw new Error('Die Etikettengröße muss zwischen 1 und 300 mm liegen.');
-  return { id, data: normalizeInput(value.data), packId, packVersion, layoutId, quantity, widthMm };
+  return { id, data: normalizeInput(value.data), packId, packVersion, layoutId, quantity, widthMm, ...(value.spriteOrder === undefined ? {} : {spriteOrder: validateSpriteOrder(value.spriteOrder)}) };
 }
 
 export class PrintCartService {

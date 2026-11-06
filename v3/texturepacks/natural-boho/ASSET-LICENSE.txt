@@ -1,0 +1,24 @@
+Natural Boho 1.1.0
+
+Illustrations
+The separate paper bases and full-canvas botanical foregrounds (v1.1), all day-cycle, smoke and botanical sprites, and the four
+decorative sprites were generated for this pack with OpenAI's built-in Imagegen
+tool on 2026-11-06, using the user's Natural Boho art direction. No third-party
+illustration was copied. PROMPTS.md records the production prompts.
+The pack authors make their rights, if any, in these generated illustrations
+available under CC0 1.0 Universal:
+https://creativecommons.org/publicdomain/zero/1.0/
+AI-generated artwork may not be copyrightable in every jurisdiction.
+Previews are compositions of those assets and the separately licensed fonts.
+
+Shrikhand Regular (unmodified)
+Source: https://github.com/google/fonts/tree/main/ofl/shrikhand
+License: SIL Open Font License 1.1. Full notice: fonts/shrikhand/OFL.txt
+
+Lora (unmodified existing repository font)
+Source in repository: v3/assets/fonts/label-serif.ttf
+Upstream: https://github.com/cyrealtype/Lora-Cyrillic
+License: SIL Open Font License 1.1. Full notice: fonts/lora/OFL.txt
+
+Manifest and documentation: CC0 1.0 Universal, to the extent permitted by law.
+Font files retain their own licenses and are not relicensed under CC0.

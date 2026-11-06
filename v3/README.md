@@ -29,9 +29,11 @@ Die optionale Sortensuche übernimmt wie in v1 Kurzname, Seed-Produzent, THC, CB
 `data/strains.csv` ist die statisch ausgelieferte Kopie der Repository-Datei `strains.csv`. Nach Änderungen an dieser Quelldatei im Ordner `v3` einmal `npm run data:sync` ausführen und die aktualisierte Kopie mit veröffentlichen. Der Browser benötigt weiterhin keinen Build oder Serverdienst. Die eigene Browserprüfung steht unter `tests/browser-strains.html`.
 
 - Ein Canvas-Renderer mit benannten, dynamischen Layouts. **Watercolor Forest** bietet Hochformat (1024 × 1536 px), Querformat (1536 × 1024 px) und Rund (1254 × 1254 px) mit jeweils eigener illustrierter Komposition. Die beiden technischen Packs besitzen dieselben Layoutarten in 1200 × 1800, 1800 × 1200 beziehungsweise 1200 × 1200 px.
-- Jedes Pack enthält 66 Layer-PNGs: pro Layout eine Basis und je sieben Genetik-, THC- und CBD-Stufen. Über alle drei Packs sind es 198 Layer-PNGs; Vorschauen kommen hinzu. Die Illustrationen von Watercolor Forest sind KI-generierte Grafiken, keine menschlich gemalten Originalaquarelle.
-- Feste, inklusive Stufen: Genetik 14/29/44/59/74/89/100 %, THC 5/11/17/23/29/35/40 %, CBD 2/5/8/11/14/17/20 %. THC reicht bis 40 %, CBD bis 20 %; Werte zwischen Schwellen werden der nächsthöheren passenden Stufe zugeordnet, ohne Überblendung.
+- Watercolor Forest 1.1.0 enthält pro Layout eine Basis und je sieben Landschafts-, Wetter-, Baum-Vordergrund- und Ornamentstufen (29 PNGs, 87 für drei Layouts). Wolken liegen zwischen Landschaft und transparenten Bäumen. Andere Packs dürfen die optionale `foreground`-Ebene als festes PNG oder eigene Sativa-Skala nutzen. Die Illustrationen sind KI-generierte Grafiken, keine menschlich gemalten Originalaquarelle.
+- Eigene Skalen pro Pack, Layout und Kategorie: 1–64 Stufen mit exklusiven `below`-Grenzen und PNG-Pfaden für THC, CBD und den Sativa-Anteil. Der letzte Eintrag gilt für den restlichen Bereich. Beispiele in [TEXTUREPACKS.md](TEXTUREPACKS.md#5-dynamische-sprite-layer-und-frei-definierbare-skalen). Bestehende Packs verwenden weiterhin sieben Standardstufen.
+- Standardform mit inklusiven Stufen: Genetik 14/29/44/59/74/89/100 %, THC 5/11/17/23/29/35/40 %, CBD 2/5/8/11/14/17/20 %. THC reicht bis 40 %, CBD bis 20 %; Werte zwischen Schwellen werden der nächsthöheren passenden Stufe zugeordnet, ohne Überblendung.
 - Lokale Lora-Schriften unter SIL Open Font License, Sortenname, optionale Produzentenangabe, Live-Vorschau und PNG-Export.
+- Texturepack-Spezifikation 2 mit unabhängigen Textfeldern und mehreren lokalen Schriftfamilien, gemeinsamer zIndex-Reihenfolge für Texte und Sprites, PNG-/Flächenhintergründen, Dekorationen, Rotation und Kreisbogen-Text. Alte Packs benötigen eine Aktualisierung auf die neue Spezifikation.
 - Druckgröße in Millimetern, DPI-Anzeige, Warenkorb mit `localStorage`, Bearbeitung und Entfernung von Einträgen.
 - A4-Vorschau und PDF mit Hoch-/Querformat, automatischer 90°-Drehung rechteckiger Etiketten, Schnittmarken, Beschnitt und Kalibrierungsseite. Gemischte Größen sind standardmäßig aktiv; gleiche physische Maße können layout-, pack- und formübergreifend auf einem Bogen stehen. Beim PDF-Druck **„Tatsächliche Größe“ / 100 %** wählen, „An Seite anpassen“ ausschalten.
 - Manueller Druckbogeneditor: Etiketten mit Maus oder Touch verschieben, Position in Millimetern eingeben, Rechtecke drehen, per Pfeiltasten bewegen sowie Änderungen rückgängig machen/wiederholen. Leere Seiten hinzufügen und den automatischen Bogen wiederherstellen.
@@ -43,6 +45,7 @@ Beschnitt erweitert Randpixel außerhalb der unveränderten Schnittgröße. Tran
 
 - [Architektur und Grafikvertrag](ARCHITECTURE.md)
 - [Texturepack-Manifeste und Asset-Erstellung](TEXTUREPACKS.md)
+- [Texturepacks mit KI-Agenten erstellen](TEXTUREPACK_AI_GUIDE.md), [JSON Schema](schemas/texturepack.schema.json), [Funktionsbeispiel](examples/composition/README.md) und [kleine Vorlage](examples/template/README.md)
 - [Watercolor Forest: Layouts, Herkunft und Druck](texturepacks/watercolor-forest/README.md)
 - [Platzhalter und Grafikhinweise](assets/README.md)
 - [Ausgangszustand und ursprünglicher Implementierungsplan](BESTANDSAUFNAHME.md)

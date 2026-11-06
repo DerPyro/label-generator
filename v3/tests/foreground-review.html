@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="de"><meta charset="utf-8"><title>Watercolor · getrennte Bildebenen</title>
+<body style="font:16px system-ui;background:#f5f0e2;color:#203b34;margin:24px">
+<h1>Watercolor Forest · Hintergrund / Wolken / Vordergrund</h1><pre id="results">Prüfung läuft …</pre><div id="art"></div>
+<script type="module">
+import {validateManifest,resolvePackConfig} from '../src/texturepacks.js';
+import {renderLabel} from '../src/renderer.js';
+const root=new URL('../texturepacks/watercolor-forest/',import.meta.url);
+try{
+ const manifest=validateManifest(await(await fetch(new URL('pack.json',root))).json());
+ const sheet=document.createElement('canvas');sheet.width=1440;sheet.height=1580;const ctx=sheet.getContext('2d');ctx.fillStyle='#f5f0e2';ctx.fillRect(0,0,sheet.width,sheet.height);ctx.fillStyle='#203b34';ctx.font='28px Georgia';ctx.fillText('Watercolor Forest · Landschaft → Wolken → Bäume',24,42);
+ for(const [col,layout]of manifest.layouts.entries()){
+  const config=resolvePackConfig(manifest,layout.id,root);
+  for(const [row,sativa]of [0,50,100].entries()){
+   const canvas=document.createElement('canvas');await renderLabel(canvas,{name:'Wolken hinter Bäumen',year:2026,sativa,thc:40,cbd:0},{config,visibility:{text:false,cbd:false}});
+   const scale=Math.min(440/canvas.width,450/canvas.height),w=canvas.width*scale,h=canvas.height*scale,x=col*480+(480-w)/2,y=80+row*495+(450-h)/2;
+   ctx.drawImage(canvas,x,y,w,h);ctx.fillStyle='#203b34';ctx.font='16px system-ui';ctx.fillText(`${layout.name} · Sativa ${sativa} % · THC 40 %`,col*480+20,80+row*495+474);
+  }
+ }
+ document.querySelector('#art').append(sheet);sheet.style.cssText='width:100%;max-width:1100px;height:auto';window.__packArtifacts={'foreground-review.png':sheet.toDataURL()};
+ document.querySelector('#results').textContent='PASS Drei Layouts und drei Tageszeiten mit Wetter hinter dem transparenten Baum-Vordergrund.';document.body.dataset.testStatus='passed';
+}catch(error){document.querySelector('#results').textContent='FAIL '+error.message;document.body.dataset.testStatus='failed';}
+</script></body></html>

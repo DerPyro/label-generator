@@ -28,12 +28,12 @@ test('Alle Bundled-Packs haben gültige Manifeste und eigene Layouts', async () 
 test('Manifest weist ungültige Metadaten, Versionen, Formate, Grenzen und Layer zurück', async () => {
   const original = await readPack('woodland');
   const mutations = [
-    m => { m.id = '../bad'; }, m => { m.version = 'latest'; }, m => { m.compatibilityVersion = 2; },
+    m => { m.id = '../bad'; }, m => { m.version = 'latest'; }, m => { m.compatibilityVersion = 1; },
     m => { delete m.author; }, m => { m.layouts.push({...m.layouts[0],id:'bad/id'}); },
     m => { m.layouts.find(x => x.id === 'circular').height = 1300; }, m => { m.layouts.find(x => x.id === 'rectangular').width = -1; },
     m => { m.layouts.find(x => x.id === 'rectangular').layers.thc.pop(); }, m => { m.layouts.find(x => x.id === 'rectangular').layers.cbd[6] = m.layouts.find(x => x.id === 'rectangular').layers.cbd[0]; },
-    m => { m.layerOrder = ['base', 'text']; }, m => { m.layouts.find(x => x.id === 'rectangular').typography.name.maxLines = 0; },
-    m => { m.layouts.find(x => x.id === 'rectangular').typography.panels[0].width = 5000; },
+    m => { m.layerOrder = ['base', 'text']; }, m => { m.layouts.find(x => x.id === 'rectangular').typography.fields[0].maxLines = 0; },
+    m => { m.layouts.find(x => x.id === 'rectangular').typography.decorations[0].width = 9000; },
     m => { m.fonts[0].path = '../font.ttf'; }, m => { m.layouts.find(x => x.id === 'rectangular').masks = { bad: 'mask.png' }; },
   ];
   for (const mutate of mutations) { const pack = structuredClone(original); mutate(pack); assert.throws(() => validateManifest(pack)); }
@@ -59,11 +59,11 @@ test('Pack-Verwaltung lädt statisch, prüft Versionen und bewahrt Eingabedaten 
 });
 test('Projekt-Pages-Unterverzeichnisse und optionale Masken werden korrekt aufgelöst', async () => {
   const manifest = await readPack('woodland'); manifest.layouts.find(x => x.id === 'rectangular').masks = { thc: 'rectangular/sky-mask.png' };
-  manifest.layouts.find(x => x.id === 'rectangular').layerOrder = ['base', 'genetics', 'thc', 'text', 'cbd'];
+  manifest.layouts.find(x => x.id === 'rectangular').zIndex.cbd = 600;
   const config = resolvePackConfig(manifest, 'rectangular', 'https://user.github.io/label-generator/v3/texturepacks/woodland/');
   assert.equal(config.base.path, 'https://user.github.io/label-generator/v3/texturepacks/woodland/rectangular/base.png');
   assert.equal(config.masks.thc, 'https://user.github.io/label-generator/v3/texturepacks/woodland/rectangular/sky-mask.png');
-  assert.equal(config.layerOrder[3], 'text');
+  assert.equal(config.zIndex.cbd, 600);
 });
 test('Fehlende oder ungültige JSON-Dateien erzeugen kontrollierte Fehler', async () => {
   const missing = new TexturePackManager({ fetchImpl: async () => ({ ok: false, status: 404 }) });
@@ -76,11 +76,10 @@ test('Alle Sprite-PNGs sind vorhanden, RGBA und je Layout dimensionsgleich', asy
   let expected = 0;
   for (const id of bundledIds) {
     const manifest = await readPack(id);
-    expected += manifest.layouts.length * 22;
     for (const design of manifest.layouts) {
       const format = design.id;
-      const paths = [design.layers.base, ...design.layers.genetics, ...design.layers.thc, ...design.layers.cbd];
-      assert.equal(paths.length, 22); assert.equal(new Set(paths).size, 22);
+      const paths = [design.layers.base, ...design.layers.genetics, ...design.layers.thc, ...design.layers.cbd,...(design.layers.foreground?(Array.isArray(design.layers.foreground)?design.layers.foreground:[design.layers.foreground]):[])].map(entry=>typeof entry==='string'?entry:entry.asset);
+      expected+=paths.length;assert.equal(new Set(paths).size, paths.length);
       for (const path of paths) {
         const png = await readFile(new URL(`${id}/${path}`, packRoot)); total++;
         assert.equal(png.subarray(1, 4).toString(), 'PNG', path);
@@ -91,7 +90,6 @@ test('Alle Sprite-PNGs sind vorhanden, RGBA und je Layout dimensionsgleich', asy
     const font = await readFile(new URL(`${id}/${manifest.fonts[0].path}`, packRoot)); assert.ok(font.length > 1000);
   }
   assert.equal(total, expected);
-  assert.equal(total % 22, 0);
 });
 
 test('Dynamische Layouts erlauben freie IDs, Seitenverhältnisse und unabhängige Konturen', async () => {
@@ -116,14 +114,9 @@ test('Dynamische Layouts erlauben freie IDs, Seitenverhältnisse und unabhängig
   assert.equal(chooseComparableLayout([portrait], circle).id, 'classic-portrait');
 });
 
-test('Alte formats-Manifeste werden ohne Mutation in Layouts migriert', async () => {
-  const source = await readPack('woodland');
-  const formats = Object.fromEntries(source.layouts.filter(x => ['rectangular','circular'].includes(x.id)).map(({id,name,...design}) => [id,design]));
-  const legacy = {...source, formats}; delete legacy.layouts;
-  const before = structuredClone(legacy), normalized = validateManifest(legacy);
-  assert.deepEqual(legacy, before); assert.equal(normalized.formats, undefined);
-  assert.deepEqual(normalized.layouts.map(x => x.id), ['rectangular','circular']);
-  assert.equal(resolvePackConfig(legacy, 'circular', 'https://example.test/').shape, 'circle');
+test('Alte Manifeste werden mit Aktualisierungshinweis abgewiesen', async () => {
+  const source = await readPack('woodland'); source.compatibilityVersion=1;
+  assert.throws(()=>validateManifest(source),/compatibilityVersion 2.*aktualisieren/);
 });
 
 test('Ungültige und widersprüchliche dynamische Layoutdefinitionen werden abgefangen', async () => {
@@ -141,18 +134,4 @@ test('Ungültige und widersprüchliche dynamische Layoutdefinitionen werden abge
   const manifest = structuredClone(original); manifest.layouts[0].preview = 'preview.png'; manifest.layouts[0].bleedMm = 2;
   const config = resolvePackConfig(manifest, manifest.layouts[0].id, 'https://example.test/pack/');
   assert.equal(config.preview, 'https://example.test/pack/preview.png'); assert.equal(config.bleedMm, 2);
-});
-
-test('Nur alte formats binden Konturen an Formatnamen; dynamische IDs bleiben unabhängig', async () => {
-  const source = await readPack('woodland');
-  const legacy = {...source, formats:Object.fromEntries(source.layouts.filter(x=>['rectangular','circular'].includes(x.id)).map(({id,name,...design})=>[id,design]))};
-  delete legacy.layouts;
-  for(const [id,shape] of [['circular','rectangle'],['rectangular','circle']]){
-    const invalid=structuredClone(legacy);invalid.formats[id].shape=shape;
-    assert.throws(()=>validateManifest(invalid),/Kontur.*altes Format/);
-  }
-  const dynamic=structuredClone(source);dynamic.layouts=[{...structuredClone(source.layouts.find(x=>x.id==='circular')),shape:'rectangle'}];
-  assert.equal(validateManifest(dynamic).layouts[0].shape,'rectangle');
-  dynamic.layouts=[{...structuredClone(source.layouts.find(x=>x.id==='circular')),id:'rectangular'}];
-  assert.equal(validateManifest(dynamic).layouts[0].shape,'circle');
 });

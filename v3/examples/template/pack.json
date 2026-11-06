@@ -1,0 +1,79 @@
+{
+  "id": "starter-template",
+  "name": "Starter Template",
+  "description": "Kleines gültiges Ausgangspack mit einem Textfeld.",
+  "author": "label-generator contributors",
+  "version": "1.0.0",
+  "compatibilityVersion": 2,
+  "fonts": [
+    {
+      "family": "Lora",
+      "path": "fonts/lora/label-serif.ttf",
+      "weight": "400 700"
+    }
+  ],
+  "layouts": [
+    {
+      "id": "portrait",
+      "name": "Hochformat",
+      "width": 128,
+      "height": 192,
+      "shape": "rectangle",
+      "layers": {
+        "base": "layouts/portrait/base.png",
+        "genetics": [
+          "layouts/portrait/genetics/1.png",
+          "layouts/portrait/genetics/2.png",
+          "layouts/portrait/genetics/3.png",
+          "layouts/portrait/genetics/4.png",
+          "layouts/portrait/genetics/5.png",
+          "layouts/portrait/genetics/6.png",
+          "layouts/portrait/genetics/7.png"
+        ],
+        "thc": [
+          "layouts/portrait/thc/1.png",
+          "layouts/portrait/thc/2.png",
+          "layouts/portrait/thc/3.png",
+          "layouts/portrait/thc/4.png",
+          "layouts/portrait/thc/5.png",
+          "layouts/portrait/thc/6.png",
+          "layouts/portrait/thc/7.png"
+        ],
+        "cbd": [
+          "layouts/portrait/cbd/1.png",
+          "layouts/portrait/cbd/2.png",
+          "layouts/portrait/cbd/3.png",
+          "layouts/portrait/cbd/4.png",
+          "layouts/portrait/cbd/5.png",
+          "layouts/portrait/cbd/6.png",
+          "layouts/portrait/cbd/7.png"
+        ]
+      },
+      "zIndex": {
+        "base": 0,
+        "genetics": 100,
+        "thc": 200,
+        "cbd": 300
+      },
+      "typography": {
+        "fields": [
+          {
+            "id": "strain-name",
+            "source": "name",
+            "font": "Lora",
+            "x": 64,
+            "y": 82.56,
+            "fontSize": 16,
+            "minFontSize": 8,
+            "maxWidth": 102.4,
+            "maxLines": 2,
+            "lineHeight": 1.15,
+            "color": "#253e32",
+            "zIndex": 500
+          }
+        ],
+        "decorations": []
+      }
+    }
+  ]
+}

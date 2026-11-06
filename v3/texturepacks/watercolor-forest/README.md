@@ -4,7 +4,7 @@ Das erste illustrierte Texturepack für Label Generator v3 kombiniert Waldlandsc
 
 ## Aufbau
 
-Jedes Layout enthält eine Basisgrafik sowie sieben separat kombinierbare Stufen für Genetik, THC und CBD. Die globalen Stufengrenzen und die bestehende Canvas-Pipeline bleiben unverändert. Namen, Prozentwerte, Erntejahr und optionaler Seed-Produzent werden vom Renderer gesetzt; sie sind nicht Teil der Illustrationen.
+Seit Version 1.1.0 enthält jedes Layout eine Basisgrafik, sieben hintere Landschaften (Genetik), sieben Wetterstufen (THC), sieben transparente Baum-Vordergründe und sieben Ornamentstufen (CBD). Landschaft und Baumrahmen folgen denselben sieben Sativa-/Tageszeitstufen. Namen, Prozentwerte, Erntejahr und optionaler Seed-Produzent werden vom Renderer gesetzt; sie sind nicht Teil der Illustrationen.
 
 Die Layoutdefinitionen, Auflösungen, Textpositionen und Assetpfade stehen in `pack.json`. Alle Pfade sind relativ zu diesem Manifest, damit das Pack vollständig statisch auf GitHub Pages und als lokaler ZIP-Import funktioniert.
 
@@ -14,15 +14,21 @@ Die Layoutdefinitionen, Auflösungen, Textpositionen und Assetpfade stehen in `p
 | `wide-landscape` | Breites Querformat | 1536 × 1024 px |
 | `round-lid` | Runder Deckel | 1254 × 1254 px |
 
-Die drei Layouts besitzen eigene Kompositionen und verwenden je 22 PNGs: Basis, sieben Tageszeiten, sieben Wetterstufen und sieben Ornamentstufen. Der ruhige Mittelbereich dient der dynamischen Schrift. Helle Leseflächen erhalten die Lesbarkeit auch vor den dunklen Nacht- und Gewitterdarstellungen.
+Die drei Layouts besitzen eigene Kompositionen und verwenden je 29 PNGs. Himmel, Berge und fernes Tal liegen in `genetics` (zIndex 100), Wolken in `thc` (200), die seitlichen Bäume und nahen Bodenpflanzen in `foreground` (250), botanische Ornamente in `cbd` (300). So verdecken die Wolken nicht mehr die vorderen Bäume. Die Vordergründe besitzen echte Alpha-Transparenz und volle Canvas-Abmessungen. Die Ebenenliste erlaubt ihr separates Ausblenden und Verschieben; Vorschau, PNG und PDF verwenden dieselbe Reihenfolge.
 
-[Neun Beispielkombinationen ansehen](contact-sheet.png). Die Pack-Auswahl lädt kleine Vorschaubilder; das vollständige Pack wird erst beim ZIP-Export zusammengestellt und ist rund 102 MiB groß. Die ZIP-Importgrenze beträgt 128 MiB; die separaten Grenzen für Bildpixel, einzelne Dateien und entpackte Daten gelten weiterhin.
+Die Hintergründe wurden generativ um die zuvor verdeckten Landschaftsbereiche ergänzt und die Vordergründe separat freigestellt. Stil, Auflösung und Tageszeit bleiben erhalten; die Bearbeitung ist keine pixelidentische Zerlegung. Der ruhige Mittelbereich und die bestehenden Textpositionen bleiben nutzbar.
+
+[Neun Beispielkombinationen ansehen](contact-sheet.png). Die Pack-Auswahl lädt kleine Vorschaubilder; das vollständige Pack wird erst beim ZIP-Export zusammengestellt. Die ZIP-Importgrenze beträgt 160 MiB, die Grenze für entpackte Daten 192 MiB und das PNG-Pixelbudget 160 Mi-Pixel. Einzeldatei- und Eintragslimits gelten weiterhin.
 
 ## Herkunft und Weitergabe
 
 Die Generierung verwendet das integrierte Imagegen-Werkzeug. Die verwendeten Prompts werden in `PROMPTS.md` festgehalten. Hinweise zur Weitergabe stehen in `ASSET-LICENSE.txt`. Die mitgelieferte Lora-Schrift behält ihre eigene SIL Open Font License in `fonts/OFL.txt`.
 
 Beim manuellen Ändern der Grafiken oder des Manifests die Pack-Version erhöhen. Alte Versionen und ihre Assetdateien müssen erhalten bleiben, wenn bestehende Druckaufträge exakt reproduzierbar bleiben sollen.
+
+## Technische Prüfung der Version 1.1.0
+
+Am 6. November 2026 bestanden: vollständige Packvalidierung mit ZIP-Roundtrip (98 Dateien einschließlich Kontaktübersicht), 116 Node-Tests, statische Prüfung und die gesamte Browsersuite. Die Browserprüfung vergleicht die Landschaft-/Wetter-/Vordergrundkomposition in allen drei Layouts bei Nacht, Nachmittag und Morgen mit der erwarteten Zeichenreihenfolge; separate Sichtbarkeit, mobile Ebenenliste, gespeicherte Reihenfolge, PNG und PDF werden ebenfalls geprüft. Die Kontaktübersicht und Pack-Vorschaubilder wurden aus dem gemeinsamen Renderer neu erzeugt und visuell geprüft.
 
 ## Druck
 

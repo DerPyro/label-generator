@@ -1,4 +1,5 @@
-import { CONFIG, THRESHOLDS, LAYER_ORDER } from './config.js';
+import { CONFIG, THRESHOLDS, LIMITS } from './config.js';
+import { validateThresholds } from './scales.js';
 
 function number(value, label, min, max) {
   if ((typeof value === 'string' && !value.trim()) || value === null || value === undefined || typeof value === 'boolean') {
@@ -32,29 +33,35 @@ export function normalizeInput(input, config = CONFIG) {
 /** @returns {import('./types.d.ts').LayerLevel} */
 export function getLayerLevel(value, layer, thresholds = THRESHOLDS) {
  const boundaries=thresholds[layer];
- if(!Array.isArray(boundaries)||boundaries.length!==7||boundaries.some((n,i)=>!Number.isFinite(n)||(i>0&&n<=boundaries[i-1]))) throw new Error(`Ungültige siebenstufige Grenzwerte für ${layer}.`);
- if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>boundaries[6]) throw new Error(`Ungültiger Wert für ${layer}.`);
- return boundaries.findIndex(max=>value<=max)+1;
+ const rules=validateThresholds(boundaries,layer);
+ if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>(['genetics','foreground'].includes(layer)?100:LIMITS[layer])) throw new Error(`Ungültiger Wert für ${layer}.`);
+ return boundaries.findIndex(bound=>rules?bound.below===undefined||value<bound.below:value<=bound)+1;
 }
 
 export function selectLayers(input, config = CONFIG) {
  const model=normalizeInput(input,config);
  const result={base:{...config.base,id:'base',sources:[{path:config.base.path,weight:1}]}};
- for(const [id,value] of [['genetics',model.sativa],['thc',model.thc],['cbd',model.cbd]]) {
+ for(const [id,value] of [['genetics',model.sativa],['thc',model.thc],['cbd',model.cbd],...(Array.isArray(config.foreground)?[['foreground',model.sativa]]:[])]) {
   const level=getLayerLevel(value,id,config.thresholds||THRESHOLDS);
   const sprites=config[id];
-  if(!Array.isArray(sprites)||sprites.length!==7)throw new Error(`Für ${id} werden genau sieben Sprites benötigt.`);
+  if(!Array.isArray(sprites)||sprites.length!==(config.thresholds||THRESHOLDS)[id].length)throw new Error(`Für ${id} wird genau ein Sprite pro Stufe benötigt.`);
   const sprite=sprites.find(x=>x.level===level)||sprites[level-1];
   if(!sprite?.path)throw new Error(`Sprite ${id}/${level} fehlt.`);
-  result[id]={id,level,label:`${sprite.label||id} · Stufe ${level}/7`,path:sprite.path,assetPath:sprite.assetPath,sources:[{path:sprite.path,weight:1}],...(config.masks?.[id]?{mask:config.masks[id]}:{})};
+  result[id]={id,level,totalLevels:sprites.length,label:`${sprite.label||id} · Stufe ${level}/${sprites.length}`,path:sprite.path,assetPath:sprite.assetPath,sources:[{path:sprite.path,weight:1}],...(config.masks?.[id]?{mask:config.masks[id]}:{})};
  }
+ if(config.foreground&&!Array.isArray(config.foreground))result.foreground={...config.foreground,id:'foreground',sources:[{path:config.foreground.path,weight:1}],...(config.masks?.foreground?{mask:config.masks.foreground}:{})};
  if(config.masks?.base)result.base.mask=config.masks.base;
  return result;
 }
 
 export function getRenderPlan(input, config = CONFIG) {
  const model=normalizeInput(input,config);const selected=selectLayers(model,config);
- const order=config.layerOrder||LAYER_ORDER;
- if(order.length!==5||new Set(order).size!==5||order.some(id=>!LAYER_ORDER.includes(id)))throw new Error('Ungültige Layer-Reihenfolge.');
- return {input:model,assetVersion:config.assetVersion,packId:config.packId||config.id,packVersion:config.packVersion,layoutId:config.layoutId||config.format,width:config.width,height:config.height,levels:Object.fromEntries(['genetics','thc','cbd'].map(id=>[id,selected[id].level])),layers:order.map(id=>id==='text'?{id:'text',label:'Dynamischer Text',sources:[],...(config.masks?.text?{mask:config.masks.text}:{})}:selected[id])};
+ const fields=config.typography.fields;
+ const elements=(config.spriteOrder||Object.keys(selected)).map(id=>({...selected[id],type:'layer',category:id,zIndex:config.zIndex[id]}));
+ for(const field of fields)if(field.background)elements.push({...field.background,category:'text'});
+ elements.push(...config.typography.decorations.map(element=>({...element,category:'text'})));
+ elements.push(...fields.map(field=>({...field,type:'text',category:'text'})));
+ elements.forEach((element,index)=>{element.order=index;if(!Number.isInteger(element.zIndex)||Math.abs(element.zIndex)>10000)throw Error('Ungültiger zIndex.');});
+ elements.sort((a,b)=>a.zIndex-b.zIndex||a.order-b.order);
+ return {input:model,assetVersion:config.assetVersion,packId:config.packId||config.id,packVersion:config.packVersion,layoutId:config.layoutId||config.format,width:config.width,height:config.height,levels:Object.fromEntries(['genetics','thc','cbd',...(selected.foreground?.level?['foreground']:[])].map(id=>[id,selected[id].level])),layers:[...Object.values(selected),{id:'text',label:'Text & Dekoration',sources:[]}],elements};
 }

@@ -1,15 +1,17 @@
 import { Inflate, zipSync } from '../vendor/fflate.browser.js';
 import { validateManifest, validateAssetPath } from './texturepacks.js';
+import { layerAssetPath } from './scales.js';
 
 export const ARCHIVE_LIMITS = Object.freeze({
-  // The illustrated three-layout Watercolor Forest pack is about 102 MiB.
+  // Full illustrated packs may include seven foregrounds per layout as well.
   // Keep pixel, per-file and expanded-byte bounds independently enforced.
-  archiveBytes: 128 * 1024 * 1024,
-  totalBytes: 150 * 1024 * 1024,
+  archiveBytes: 160 * 1024 * 1024,
+  totalBytes: 192 * 1024 * 1024,
   files: 256,
   fileBytes: 16 * 1024 * 1024,
   manifestBytes: 256 * 1024,
-  decodedPixels: 128 * 1024 * 1024,
+  // Five full-canvas image layers, including Sativa-dependent foregrounds.
+  decodedPixels: 160 * 1024 * 1024,
   chunkBytes: 1024,
 });
 
@@ -154,8 +156,9 @@ function validateFiles(manifest, files) {
     return bytes;
   };
   for (const design of manifest.layouts) {
-    for (const path of [design.layers.base, ...design.layers.genetics, ...design.layers.thc, ...design.layers.cbd, ...Object.values(design.masks || {})]) pngInfo(requireFile(path), path, design);
+    for (const path of [design.layers.base, ...design.layers.genetics.map(layerAssetPath), ...design.layers.thc.map(layerAssetPath), ...design.layers.cbd.map(layerAssetPath), ...(design.layers.foreground?(Array.isArray(design.layers.foreground)?design.layers.foreground:[design.layers.foreground]).map(layerAssetPath):[]), ...Object.values(design.masks || {})]) pngInfo(requireFile(path), path, design);
   }
+  for(const design of manifest.layouts)for(const element of [...design.typography.decorations,...design.typography.fields.flatMap(field=>field.background?[field.background]:[])])if(element.asset)pngInfo(requireFile(element.asset),element.asset);
   for (const design of manifest.layouts) if (design.preview) pngInfo(requireFile(design.preview), design.preview);
   if (manifest.preview) pngInfo(requireFile(manifest.preview), manifest.preview);
   for (const font of manifest.fonts) fontInfo(requireFile(font.path), font.path);

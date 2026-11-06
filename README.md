@@ -4,6 +4,12 @@ v1 -> https://derpyro.github.io/label-generator/v1/index.html
 v2 -> https://derpyro.github.io/label-generator/v2/index.html
 v3 -> https://derpyro.github.io/label-generator/v3/
 
+## Eigene Texturepacks erstellen
+
+Texturepacks bestimmen das Design der Etiketten in v3. Eigene Layouts, PNG-Sprites, Schriftarten, Textpositionen, Hintergründe und Zeichenreihenfolgen lassen sich vollständig im Manifest definieren und als ZIP importieren.
+
+Die [vollständige Texturepack-Anleitung](v3/TEXTUREPACKS.md) erklärt das Format und den ZIP-Import. Das [funktionierende Beispieltexturepack](v3/examples/composition/README.md) demonstriert die Möglichkeiten; die [kleine Vorlage](v3/examples/template/README.md) dient als Ausgangspunkt. Für KI-Agenten gibt es eine [eigene Anleitung](v3/TEXTUREPACK_AI_GUIDE.md) und ein [JSON Schema](v3/schemas/texturepack.schema.json).
+
 ## Updating Search
 
 1. Run zamnesia-crawler.py or something else that collects data into a csv or json.
