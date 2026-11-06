@@ -59,7 +59,7 @@ export async function renderLabel(canvas,input,{config=CONFIG,visibility={}}={})
   Promise.all(plan.elements.map(element=>element.type==='layer'?Promise.all(element.sources.map(source=>loadImage(source.path,config))):element.type==='sprite'?loadImage(element.asset,config,false):null)),
   Promise.all(plan.elements.map(element=>config.masks?.[element.category]?loadImage(config.masks[element.category],config):null))
  ]);
- if(renderJobs.get(canvas)!==job)return {plan,textLayout:{},committed:false};
+ if(renderJobs.get(canvas)!==job)return {plan,textLayout:null,committed:false};
  const buffer=document.createElement('canvas');buffer.width=config.width;buffer.height=config.height;
  const ctx=buffer.getContext('2d');if(!ctx)throw Error('Canvas-Rendering ist in diesem Browser nicht verfügbar.');
  if(config.shape==='circle'){ctx.beginPath();ctx.arc(config.width/2,config.height/2,Math.min(config.width,config.height)/2,0,2*Math.PI);ctx.clip();}

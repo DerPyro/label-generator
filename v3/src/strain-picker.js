@@ -69,3 +69,4 @@ export function mountStrainPicker(root, onSelect) {
  else status.textContent=t('Sortenliste wird geladen …');
  },clear(){selectedName=null;input.value='';close();if(catalog.length)status.textContent=t(`${catalog.length.toLocaleString(locale())} Sorten verfügbar. Auswahl übernimmt die hinterlegten Werte.`);}};
 }
+

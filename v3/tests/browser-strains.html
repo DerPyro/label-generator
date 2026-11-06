@@ -45,3 +45,4 @@ await check('Eine fehlende CSV blockiert die manuelle Etikettenerstellung nicht'
 document.querySelector('#results').textContent=checks.join('\n');if(savedLanguage===null)localStorage.removeItem('label-generator-v3-language');else localStorage.setItem('label-generator-v3-language',savedLanguage);
 document.body.dataset.testStatus=checks.some(line=>line.startsWith('FAIL'))?'failed':'passed';
 </script></body></html>
+

@@ -1,32 +1,29 @@
-# Abnahme · Natural Boho 1.0.0
+# Abnahme · Natural Boho 1.1.0
 
-Geprüft am 6. November 2026 mit Node 26.2.0 und lokalem Chrome unter Windows.
+Geprüft am 6. November 2026 mit Node 26.2.0 und Chrome unter Windows.
 
-## Bestand und Integration
+## Neuer Vertrag
 
-- Zwei eigenständige native Layouts: 1024 × 1536 und 1254 × 1254.
-- 44 vollständige Layout-PNGs, vier zusätzliche dekorative PNGs, zwei echte lokale Schriftfamilien mit vollständigen OFL-Lizenzen.
-- RGBA mit 8 Bit, native Abmessungen und echte Alpha-Freiflächen geprüft. PNG-Normalisierung erhält die Bildinhalte pixelgenau.
-- Sieben unterschiedliche Pixelbilder pro dynamischer Kategorie. THC/CBD-Stufe 7 besitzt jeweils mehr bemalte Detailfläche als Stufe 1. Die tatsächlichen Engine-Grenzen sind geprüft.
-- Katalogeintrag und Beschreibung auf der Startseite ergänzt. Keine Änderungen an v1/v2 oder am Renderer, Warenkorb und Druckplaner für dieses Pack vorgenommen.
+- Beide Layouts verwenden explizite below/asset-Regeln für THC, CBD und Sativa. below ist exklusiv; die letzte Stufe ist ein Catch-all ohne below.
+- Alle sechs Grenzen je Kategorie und Layout wurden direkt darunter, exakt darauf und direkt darüber geprüft, zusätzlich 0 und der jeweilige Maximalwert.
+- Je Layout eine neu ausgefüllte Papierbasis und ein eigener freigestellter botanischer Vordergrund in nativer Canvas-Größe. Insgesamt 46 Layout-PNGs plus vier dekorative Sprites.
+- Reihenfolge: Papier 0 → Tageszeit 100 → Rauch 200 → botanischer Vordergrund 250 → CBD 300 → Textplaketten → Text 500 → kleines Vordergrundornament 600.
+- Alle PNGs sind 8-Bit-RGBA. Vordergründe besitzen echte Alpha-Freiflächen; dynamische Texte sind nicht eingebrannt. Schriftdateien und beide OFL-Lizenzen sind lokal enthalten.
 
-## Automatisierte Ergebnisse
+## Ergebnisse
 
-- `npm --prefix v3 test`: **101 Tests bestanden**, keine Fehler.
-- Nach der abschließenden Anpassung von Schriftgrößen und Medaillon-Schichtung: die drei packspezifischen Tests erneut bestanden.
-- `npm --prefix v3 run check`: **vier Packs, 242 RGBA-Layout-Sprites** und lokale Schriftdateien erfolgreich geprüft.
-- `npm --prefix v3 run test:browser`: **24 allgemeine Browserprüfungen bestanden**, einschließlich gemeinsamer Vorschau-/PNG-/PDF-Komposition, Typografie, Import, Druck und Oberflächenbedienung.
-- `tests/natural-boho-review.html`: abschließende **fünf Prüfgruppen bestanden**. Alle 42 dynamischen Einzelstufen, sechs niedrige/mittlere/hohe Mischkompositionen, kurze/lange Namen, Umlaute und lange Produzenten rendern erfolgreich.
-- PNGs aus beiden Layouts wurden dekodiert und mit der Vorschau pixelgenau verglichen. Die runde PNG-Ausgabe besitzt transparente Ecken.
-- Beide Layouts wurden über den normalen Renderer auf einen gemeinsamen A4-PDF-Bogen exportiert; Seitenzahl und physische Proportionen stimmen.
-- ZIP-Export, Prüfung, echter IndexedDB-Import, Blob-Rendering und Reexport bestanden. Beide importierten Layouts sind zur mitgelieferten Version pixelgleich; beide Fontlizenzen und Assetlizenz bleiben enthalten.
-- Zusätzlich wurde die ZIP-Datei über den echten Datei-Input der Oberfläche importiert und beide Layouts ausgewählt. Dafür wurde eine zufällige private Test-ID verwendet, weil mitgelieferte ID-/Versionspaare absichtlich geschützt sind. Temporäre Importdaten werden wieder entfernt.
-- Die CLI `validate-pack.js` prüft das vollständige ausgelieferte ZIP samt Manifest, PNGs, Fonts und Limits.
+- 116 Node-Tests bestanden; keine Fehler. Darunter vier Natural-Boho-Prüfungen sowie Tests für eigene Skalen, Vordergrund, Typografie, ZIP, Druck und bestehende Packs.
+- Statische Prüfung des isolierten Releases: vier Packs und 244 RGBA-Layout-Sprites erfolgreich geprüft. Der parallele lokale Watercolor-Umbau ist nicht Bestandteil dieses gezielten Releases.
+- Allgemeine Browserprüfung bestanden, einschließlich Ebenensortierung, Warenkorb, PNG/PDF, Typografie und Import.
+- Deutsch-/Englisch-Browserprüfung bestanden; Sprachwechsel verändert Grafik, Warenkorb und Druckgeometrie nicht.
+- Natural-Boho-Browserabnahme bestanden: alle 42 Einzelstufen, ausgewählte niedrige/mittlere/hohe Kombinationen, kurze und lange Namen, Umlaute, PNG-Pixelgleichheit und transparente Kreisecken.
+- Beide Layouts erfolgreich über den gemeinsamen Renderer auf einen maßstäblichen A4-PDF-Bogen exportiert.
+- ZIP-Export, echter IndexedDB-Import, Blob-Rendering und Reexport bestanden. Beide Layouts bleiben pixelgleich und die Lizenzen erhalten.
+- Natural Boho 1.1.0 im echten Dropdown gewählt, beide Layouts gerendert und die separate Vordergrundebene in der Oberfläche nachgewiesen (tests/natural-boho-selection.html).
+- Abschließender CLI-ZIP-Roundtrip samt Manifest, PNGs, Fonts und Limits erfolgreich.
 
-Die Chrome-DevTools-Verbindung war innerhalb der Ausführungssandbox blockiert. Beide Browserprüfungen wurden anschließend außerhalb dieser Sandbox erfolgreich ausgeführt; die Seite und sämtliche Packassets kamen vom lokalen Server.
+## Grenzen der Prüfung
 
-## Visuelle Prüfung
+Die Einzelstufen und ausgewählten Kombinationen wurden geprüft, nicht alle 343 Mischungen je Layout visuell verglichen. Kein physischer Probedruck. Die PDF-Prüfung kontrolliert Export und Geometrie über den gemeinsamen Renderer, ohne zusätzliche Rasterisierung durch einen unabhängigen PDF-Viewer.
 
-`contact-sheet.png` und `stage-sheet.png` wurden nach der letzten Typografieanpassung visuell geprüft. Die Papierbasis, Handschrift, Pilze, Farbpalette und Textfreiflächen sind konsistent. Nacht, Dämmerung, Sonnenaufgang und Sonnentag sind unterscheidbar. Zusätzliche Pflanzen in frühen runden Rauchentwürfen wurden durch reine Rauchbilder ersetzt. Das runde Textmedaillon liegt unter den Werterschildern; die Werte wurden für die Drucklesbarkeit vergrößert. Es sind keine dynamischen Texte in den Illustrationen eingebrannt.
-
-Die Tests decken alle Einzelstufen und ausgewählte Mischungen ab; sie sind kein visueller Vollvergleich aller 343 Kombinationen pro Layout. Ein physischer Druck auf einem konkreten Drucker wurde nicht durchgeführt. Die PDF-Prüfung kontrolliert Export, gemeinsame Renderpipeline und Geometrie, ohne zusätzliche Rasterisierung des fertigen PDF durch einen unabhängigen PDF-Viewer.
+Die aufwendige öffentliche Vollprüfung von Version 1.0.0 erreichte ihr Zeitlimit beim Herunterladen der Assets. Die gezielte Auswahlprüfung ist davon unabhängig; ihr Ergebnis wird nach der Veröffentlichung separat geprüft. Lokale Browserprüfungen liefen außerhalb der Ausführungssandbox, da Chrome darin keine DevTools-Verbindung aufbauen konnte.
