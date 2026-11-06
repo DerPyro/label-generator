@@ -12,15 +12,11 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="app-header">
-      <a class="brand" href="./" aria-label="Wald und Papier Startseite"><span class="brand-mark" aria-hidden="true">✳</span><span>Wald & Papier<small>ETIKETTENWERKSTATT</small></span></a>
-      <span class="version">V3 <span>·</span> Prototyp</span>
-    </header>
     <nav class="section-nav" aria-label="Bereiche"><a href="#editor-title">Etikett</a><a href="#cart-title">Druckwarenkorb <span id="cart-count">0</span></a><a href="#print-title">Druckbogen</a><a href="#packs-title">Texturepacks</a></nav>
     <p id="app-notice" class="notice" role="status" hidden></p>
     <main class="workspace">
       <section class="editor" aria-labelledby="editor-title">
-        <div class="intro"><p class="eyebrow">DEINE ERNTE. DEIN ETIKETT.</p><h1 id="editor-title">Ein kleines Stück <br>Wald fürs Glas.</h1><p>Eine Sorte, ihre Werte und ein Etikett, das daraus entsteht.</p></div>
+        <h1 id="editor-title" class="visually-hidden">Etikett gestalten</h1>
         <form id="label-form" novalidate>
           <fieldset><legend>Texturepack & Layout</legend><div class="percent-grid"><div class="field"><label for="pack">Texturepack</label><select id="pack" name="pack" disabled><option>Lade Packs …</option></select></div><div class="field"><label for="layout">Etikettenlayout</label><select id="layout" name="layout" disabled><option value="">Lade Layouts …</option></select></div></div><div id="layout-gallery" class="layout-gallery" role="group" aria-label="Verfügbare Layouts mit Vorschau"></div></fieldset>
           <fieldset><legend><span>01</span> Sorte & Ernte</legend>
