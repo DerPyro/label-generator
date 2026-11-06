@@ -3,6 +3,7 @@
 <body style="font:15px system-ui;margin:2rem;background:#f3eee3;color:#21382d"><h1>Sortensuche in v3</h1><pre id="results">Prüfung läuft …</pre>
 <script type="module">
 import { mountStrainPicker } from '../src/strain-picker.js';
+const savedLanguage=localStorage.getItem('label-generator-v3-language');localStorage.setItem('label-generator-v3-language','de');
 const checks=[],assert=(ok,message)=>{if(!ok)throw Error(message);};
 async function until(fn){for(let i=0;i<500;i++){if(fn())return;await new Promise(resolve=>setTimeout(resolve,20));}throw Error('Zeitüberschreitung');}
 async function check(name,fn){try{await fn();checks.push('PASS '+name);}catch(error){checks.push('FAIL '+name+': '+error.message);}document.querySelector('#results').textContent=checks.join('\n');}
@@ -41,5 +42,7 @@ await check('Eine fehlende CSV blockiert die manuelle Etikettenerstellung nicht'
  try{globalThis.fetch=async()=>({ok:false,status:404});const picker=mountStrainPicker(wrapper,()=>{throw Error('Unerwartete Auswahl');});await picker.ready;assert(wrapper.querySelector('#strain-status').textContent.includes('manuell'),'Kein verständlicher Ausweichhinweis');assert(wrapper.querySelector('#strain-search').disabled,'Fehlgeschlagene Suche aktiv');}
  finally{globalThis.fetch=originalFetch;wrapper.remove();}
 });
-document.querySelector('#results').textContent=checks.join('\n');document.body.dataset.testStatus=checks.some(line=>line.startsWith('FAIL'))?'failed':'passed';
+document.querySelector('#results').textContent=checks.join('\n');if(savedLanguage===null)localStorage.removeItem('label-generator-v3-language');else localStorage.setItem('label-generator-v3-language',savedLanguage);
+document.body.dataset.testStatus=checks.some(line=>line.startsWith('FAIL'))?'failed':'passed';
 </script></body></html>
+

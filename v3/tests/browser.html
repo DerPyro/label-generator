@@ -13,6 +13,7 @@ import { inspectPackArchive,buildPackArchive } from '../src/pack-archive.js';
 import { layoutSheets,generatePdf,configKey,getPhysicalSize,MM_TO_PT } from '../src/print.js';
 import { SheetEditor } from '../src/sheet-editor.js';
 import { PDFDocument } from '../vendor/pdf-lib.esm.min.js';
+const savedLanguage=localStorage.getItem('label-generator-v3-language');localStorage.setItem('label-generator-v3-language','de');
 const sample={name:'Super Silver Haze',producer:'Royal Queen Seeds',year:2026,sativa:75,thc:20,cbd:3};
 const canvas=document.querySelector('canvas'),checks=[],manager=new TexturePackManager(),configs=new Map();
 const assert=(ok,message)=>{if(!ok)throw Error(message);};
@@ -231,5 +232,7 @@ await check('Ein-Layout-ZIP: dynamische Auswahl, vergleichbarer Packwechsel, Neu
  }finally{frame.remove();await store.remove(id,version);store.close();if(original===null)localStorage.removeItem(key);else localStorage.setItem(key,original);}
 });
 await renderLabel(canvas,sample,{config:circle()});
+if(savedLanguage===null)localStorage.removeItem('label-generator-v3-language');else localStorage.setItem('label-generator-v3-language',savedLanguage);
 document.body.dataset.testStatus=checks.some(x=>x.startsWith('FAIL'))?'failed':'passed';
 </script></body></html>
+

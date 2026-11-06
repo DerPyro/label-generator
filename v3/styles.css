@@ -760,3 +760,9 @@ button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible { 
 .layer-move { width:34px; height:36px; padding:0; border:1px solid var(--line); border-radius:4px; background:var(--input-bg); color:var(--accent); font:18px system-ui; cursor:pointer; }
 .layer-move:hover:enabled { background:var(--hover-bg); }
 .layer-move:disabled { opacity:.35; cursor:default; }
+
+.section-nav { align-items:center; }
+.language-toggle { margin-left:auto; padding:7px 12px; border:1px solid var(--line); border-radius:5px; background:var(--input-bg); color:var(--accent); font:600 12px system-ui; cursor:pointer; }
+.language-toggle:hover { background:var(--hover-bg); }
+@media(max-width:480px) { .section-nav { gap:10px 16px; } }
+
